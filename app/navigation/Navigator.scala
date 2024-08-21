@@ -24,11 +24,47 @@ import pages._
 import models._
 
 @Singleton
-class Navigator @Inject()() {
+class Navigator @Inject() {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case _ => _ => routes.IndexController.onPageLoad()
+    case PrimaryContactNamePage           => _ => routes.PrimaryContactEmailAddressController.onPageLoad(NormalMode)
+    case PrimaryContactEmailAddressPage   => _ => routes.CanPhonePrimaryContactController.onPageLoad(NormalMode)
+    case CanPhonePrimaryContactPage       => canPhonePrimaryContactRoute
+    case PrimaryContactPhoneNumberPage    => _ => routes.PrimaryContactUpdatedController.onPageLoad()
+    case HasSecondaryContactPage          => hasSecondaryContactRoute
+    case SecondaryContactNamePage         => _ => routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode)
+    case SecondaryContactEmailAddressPage => _ => routes.CanPhoneSecondaryContactController.onPageLoad(NormalMode)
+    case CanPhoneSecondaryContactPage     => canPhoneSecondaryContactRoute
+    case SecondaryContactPhoneNumberPage  => _ => routes.SecondaryContactUpdatedController.onPageLoad()
+    case IndividualEmailAddressPage       => _ => routes.IndividualEmailAddressUpdatedController.onPageLoad()
+    case CanPhoneIndividualPage           => canPhoneIndividualRoute
+    case IndividualPhoneNumberPage        => _ => routes.IndividualPhoneNumberUpdatedController.onPageLoad()
+    case _                                => _ => routes.IndexController.onPageLoad()
   }
+
+  private def canPhonePrimaryContactRoute(answers: UserAnswers): Call =
+    answers.get(CanPhonePrimaryContactPage).map {
+      case true => routes.PrimaryContactPhoneNumberController.onPageLoad(NormalMode)
+      case false => routes.PrimaryContactUpdatedController.onPageLoad()
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+
+  private def hasSecondaryContactRoute(answers: UserAnswers): Call =
+    answers.get(HasSecondaryContactPage).map {
+      case true => routes.SecondaryContactNameController.onPageLoad(NormalMode)
+      case false => routes.SecondaryContactUpdatedController.onPageLoad()
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+
+  private def canPhoneSecondaryContactRoute(answers: UserAnswers): Call =
+    answers.get(CanPhoneSecondaryContactPage).map {
+      case true => routes.SecondaryContactPhoneNumberController.onPageLoad(NormalMode)
+      case false => routes.SecondaryContactUpdatedController.onPageLoad()
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
+
+  private def canPhoneIndividualRoute(answers: UserAnswers): Call =
+    answers.get(CanPhoneIndividualPage).map {
+      case true => routes.IndividualPhoneNumberController.onPageLoad(NormalMode)
+      case false => routes.IndividualPhoneNumberRemovedController.onPageLoad()
+    }.getOrElse(routes.JourneyRecoveryController.onPageLoad())
 
   private val checkRouteMap: Page => UserAnswers => Call = {
     case _ => _ => routes.CheckYourAnswersController.onPageLoad()
