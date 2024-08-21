@@ -30,10 +30,11 @@
     hmrcTimeoutDialog: HmrcTimeoutDialog,
     hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
     hmrcScripts: HmrcScripts,
-    alphaBanner: StandardAlphaBanner
+    alphaBanner: StandardAlphaBanner,
+    defaultLayout: TwoThirdsMainContent
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, mainContentLayout: Option[Html => Html] = Some(defaultLayout(_)))(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
 
@@ -95,5 +96,6 @@
     footerBlock        = Some(hmrcStandardFooter()),
     scriptsBlock       = Some(hmrcScripts(
         scriptsBlock = Some(additionalScripts)
-    ))
+    )),
+    mainContentLayout = mainContentLayout
 )(content)

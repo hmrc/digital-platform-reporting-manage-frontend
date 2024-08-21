@@ -1,4 +1,4 @@
-service.name = digital-platform-reporting-manage-frontend
+service.name = Digital Platforms Reporting Service
 
 site.back = Back
 site.remove = Remove
@@ -27,9 +27,15 @@ error.title.prefix = Error:
 error.prefix = Error
 error.summary.title = There is a problem
 
-index.title = digital-platform-reporting-manage-frontend
-index.heading = digital-platform-reporting-manage-frontend
-index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
+index.title = Manage your Digital Platform Reporting
+index.heading = Manage your Digital Platform Reporting
+index.guidance.1 = Manage your reporting for the Digital Platform Reporting (DPR) service. You can also
+index.guidance.link = refer to the technical guidance (opens in new tab)
+index.guidance.2 = for more information.
+index.contactDetails.heading = Contact Details
+index.contactDetails.p = View or change the contact details you entered when registering for this service.
+index.contactDetails.actions.view = View contact details
+index.contactDetails.actions.change = Change contact details
 
 checkYourAnswers.title = Check your answers
 checkYourAnswers.heading = Check your answers
