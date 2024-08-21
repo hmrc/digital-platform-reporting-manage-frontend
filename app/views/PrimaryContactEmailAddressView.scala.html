@@ -34,10 +34,14 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        <h1 class="govuk-heading-xl">@messages("primaryContactEmailAddress.heading")</h1>
+
+        <p class="govuk-body">@messages("primaryContactEmailAddress.p1")</p>
+
         @govukInput(
             InputViewModel(
                 field = form("value"),
-                label = LabelViewModel(messages("primaryContactEmailAddress.heading")).asPageHeading()
+                label = LabelViewModel(messages("primaryContactEmailAddress.heading")).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Full)
         )

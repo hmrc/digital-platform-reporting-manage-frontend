@@ -32,10 +32,14 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
+        <h1 class="govuk-heading-xl">@messages("canPhoneSecondaryContact.heading")</h1>
+
+        <p class="govuk-body">@messages("canPhoneSecondaryContact.p1")</p>
+
         @govukRadios(
             RadiosViewModel.yesNo(
                 field = form("value"),
-                legend = LegendViewModel(messages("canPhoneSecondaryContact.heading")).asPageHeading()
+                legend = LegendViewModel(messages("canPhoneSecondaryContact.heading")).withCssClass("govuk-visually-hidden")
             )
         )
 
