@@ -47,3 +47,98 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+
+canPhoneIndividual.title = canPhoneIndividual
+canPhoneIndividual.heading = canPhoneIndividual
+canPhoneIndividual.checkYourAnswersLabel = canPhoneIndividual
+canPhoneIndividual.error.required = Select yes if canPhoneIndividual
+canPhoneIndividual.change.hidden = CanPhoneIndividual
+
+canPhonePrimaryContact.title = canPhonePrimaryContact
+canPhonePrimaryContact.heading = canPhonePrimaryContact
+canPhonePrimaryContact.checkYourAnswersLabel = canPhonePrimaryContact
+canPhonePrimaryContact.error.required = Select yes if canPhonePrimaryContact
+canPhonePrimaryContact.change.hidden = CanPhonePrimaryContact
+
+canPhoneSecondaryContact.title = canPhoneSecondaryContact
+canPhoneSecondaryContact.heading = canPhoneSecondaryContact
+canPhoneSecondaryContact.checkYourAnswersLabel = canPhoneSecondaryContact
+canPhoneSecondaryContact.error.required = Select yes if canPhoneSecondaryContact
+canPhoneSecondaryContact.change.hidden = CanPhoneSecondaryContact
+
+hasSecondaryContact.title = hasSecondaryContact
+hasSecondaryContact.heading = hasSecondaryContact
+hasSecondaryContact.checkYourAnswersLabel = hasSecondaryContact
+hasSecondaryContact.error.required = Select yes if hasSecondaryContact
+hasSecondaryContact.change.hidden = HasSecondaryContact
+
+individualEmailAddress.title = individualEmailAddress
+individualEmailAddress.heading = individualEmailAddress
+individualEmailAddress.checkYourAnswersLabel = individualEmailAddress
+individualEmailAddress.error.required = Enter individualEmailAddress
+individualEmailAddress.error.length = IndividualEmailAddress must be 132 characters or less
+individualEmailAddress.change.hidden = IndividualEmailAddress
+
+individualEmailAddressUpdated.title = individualEmailAddressUpdated
+individualEmailAddressUpdated.heading = individualEmailAddressUpdated
+
+individualPhoneNumber.title = individualPhoneNumber
+individualPhoneNumber.heading = individualPhoneNumber
+individualPhoneNumber.checkYourAnswersLabel = individualPhoneNumber
+individualPhoneNumber.error.required = Enter individualPhoneNumber
+individualPhoneNumber.error.length = IndividualPhoneNumber must be 24 characters or less
+individualPhoneNumber.change.hidden = IndividualPhoneNumber
+
+individualPhoneNumberRemoved.title = individualPhoneNumberRemoved
+individualPhoneNumberRemoved.heading = individualPhoneNumberRemoved
+
+individualPhoneNumberUpdated.title = individualPhoneNumberUpdated
+individualPhoneNumberUpdated.heading = individualPhoneNumberUpdated
+
+primaryContactEmailAddress.title = primaryContactEmailAddress
+primaryContactEmailAddress.heading = primaryContactEmailAddress
+primaryContactEmailAddress.checkYourAnswersLabel = primaryContactEmailAddress
+primaryContactEmailAddress.error.required = Enter primaryContactEmailAddress
+primaryContactEmailAddress.error.length = PrimaryContactEmailAddress must be 132 characters or less
+primaryContactEmailAddress.change.hidden = PrimaryContactEmailAddress
+
+primaryContactName.title = primaryContactName
+primaryContactName.heading = primaryContactName
+primaryContactName.checkYourAnswersLabel = primaryContactName
+primaryContactName.error.required = Enter primaryContactName
+primaryContactName.error.length = PrimaryContactName must be 105 characters or less
+primaryContactName.change.hidden = PrimaryContactName
+
+primaryContactPhoneNumber.title = primaryContactPhoneNumber
+primaryContactPhoneNumber.heading = primaryContactPhoneNumber
+primaryContactPhoneNumber.checkYourAnswersLabel = primaryContactPhoneNumber
+primaryContactPhoneNumber.error.required = Enter primaryContactPhoneNumber
+primaryContactPhoneNumber.error.length = PrimaryContactPhoneNumber must be 24 characters or less
+primaryContactPhoneNumber.change.hidden = PrimaryContactPhoneNumber
+
+primaryContactUpdated.title = primaryContactUpdated
+primaryContactUpdated.heading = primaryContactUpdated
+
+secondaryContactEmailAddress.title = secondaryContactEmailAddress
+secondaryContactEmailAddress.heading = secondaryContactEmailAddress
+secondaryContactEmailAddress.checkYourAnswersLabel = secondaryContactEmailAddress
+secondaryContactEmailAddress.error.required = Enter secondaryContactEmailAddress
+secondaryContactEmailAddress.error.length = SecondaryContactEmailAddress must be 132 characters or less
+secondaryContactEmailAddress.change.hidden = SecondaryContactEmailAddress
+
+secondaryContactName.title = secondaryContactName
+secondaryContactName.heading = secondaryContactName
+secondaryContactName.checkYourAnswersLabel = secondaryContactName
+secondaryContactName.error.required = Enter secondaryContactName
+secondaryContactName.error.length = SecondaryContactName must be 105 characters or less
+secondaryContactName.change.hidden = SecondaryContactName
+
+secondaryContactPhoneNumber.title = secondaryContactPhoneNumber
+secondaryContactPhoneNumber.heading = secondaryContactPhoneNumber
+secondaryContactPhoneNumber.checkYourAnswersLabel = secondaryContactPhoneNumber
+secondaryContactPhoneNumber.error.required = Enter secondaryContactPhoneNumber
+secondaryContactPhoneNumber.error.length = SecondaryContactPhoneNumber must be 24 characters or less
+secondaryContactPhoneNumber.change.hidden = SecondaryContactPhoneNumber
+
+secondaryContactUpdated.title = secondaryContactUpdated
+secondaryContactUpdated.heading = secondaryContactUpdated
