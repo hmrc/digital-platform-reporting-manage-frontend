@@ -21,11 +21,11 @@ import play.api.data.FormError
 
 class SecondaryContactPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
-  val requiredKey = "secondaryContactPhoneNumber.error.required"
-  val lengthKey = "secondaryContactPhoneNumber.error.length"
-  val maxLength = 24
-
-  val form = new SecondaryContactPhoneNumberFormProvider()()
+  private val requiredKey = "secondaryContactPhoneNumber.error.required"
+  private val lengthKey = "secondaryContactPhoneNumber.error.length"
+  private val maxLength = 24
+  private val contactName = "name"
+  private val form = new SecondaryContactPhoneNumberFormProvider()(contactName)
 
   ".value" - {
 
@@ -41,13 +41,13 @@ class SecondaryContactPhoneNumberFormProviderSpec extends StringFieldBehaviours 
       form,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength, contactName))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(contactName))
     )
   }
 }

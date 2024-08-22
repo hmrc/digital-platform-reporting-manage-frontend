@@ -18,16 +18,16 @@ package controllers
 
 import controllers.actions._
 import forms.CanPhoneSecondaryContactFormProvider
-import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.CanPhoneSecondaryContactPage
+import pages.{CanPhoneSecondaryContactPage, SecondaryContactNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CanPhoneSecondaryContactView
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CanPhoneSecondaryContactController @Inject()(
@@ -40,33 +40,40 @@ class CanPhoneSecondaryContactController @Inject()(
                                          formProvider: CanPhoneSecondaryContactFormProvider,
                                          val controllerComponents: MessagesControllerComponents,
                                          view: CanPhoneSecondaryContactView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
-  val form = formProvider()
+                                 )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
+      getAnswer(SecondaryContactNamePage) { contactName =>
 
-      val preparedForm = request.userAnswers.get(CanPhoneSecondaryContactPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+        val form = formProvider(contactName)
+
+        val preparedForm = request.userAnswers.get(CanPhoneSecondaryContactPage) match {
+          case None => form
+          case Some(value) => form.fill(value)
+        }
+
+        Ok(view(preparedForm, mode, contactName))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getAnswerAsync(SecondaryContactNamePage) { contactName =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+        val form = formProvider(contactName)
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(CanPhoneSecondaryContactPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(CanPhoneSecondaryContactPage, mode, updatedAnswers))
-      )
+        form.bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode, contactName))),
+
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(CanPhoneSecondaryContactPage, value))
+              _ <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(CanPhoneSecondaryContactPage, mode, updatedAnswers))
+        )
+      }
   }
 }
