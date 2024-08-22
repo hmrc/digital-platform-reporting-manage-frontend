@@ -43,7 +43,7 @@ class AuthenticatedIdentifierAction @Inject()(
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised().retrieve(Retrievals.internalId and Retrievals.allEnrolments) {
+    authorised(Enrolment("HMRC-DPRS")).retrieve(Retrievals.internalId and Retrievals.authorisedEnrolments) {
       case Some(internalId) ~ enrolments =>
         getEnrolment(enrolments).map { dprsId =>
           block(IdentifierRequest(request, internalId, dprsId))
