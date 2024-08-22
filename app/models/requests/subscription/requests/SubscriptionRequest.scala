@@ -19,11 +19,13 @@ package models.requests.subscription.requests
 import models.requests.subscription.Contact
 import play.api.libs.json._
 
-final case class SubscriptionRequest(safeId: String,
-                                     gbUser: Boolean,
-                                     tradingName: Option[String],
-                                     primaryContact: Contact,
-                                     secondaryContact: Option[Contact])
+final case class SubscriptionRequest(
+                                      id: String,
+                                      gbUser: Boolean,
+                                      tradingName: Option[String],
+                                      primaryContact: Contact,
+                                      secondaryContact: Option[Contact]
+                                    )
 
 object SubscriptionRequest {
 
