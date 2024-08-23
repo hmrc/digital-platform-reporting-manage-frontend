@@ -16,8 +16,7 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.SecondaryContactPhoneNumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -33,11 +32,7 @@ object SecondaryContactPhoneNumberSummary  {
 
         SummaryListRowViewModel(
           key     = "secondaryContactPhoneNumber.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.SecondaryContactPhoneNumberController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("secondaryContactPhoneNumber.change.hidden"))
-          )
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString)
         )
     }
 }

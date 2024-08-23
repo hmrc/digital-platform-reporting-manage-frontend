@@ -21,10 +21,10 @@ import play.api.data.FormError
 
 class CanPhoneSecondaryContactFormProviderSpec extends BooleanFieldBehaviours {
 
-  val requiredKey = "canPhoneSecondaryContact.error.required"
-  val invalidKey = "error.boolean"
-
-  val form = new CanPhoneSecondaryContactFormProvider()()
+  private val requiredKey = "canPhoneSecondaryContact.error.required"
+  private val invalidKey = "error.boolean"
+  private val contactName = "name"
+  private val form = new CanPhoneSecondaryContactFormProvider()(contactName)
 
   ".value" - {
 
@@ -33,13 +33,13 @@ class CanPhoneSecondaryContactFormProviderSpec extends BooleanFieldBehaviours {
     behave like booleanField(
       form,
       fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+      invalidError = FormError(fieldName, invalidKey, Seq(contactName))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey)
+      requiredError = FormError(fieldName, requiredKey, Seq(contactName))
     )
   }
 }

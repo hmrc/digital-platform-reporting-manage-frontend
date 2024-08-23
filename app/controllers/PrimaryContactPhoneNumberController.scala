@@ -18,10 +18,11 @@ package controllers
 
 import controllers.actions._
 import forms.PrimaryContactPhoneNumberFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
-import pages.PrimaryContactPhoneNumberPage
+import pages.{PrimaryContactNamePage, PrimaryContactPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
@@ -40,33 +41,40 @@ class PrimaryContactPhoneNumberController @Inject()(
                                         formProvider: PrimaryContactPhoneNumberFormProvider,
                                         val controllerComponents: MessagesControllerComponents,
                                         view: PrimaryContactPhoneNumberView
-                                    )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
-
-  val form = formProvider()
+                                    )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with AnswerExtractor {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
+      getAnswer(PrimaryContactNamePage) { contactName =>
 
-      val preparedForm = request.userAnswers.get(PrimaryContactPhoneNumberPage) match {
-        case None => form
-        case Some(value) => form.fill(value)
+        val form = formProvider(contactName)
+
+        val preparedForm = request.userAnswers.get(PrimaryContactPhoneNumberPage) match {
+          case None => form
+          case Some(value) => form.fill(value)
+        }
+
+        Ok(view(preparedForm, mode, contactName))
       }
-
-      Ok(view(preparedForm, mode))
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
+      getAnswerAsync(PrimaryContactNamePage) { contactName =>
 
-      form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(formWithErrors, mode))),
+        val form = formProvider(contactName)
 
-        value =>
-          for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactPhoneNumberPage, value))
-            _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PrimaryContactPhoneNumberPage, mode, updatedAnswers))
-      )
+        form.bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(formWithErrors, mode, contactName))),
+
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactPhoneNumberPage, value))
+              _ <- sessionRepository.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(PrimaryContactPhoneNumberPage, mode, updatedAnswers))
+        )
+      }
   }
 }

@@ -24,7 +24,7 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], mode: Mode, contactName: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("primaryContactEmailAddress.title"))) {
 
@@ -34,7 +34,7 @@
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        <h1 class="govuk-heading-xl">@messages("primaryContactEmailAddress.heading")</h1>
+        <h1 class="govuk-heading-xl">@messages("primaryContactEmailAddress.heading", contactName)</h1>
 
         <p class="govuk-body">@messages("primaryContactEmailAddress.p1")</p>
 

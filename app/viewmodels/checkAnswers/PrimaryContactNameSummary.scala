@@ -16,8 +16,7 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.PrimaryContactNamePage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -33,11 +32,7 @@ object PrimaryContactNameSummary  {
 
         SummaryListRowViewModel(
           key     = "primaryContactName.checkYourAnswersLabel",
-          value   = ValueViewModel(HtmlFormat.escape(answer).toString),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.PrimaryContactNameController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("primaryContactName.change.hidden"))
-          )
+          value   = ValueViewModel(HtmlFormat.escape(answer).toString)
         )
     }
 }

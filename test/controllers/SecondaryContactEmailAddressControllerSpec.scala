@@ -18,12 +18,12 @@ package controllers
 
 import base.SpecBase
 import forms.SecondaryContactEmailAddressFormProvider
-import models.{NormalMode, UserAnswers}
+import models.NormalMode
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
-import pages.SecondaryContactEmailAddressPage
+import pages.{SecondaryContactEmailAddressPage, SecondaryContactNamePage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -35,18 +35,19 @@ import scala.concurrent.Future
 
 class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val onwardRoute = Call("GET", "/foo")
+  private val contactName = "name"
+  private val formProvider = new SecondaryContactEmailAddressFormProvider()
+  private val form = formProvider(contactName)
+  private val baseAnswers = emptyUserAnswers.set(SecondaryContactNamePage, contactName).success.value
 
-  val formProvider = new SecondaryContactEmailAddressFormProvider()
-  val form = formProvider()
-
-  lazy val secondaryContactEmailAddressRoute = routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode).url
+  private lazy val secondaryContactEmailAddressRoute = routes.SecondaryContactEmailAddressController.onPageLoad(NormalMode).url
 
   "SecondaryContactEmailAddress Controller" - {
 
     "must return OK and the correct view for a GET" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request = FakeRequest(GET, secondaryContactEmailAddressRoute)
@@ -56,13 +57,13 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
         val view = application.injector.instanceOf[SecondaryContactEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, NormalMode, contactName)(request, messages(application)).toString
       }
     }
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = UserAnswers(userAnswersId).set(SecondaryContactEmailAddressPage, "answer").success.value
+      val userAnswers = baseAnswers.set(SecondaryContactEmailAddressPage, "answer").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -74,7 +75,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, contactName)(request, messages(application)).toString
       }
     }
 
@@ -85,7 +86,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(baseAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository)
@@ -106,7 +107,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
 
     "must return a Bad Request and errors when invalid data is submitted" in {
 
-      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      val application = applicationBuilder(userAnswers = Some(baseAnswers)).build()
 
       running(application) {
         val request =
@@ -120,7 +121,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, NormalMode, contactName)(request, messages(application)).toString
       }
     }
 

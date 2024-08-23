@@ -23,8 +23,8 @@ import play.api.data.Form
 
 class HasSecondaryContactFormProvider @Inject() extends Mappings {
 
-  def apply(): Form[Boolean] =
+  def apply(contactName: String): Form[Boolean] =
     Form(
-      "value" -> boolean("hasSecondaryContact.error.required")
+      "value" -> boolean("hasSecondaryContact.error.required", args = Seq(contactName))
     )
 }

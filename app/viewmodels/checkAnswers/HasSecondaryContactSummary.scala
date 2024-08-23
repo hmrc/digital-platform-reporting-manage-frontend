@@ -16,8 +16,7 @@
 
 package viewmodels.checkAnswers
 
-import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.UserAnswers
 import pages.HasSecondaryContactPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -34,11 +33,7 @@ object HasSecondaryContactSummary  {
 
         SummaryListRowViewModel(
           key     = "hasSecondaryContact.checkYourAnswersLabel",
-          value   = ValueViewModel(value),
-          actions = Seq(
-            ActionItemViewModel("site.change", routes.HasSecondaryContactController.onPageLoad(CheckMode).url)
-              .withVisuallyHiddenText(messages("hasSecondaryContact.change.hidden"))
-          )
+          value   = ValueViewModel(value)
         )
     }
 }
