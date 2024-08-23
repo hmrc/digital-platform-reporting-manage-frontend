@@ -14,16 +14,23 @@
  * limitations under the License.
  *@
 
+@import viewmodels.ContactDetailsIndividualViewModel
+
 @this(
-    layout: templates.Layout,
-    govukSummaryList: GovukSummaryList
+        layout: templates.Layout,
+        govukSummaryList: GovukSummaryList
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(viewModel: ContactDetailsIndividualViewModel)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+@layout(
+    pageTitle = titleNoForm(messages("contactDetails.individual.title")),
+    showBackLink = false
+) {
 
-    <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
+    <h1 class="govuk-heading-xl">@messages("contactDetails.individual.heading")</h1>
 
-    @govukSummaryList(list)
+    @govukSummaryList(viewModel.contactList)
+
+    <a href="@routes.IndexController.onPageLoad()" class="govuk-button" role="button">@messages("site.back")</a>
 }
