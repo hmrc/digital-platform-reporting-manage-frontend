@@ -24,4 +24,6 @@
 @layout(pageTitle = titleNoForm(messages("individualEmailAddressUpdated.title"))) {
 
     <h1 class="govuk-heading-xl">@messages("individualEmailAddressUpdated.heading")</h1>
+
+ <a href="@routes.ContactDetailsController.onPageLoad()" class="govuk-button" role="button">@messages("site.continue")</a>
 }

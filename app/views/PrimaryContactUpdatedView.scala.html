@@ -24,4 +24,6 @@
 @layout(pageTitle = titleNoForm(messages("primaryContactUpdated.title"))) {
 
     <h1 class="govuk-heading-xl">@messages("primaryContactUpdated.heading")</h1>
+
+ <a href="@routes.ContactDetailsController.onPageLoad()" class="govuk-button" role="button">@messages("site.continue")</a>
 }
