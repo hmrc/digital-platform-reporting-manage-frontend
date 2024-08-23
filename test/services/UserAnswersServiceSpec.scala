@@ -16,16 +16,24 @@
 
 package services
 
+import models.UserAnswers
+import models.requests.subscription.requests.SubscriptionRequest
 import models.requests.subscription.responses.SubscriptionInfo
 import models.requests.subscription.{Individual, IndividualContact, Organisation, OrganisationContact}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{OptionValues, TryValues}
+import org.scalatest.{EitherValues, OptionValues, TryValues}
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import pages._
 import queries.{GbUserQuery, IndividualQuery, TradingNameQuery}
 
-class UserAnswersServiceSpec extends AnyFreeSpec with Matchers with GuiceOneAppPerSuite with TryValues with OptionValues {
+class UserAnswersServiceSpec
+  extends AnyFreeSpec
+    with Matchers
+    with GuiceOneAppPerSuite
+    with TryValues
+    with OptionValues
+    with EitherValues {
 
   private lazy val userAnswersService = app.injector.instanceOf[UserAnswersService]
 
@@ -268,5 +276,263 @@ class UserAnswersServiceSpec extends AnyFreeSpec with Matchers with GuiceOneAppP
 
   "toSubscription" - {
 
+    "must create a subscription request" - {
+
+      "for an organisation" - {
+
+        "when there is a second contact" - {
+
+          "and phone numbers are present" in {
+            
+            val answers =
+              UserAnswers("id")
+                .set(GbUserQuery, true).success.value
+                .set(PrimaryContactNamePage, "primary name").success.value
+                .set(PrimaryContactEmailAddressPage, "primary email").success.value
+                .set(CanPhonePrimaryContactPage, true).success.value
+                .set(PrimaryContactPhoneNumberPage, "primary phone").success.value
+                .set(HasSecondaryContactPage, true).success.value
+                .set(SecondaryContactNamePage, "secondary name").success.value
+                .set(SecondaryContactEmailAddressPage, "secondary email").success.value
+                .set(CanPhoneSecondaryContactPage, true).success.value
+                .set(SecondaryContactPhoneNumberPage, "secondary phone").success.value
+
+            val expectedResult = SubscriptionRequest(
+              "dprsId",
+              true,
+              None,
+              OrganisationContact(Organisation("primary name"), "primary email", Some("primary phone")),
+              Some(OrganisationContact(Organisation("secondary name"), "secondary email", Some("secondary phone")))
+            )
+
+            val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+            result.value mustEqual expectedResult
+          }
+
+          "and phone numbers are absent" in {
+
+            val answers =
+              UserAnswers("id")
+                .set(GbUserQuery, true).success.value
+                .set(PrimaryContactNamePage, "primary name").success.value
+                .set(PrimaryContactEmailAddressPage, "primary email").success.value
+                .set(CanPhonePrimaryContactPage, false).success.value
+                .set(HasSecondaryContactPage, true).success.value
+                .set(SecondaryContactNamePage, "secondary name").success.value
+                .set(SecondaryContactEmailAddressPage, "secondary email").success.value
+                .set(CanPhoneSecondaryContactPage, false).success.value
+
+            val expectedResult = SubscriptionRequest(
+              "dprsId",
+              true,
+              None,
+              OrganisationContact(Organisation("primary name"), "primary email", None),
+              Some(OrganisationContact(Organisation("secondary name"), "secondary email", None))
+            )
+
+            val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+            result.value mustEqual expectedResult
+          }
+        }
+
+        "when there is no second contact" in {
+
+          val answers =
+            UserAnswers("id")
+              .set(GbUserQuery, true).success.value
+              .set(PrimaryContactNamePage, "primary name").success.value
+              .set(PrimaryContactEmailAddressPage, "primary email").success.value
+              .set(CanPhonePrimaryContactPage, true).success.value
+              .set(PrimaryContactPhoneNumberPage, "primary phone").success.value
+              .set(HasSecondaryContactPage, false).success.value
+
+          val expectedResult = SubscriptionRequest(
+            "dprsId",
+            true,
+            None,
+            OrganisationContact(Organisation("primary name"), "primary email", Some("primary phone")),
+            None
+          )
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.value mustEqual expectedResult
+        }
+
+        "when there is a trading name" in {
+
+          val answers =
+            UserAnswers("id")
+              .set(GbUserQuery, true).success.value
+              .set(TradingNameQuery, "trading name").success.value
+              .set(PrimaryContactNamePage, "primary name").success.value
+              .set(PrimaryContactEmailAddressPage, "primary email").success.value
+              .set(CanPhonePrimaryContactPage, true).success.value
+              .set(PrimaryContactPhoneNumberPage, "primary phone").success.value
+              .set(HasSecondaryContactPage, false).success.value
+
+          val expectedResult = SubscriptionRequest(
+            "dprsId",
+            true,
+            Some("trading name"),
+            OrganisationContact(Organisation("primary name"), "primary email", Some("primary phone")),
+            None
+          )
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.value mustEqual expectedResult
+        }
+      }
+
+      "for an individual" - {
+
+        "when optional fields are present" in {
+
+          val answers =
+            UserAnswers("id")
+              .set(GbUserQuery, true).success.value
+              .set(IndividualQuery, Individual("first", "last")).success.value
+              .set(IndividualEmailAddressPage, "email").success.value
+              .set(CanPhoneIndividualPage, true).success.value
+              .set(IndividualPhoneNumberPage, "phone").success.value
+
+          val expectedResult = SubscriptionRequest(
+            "dprsId",
+            true,
+            None,
+            IndividualContact(Individual("first", "last"), "email", Some("phone")),
+            None
+          )
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.value mustEqual expectedResult
+        }
+
+        "when optional fields are absent" in {
+
+          val answers =
+            UserAnswers("id")
+              .set(GbUserQuery, true).success.value
+              .set(IndividualQuery, Individual("first", "last")).success.value
+              .set(IndividualEmailAddressPage, "email").success.value
+              .set(CanPhoneIndividualPage, false).success.value
+
+          val expectedResult = SubscriptionRequest(
+            "dprsId",
+            true,
+            None,
+            IndividualContact(Individual("first", "last"), "email", None),
+            None
+          )
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.value mustEqual expectedResult
+        }
+      }
+    }
+
+    "must fail to build" - {
+
+      "for an individual" - {
+
+        "when mandatory fields are missing" in {
+
+          val answers = UserAnswers("id").set(IndividualQuery, Individual("first", "last")).success.value
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.left.value.toChain.toList must contain theSameElementsAs Seq(
+            GbUserQuery, IndividualEmailAddressPage, CanPhoneIndividualPage
+          )
+        }
+
+        "when we can phone the user but phone number is missing" in {
+
+          val answers =
+            UserAnswers("id")
+              .set(GbUserQuery, false).success.value
+              .set(IndividualQuery, Individual("first", "last")).success.value
+              .set(IndividualEmailAddressPage, "email").success.value
+              .set(CanPhoneIndividualPage, true).success.value
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.left.value.toChain.toList must contain only IndividualPhoneNumberPage
+        }
+      }
+
+      "for an organisation" - {
+
+        "when mandatory fields are missing" in {
+
+          val answers = UserAnswers("id")
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.left.value.toChain.toList must contain theSameElementsAs Seq(
+            GbUserQuery,
+            PrimaryContactNamePage,
+            PrimaryContactEmailAddressPage,
+            CanPhonePrimaryContactPage,
+            HasSecondaryContactPage
+          )
+        }
+
+        "when we can phone the primary contact but the phone number is missing" in {
+
+          val answers =
+            UserAnswers("id")
+              .set(GbUserQuery, true).success.value
+              .set(PrimaryContactNamePage, "primary name").success.value
+              .set(PrimaryContactEmailAddressPage, "primary email").success.value
+              .set(CanPhonePrimaryContactPage, true).success.value
+              .set(HasSecondaryContactPage, false).success.value
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.left.value.toChain.toList must contain only PrimaryContactPhoneNumberPage
+        }
+
+        "when there is a secondary contact but their details are missing" in {
+
+          val answers =
+            UserAnswers("id")
+              .set(GbUserQuery, true).success.value
+              .set(PrimaryContactNamePage, "primary name").success.value
+              .set(PrimaryContactEmailAddressPage, "primary email").success.value
+              .set(CanPhonePrimaryContactPage, false).success.value
+              .set(HasSecondaryContactPage, true).success.value
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.left.value.toChain.toList must contain theSameElementsAs Seq(
+            SecondaryContactNamePage, SecondaryContactEmailAddressPage, CanPhoneSecondaryContactPage
+          )
+        }
+
+        "when we can phone the secondary contact but the phone number is missing" in {
+
+          val answers =
+            UserAnswers("id")
+              .set(GbUserQuery, true).success.value
+              .set(PrimaryContactNamePage, "primary name").success.value
+              .set(PrimaryContactEmailAddressPage, "primary email").success.value
+              .set(CanPhonePrimaryContactPage, false).success.value
+              .set(HasSecondaryContactPage, true).success.value
+              .set(SecondaryContactNamePage, "secondary name").success.value
+              .set(SecondaryContactEmailAddressPage, "secondary email").success.value
+              .set(CanPhoneSecondaryContactPage, true).success.value
+
+          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+
+          result.left.value.toChain.toList must contain only SecondaryContactPhoneNumberPage
+        }
+      }
+    }
   }
 }
