@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import pages.IndividualPhoneNumberPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -35,7 +35,7 @@ object IndividualPhoneNumberSummary  {
           key     = "individualPhoneNumber.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.IndividualPhoneNumberController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.IndividualPhoneNumberController.onPageLoad(NormalMode).url)
               .withVisuallyHiddenText(messages("individualPhoneNumber.change.hidden"))
           )
         )

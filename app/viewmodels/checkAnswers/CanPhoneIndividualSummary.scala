@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{CheckMode, UserAnswers}
+import models.{NormalMode, UserAnswers}
 import pages.CanPhoneIndividualPage
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryListRow
@@ -36,7 +36,7 @@ object CanPhoneIndividualSummary  {
           key     = "canPhoneIndividual.checkYourAnswersLabel",
           value   = ValueViewModel(value),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.CanPhoneIndividualController.onPageLoad(CheckMode).url)
+            ActionItemViewModel("site.change", routes.CanPhoneIndividualController.onPageLoad(NormalMode).url)
               .withVisuallyHiddenText(messages("canPhoneIndividual.change.hidden"))
           )
         )
