@@ -23,9 +23,10 @@ class SecondaryContactNameFormProviderSpec extends StringFieldBehaviours {
 
   private val requiredKey = "secondaryContactName.error.required"
   private val lengthKey = "secondaryContactName.error.length"
+  private val formatKey = "secondaryContactName.error.format"
   private val maxLength = 105
-  private val primaryContactName = "name"
-  private val form = new SecondaryContactNameFormProvider()(primaryContactName)
+  private val contactName = "name"
+  private val form = new SecondaryContactNameFormProvider()(contactName)
 
   ".value" - {
 
@@ -34,20 +35,27 @@ class SecondaryContactNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(
       form,
       fieldName,
       maxLength = maxLength,
-      lengthError = FormError(fieldName, lengthKey, Seq(maxLength, primaryContactName))
+      lengthError = FormError(fieldName, lengthKey, Seq(maxLength))
     )
 
     behave like mandatoryField(
       form,
       fieldName,
-      requiredError = FormError(fieldName, requiredKey, Seq(primaryContactName))
+      requiredError = FormError(fieldName, requiredKey, Seq(contactName))
     )
   }
 }

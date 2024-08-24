@@ -17,15 +17,18 @@
 package forms
 
 import javax.inject.Inject
-
 import forms.mappings.Mappings
 import play.api.data.Form
+import play.api.i18n.Messages
 
 class SecondaryContactPhoneNumberFormProvider @Inject() extends Mappings {
 
   def apply(contactName: String): Form[String] =
     Form(
       "value" -> text("secondaryContactPhoneNumber.error.required", args = Seq(contactName))
-        .verifying(maxLength(24, "secondaryContactPhoneNumber.error.length", args = contactName))
+        .verifying(firstError(
+          maxLength(24, "secondaryContactPhoneNumber.error.length"),
+          validPhoneNumber("secondaryContactPhoneNumber.error.format")
+        ))
     )
 }

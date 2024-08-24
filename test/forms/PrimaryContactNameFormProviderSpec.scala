@@ -23,6 +23,7 @@ class PrimaryContactNameFormProviderSpec extends StringFieldBehaviours {
 
   val requiredKey = "primaryContactName.error.required"
   val lengthKey = "primaryContactName.error.length"
+  val formatKey = "primaryContactName.error.format"
   val maxLength = 105
 
   val form = new PrimaryContactNameFormProvider()()
@@ -34,7 +35,14 @@ class PrimaryContactNameFormProviderSpec extends StringFieldBehaviours {
     behave like fieldThatBindsValidData(
       form,
       fieldName,
-      stringsWithMaxLength(maxLength)
+      safeTextInputsWithMaxLength(maxLength)
+    )
+
+    behave like fieldThatDoesNotBindInvalidData(
+      form,
+      fieldName,
+      unsafeTextInputsWithMaxLength(maxLength),
+      FormError(fieldName, formatKey, Seq(Validation.textInputPattern.toString))
     )
 
     behave like fieldWithMaxLength(

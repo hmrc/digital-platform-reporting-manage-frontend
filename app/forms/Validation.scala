@@ -16,19 +16,10 @@
 
 package forms
 
-import javax.inject.Inject
+import scala.util.matching.Regex
 
-import forms.mappings.Mappings
-import play.api.data.Form
+object Validation {
 
-class PrimaryContactEmailAddressFormProvider @Inject() extends Mappings {
-
-  def apply(contactName: String): Form[String] =
-    Form(
-      "value" -> text("primaryContactEmailAddress.error.required", args = Seq(contactName))
-        .verifying(firstError(
-          maxLength(132, "primaryContactEmailAddress.error.length"),
-          regexp(Validation.emailPattern.toString, "primaryContactEmailAddress.error.format")
-        ))
-    )
+  val textInputPattern: Regex = "[0-9A-Za-zÀ-ÅÇ-ÖØ-Ýà-åç-öø-ýÿĀ-ľŁ-ňŊ-őŔ-ſ'’ -]+".r.anchored
+  val emailPattern: Regex = "^.+@.+[.].+$".r.anchored
 }
