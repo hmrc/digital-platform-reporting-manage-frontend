@@ -17,17 +17,23 @@
 package controllers
 
 import base.SpecBase
+import connector.SubscriptionConnector
 import forms.CanPhoneIndividualFormProvider
+import models.requests.subscription.{Individual, IndividualContact}
+import models.requests.subscription.requests.SubscriptionRequest
 import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.apache.pekko.Done
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.CanPhoneIndividualPage
+import pages.{CanPhoneIndividualPage, IndividualEmailAddressPage, IndividualPhoneNumberPage}
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.{GbUserQuery, IndividualQuery}
 import repositories.SessionRepository
 import views.html.CanPhoneIndividualView
 
@@ -35,12 +41,12 @@ import scala.concurrent.Future
 
 class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
 
-  def onwardRoute = Call("GET", "/foo")
+  private val onwardRoute = Call("GET", "/foo")
 
-  val formProvider = new CanPhoneIndividualFormProvider()
-  val form = formProvider()
+  private val formProvider = new CanPhoneIndividualFormProvider()
+  private val form = formProvider()
 
-  lazy val canPhoneIndividualRoute = routes.CanPhoneIndividualController.onPageLoad(NormalMode).url
+  private lazy val canPhoneIndividualRoute = routes.CanPhoneIndividualController.onPageLoad(NormalMode).url
 
   "CanPhoneIndividual Controller" - {
 
@@ -78,17 +84,73 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must update the subscription, save user answers and redirect to the next page when the answer is no" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[SubscriptionConnector]
+
+      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
+
+      val answers =
+        emptyUserAnswers
+          .set(GbUserQuery, true).success.value
+          .set(IndividualQuery, Individual("first", "last")).success.value
+          .set(IndividualEmailAddressPage, "foo@example.com").success.value
+          .set(CanPhoneIndividualPage, true).success.value
+          .set(IndividualPhoneNumberPage, "07777 777777").success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubscriptionConnector].toInstance(mockConnector)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, canPhoneIndividualRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val expectedContact = IndividualContact(Individual("first", "last"), "foo@example.com", None)
+        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedContact, None)
+        val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
+
+        val result = route(application, request).value
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+
+        val savedAnswers = answersCaptor.getValue
+        savedAnswers.get(IndividualPhoneNumberPage) must not be defined
+      }
+    }
+
+    "must save user answers and redirect to the next page when the answer is yes without updating the subscription" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[SubscriptionConnector]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
+      val answers =
+        emptyUserAnswers
+          .set(GbUserQuery, true).success.value
+          .set(IndividualQuery, Individual("first", "last")).success.value
+          .set(IndividualEmailAddressPage, "foo@example.com").success.value
+          .set(CanPhoneIndividualPage, true).success.value
+          .set(IndividualPhoneNumberPage, "07777 777777").success.value
+
       val application =
-        applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubscriptionConnector].toInstance(mockConnector)
           )
           .build()
 
@@ -101,6 +163,45 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockConnector, never()).updateSubscription(any())(any())
+        verify(mockSessionRepository, times(1)).set(any())
+      }
+    }
+
+    "must return a failed future and not save user answers when valid data is submitted but the update fails" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[SubscriptionConnector]
+
+      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
+
+      val answers =
+        emptyUserAnswers
+          .set(GbUserQuery, true).success.value
+          .set(IndividualQuery, Individual("first", "last")).success.value
+          .set(IndividualEmailAddressPage, "foo@example.com").success.value
+          .set(CanPhoneIndividualPage, true).success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubscriptionConnector].toInstance(mockConnector)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, canPhoneIndividualRoute)
+            .withFormUrlEncodedBody(("value", "false"))
+
+        val expectedContact = IndividualContact(Individual("first", "last"), "foo@example.com", None)
+        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedContact, None)
+        route(application, request).value.failed.futureValue
+
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockSessionRepository, never()).set(any())
       }
     }
 
