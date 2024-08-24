@@ -92,7 +92,7 @@ individualEmailAddress.heading = What is your email address?
 individualEmailAddress.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
 individualEmailAddress.checkYourAnswersLabel = Email address
 individualEmailAddress.error.required = Enter your email address
-individualEmailAddress.error.length = Email address must be 132 characters or less
+individualEmailAddress.error.length = Email address must be {0} characters or less
 individualEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
 individualEmailAddress.change.hidden = your email address
 
@@ -104,7 +104,7 @@ individualPhoneNumber.heading = What is your telephone number?
 individualPhoneNumber.hint = For international numbers, include the country code.
 individualPhoneNumber.checkYourAnswersLabel = Telephone
 individualPhoneNumber.error.required = Enter your telephone number
-individualPhoneNumber.error.length = Telephone number must be 24 characters or less
+individualPhoneNumber.error.length = Telephone number must be {0} characters or less
 individualPhoneNumber.error.format = Enter a telephone number in the correct format, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 individualPhoneNumber.change.hidden = your telephone number
 
@@ -137,6 +137,7 @@ primaryContactPhoneNumber.heading = What is the telephone number for {0}?
 primaryContactPhoneNumber.hint = For international numbers, include the country code.
 primaryContactPhoneNumber.checkYourAnswersLabel = Telephone
 primaryContactPhoneNumber.error.required = Enter the telephone number for {0}
+primaryContactPhoneNumber.error.length = Telephone number must be {0} characters or less
 primaryContactPhoneNumber.error.format = Enter a telephone number in the correct format, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 primaryContactPhoneNumber.change.hidden = the telephone number for {0}
 
@@ -148,7 +149,7 @@ secondaryContactEmailAddress.heading = What is the email address for {0}?
 secondaryContactEmailAddress.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
 secondaryContactEmailAddress.checkYourAnswersLabel = Email address
 secondaryContactEmailAddress.error.required = Enter the email address for {0}
-secondaryContactEmailAddress.error.length = Email must be 132 characters or less
+secondaryContactEmailAddress.error.length = Email must be {0} characters or less
 secondaryContactEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
 secondaryContactEmailAddress.change.hidden = the email address for {0}
 

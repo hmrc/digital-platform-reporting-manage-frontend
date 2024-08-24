@@ -63,7 +63,7 @@ class PrimaryContactEmailAddressControllerSpec extends SpecBase with MockitoSuga
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = baseAnswers.set(PrimaryContactEmailAddressPage, "answer").success.value
+      val userAnswers = baseAnswers.set(PrimaryContactEmailAddressPage, "foo@example.com").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -75,7 +75,7 @@ class PrimaryContactEmailAddressControllerSpec extends SpecBase with MockitoSuga
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("foo@example.com"), NormalMode, contactName)(request, messages(application)).toString
       }
     }
 
@@ -96,7 +96,7 @@ class PrimaryContactEmailAddressControllerSpec extends SpecBase with MockitoSuga
       running(application) {
         val request =
           FakeRequest(POST, primaryContactEmailAddressRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "foo@example.com"))
 
         val result = route(application, request).value
 
@@ -146,7 +146,7 @@ class PrimaryContactEmailAddressControllerSpec extends SpecBase with MockitoSuga
       running(application) {
         val request =
           FakeRequest(POST, primaryContactEmailAddressRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "foo@example.com"))
 
         val result = route(application, request).value
 

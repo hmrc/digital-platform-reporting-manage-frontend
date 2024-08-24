@@ -24,6 +24,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import pages.{SecondaryContactNamePage, SecondaryContactPhoneNumberPage}
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -35,6 +36,7 @@ import scala.concurrent.Future
 
 class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
+  private implicit val msgs: Messages = stubMessages()
   private val onwardRoute = Call("GET", "/foo")
   private val contactName = "name"
   private val formProvider = new SecondaryContactPhoneNumberFormProvider()
@@ -63,7 +65,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
     "must populate the view correctly on a GET when the question has previously been answered" in {
 
-      val userAnswers = baseAnswers.set(SecondaryContactPhoneNumberPage, "answer").success.value
+      val userAnswers = baseAnswers.set(SecondaryContactPhoneNumberPage, "07777 777777").success.value
 
       val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
@@ -75,7 +77,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("07777 777777"), NormalMode, contactName)(request, messages(application)).toString
       }
     }
 
@@ -96,7 +98,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
       running(application) {
         val request =
           FakeRequest(POST, secondaryContactPhoneNumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "07777 777777"))
 
         val result = route(application, request).value
 
@@ -146,7 +148,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
       running(application) {
         val request =
           FakeRequest(POST, secondaryContactPhoneNumberRoute)
-            .withFormUrlEncodedBody(("value", "answer"))
+            .withFormUrlEncodedBody(("value", "07777 777777"))
 
         val result = route(application, request).value
 
