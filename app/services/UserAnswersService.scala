@@ -17,10 +17,11 @@
 package services
 
 import cats.data.{EitherNec, StateT}
+import cats.implicits._
 import models.UserAnswers
 import models.requests.subscription.requests.SubscriptionRequest
 import models.requests.subscription.responses.SubscriptionInfo
-import models.requests.subscription.{Contact, IndividualContact, OrganisationContact}
+import models.requests.subscription.{Contact, IndividualContact, Organisation, OrganisationContact}
 import pages._
 import play.api.libs.json.Writes
 import queries.{GbUserQuery, IndividualQuery, Query, Settable, TradingNameQuery}
@@ -93,7 +94,67 @@ class UserAnswersService @Inject() {
       set(settable, value)
     }.getOrElse(StateT.pure(()))
 
-  def toSubscriptionRequest(answers: UserAnswers, dprsId: String): EitherNec[Query, SubscriptionRequest] = ???
+  def toSubscriptionRequest(answers: UserAnswers, dprsId: String): EitherNec[Query, SubscriptionRequest] =
+    (
+      answers.getEither(GbUserQuery),
+      getPrimaryContact(answers),
+      getSecondaryContact(answers)
+    ).parMapN { (gbUser, primaryContact, secondaryContact) =>
+      SubscriptionRequest(dprsId, gbUser, answers.get(TradingNameQuery), primaryContact, secondaryContact)
+    }
+
+  private def getPrimaryContact(answers: UserAnswers): EitherNec[Query, Contact] =
+    answers.get(IndividualQuery).map { individual =>
+      (
+        answers.getEither(IndividualEmailAddressPage),
+        getIndividualPhoneNumber(answers)
+      ).parMapN { (email, phone) =>
+        IndividualContact(individual, email, phone)
+      }
+    }.getOrElse {
+      (
+        answers.getEither(PrimaryContactNamePage),
+        answers.getEither(PrimaryContactEmailAddressPage),
+        getPrimaryContactPhoneNumber(answers)
+      ).parMapN { (name, email, phone) =>
+        OrganisationContact(Organisation(name), email, phone)
+      }
+    }
+
+  private def getSecondaryContact(answers: UserAnswers): EitherNec[Query, Option[Contact]] =
+    answers.get(IndividualQuery).map { _ =>
+      Right(None)
+    }.getOrElse {
+      answers.getEither(HasSecondaryContactPage).flatMap {
+        case false => Right(None)
+        case true =>
+          (
+            answers.getEither(SecondaryContactNamePage),
+            answers.getEither(SecondaryContactEmailAddressPage),
+            getSecondaryContactPhoneNumber(answers)
+          ).parMapN { (name, email, phone) =>
+            Some(OrganisationContact(Organisation(name), email, phone))
+          }
+      }
+    }
+
+  private def getIndividualPhoneNumber(answers: UserAnswers): EitherNec[Query, Option[String]] =
+    answers.getEither(CanPhoneIndividualPage).flatMap {
+      case true  => answers.getEither(IndividualPhoneNumberPage).map(Some(_))
+      case false => Right(None)
+    }
+
+  private def getPrimaryContactPhoneNumber(answers: UserAnswers): EitherNec[Query, Option[String]] =
+    answers.getEither(CanPhonePrimaryContactPage).flatMap {
+      case true  => answers.getEither(PrimaryContactPhoneNumberPage).map(Some(_))
+      case false => Right(None)
+    }
+
+  private def getSecondaryContactPhoneNumber(answers: UserAnswers): EitherNec[Query, Option[String]] =
+    answers.getEither(CanPhoneSecondaryContactPage).flatMap {
+      case true  => answers.getEither(SecondaryContactPhoneNumberPage).map(Some(_))
+      case false => Right(None)
+    }
 }
 
 object UserAnswersService {
