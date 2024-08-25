@@ -16,15 +16,19 @@
 
 package controllers
 
+import connector.SubscriptionConnector
 import controllers.actions._
 import forms.CanPhoneIndividualFormProvider
+
 import javax.inject.Inject
 import models.Mode
 import navigation.Navigator
+import org.apache.pekko.Done
 import pages.CanPhoneIndividualPage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.UserAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.CanPhoneIndividualView
 
@@ -39,8 +43,11 @@ class CanPhoneIndividualController @Inject()(
                                          requireData: DataRequiredAction,
                                          formProvider: CanPhoneIndividualFormProvider,
                                          val controllerComponents: MessagesControllerComponents,
-                                         view: CanPhoneIndividualView
-                                 )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
+                                         view: CanPhoneIndividualView,
+                                         val connector: SubscriptionConnector,
+                                         val userAnswersService: UserAnswersService
+                                 )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with SubscriptionUpdater {
 
   val form = formProvider()
 
@@ -62,9 +69,10 @@ class CanPhoneIndividualController @Inject()(
         formWithErrors =>
           Future.successful(BadRequest(view(formWithErrors, mode))),
 
-        value =>
+        canPhone =>
           for {
-            updatedAnswers <- Future.fromTry(request.userAnswers.set(CanPhoneIndividualPage, value))
+            updatedAnswers <- Future.fromTry(request.userAnswers.set(CanPhoneIndividualPage, canPhone))
+            _              <- if (canPhone) Future.successful(Done) else updateSubscription(updatedAnswers)
             _              <- sessionRepository.set(updatedAnswers)
           } yield Redirect(navigator.nextPage(CanPhoneIndividualPage, mode, updatedAnswers))
       )
