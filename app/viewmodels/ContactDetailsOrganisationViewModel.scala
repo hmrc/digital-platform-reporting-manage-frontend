@@ -63,7 +63,7 @@ object ContactDetailsOrganisationViewModel {
         actions = Some(Actions(
           items = Seq(ActionItem(
             content = Text(messages("site.change")),
-            href = routes.PrimaryContactNameController.onPageLoad(NormalMode).url,
+            href = routes.HasSecondaryContactController.onPageLoad(NormalMode).url,
             visuallyHiddenText = Some(messages("contactDetails.organisation.secondaryContact.change.hidden"))
           ))
         ))

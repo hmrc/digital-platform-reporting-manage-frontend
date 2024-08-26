@@ -16,6 +16,7 @@
 
 package controllers
 
+import connector.SubscriptionConnector
 import controllers.actions._
 import forms.PrimaryContactPhoneNumberFormProvider
 
@@ -26,23 +27,26 @@ import pages.{PrimaryContactNamePage, PrimaryContactPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository
+import services.UserAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.PrimaryContactPhoneNumberView
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class PrimaryContactPhoneNumberController @Inject()(
-                                        override val messagesApi: MessagesApi,
-                                        sessionRepository: SessionRepository,
-                                        navigator: Navigator,
-                                        identify: IdentifierAction,
-                                        getData: DataRetrievalAction,
-                                        requireData: DataRequiredAction,
-                                        formProvider: PrimaryContactPhoneNumberFormProvider,
-                                        val controllerComponents: MessagesControllerComponents,
-                                        view: PrimaryContactPhoneNumberView
-                                    )(implicit ec: ExecutionContext)
-  extends FrontendBaseController with I18nSupport with AnswerExtractor {
+                                                     override val messagesApi: MessagesApi,
+                                                     sessionRepository: SessionRepository,
+                                                     navigator: Navigator,
+                                                     identify: IdentifierAction,
+                                                     getData: DataRetrievalAction,
+                                                     requireData: DataRequiredAction,
+                                                     formProvider: PrimaryContactPhoneNumberFormProvider,
+                                                     val controllerComponents: MessagesControllerComponents,
+                                                     view: PrimaryContactPhoneNumberView,
+                                                     val connector: SubscriptionConnector,
+                                                     val userAnswersService: UserAnswersService
+                                                   )(implicit ec: ExecutionContext)
+  extends FrontendBaseController with I18nSupport with AnswerExtractor with SubscriptionUpdater {
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -72,7 +76,8 @@ class PrimaryContactPhoneNumberController @Inject()(
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactPhoneNumberPage, value))
-              _ <- sessionRepository.set(updatedAnswers)
+              _              <- updateSubscription(updatedAnswers)
+              _              <- sessionRepository.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(PrimaryContactPhoneNumberPage, mode, updatedAnswers))
         )
       }
