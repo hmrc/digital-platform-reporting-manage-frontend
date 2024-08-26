@@ -17,18 +17,24 @@
 package controllers
 
 import base.SpecBase
+import connector.SubscriptionConnector
 import forms.SecondaryContactPhoneNumberFormProvider
-import models.NormalMode
+import models.requests.subscription.requests.SubscriptionRequest
+import models.requests.subscription.{Organisation, OrganisationContact}
+import models.{NormalMode, UserAnswers}
 import navigation.{FakeNavigator, Navigator}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.apache.pekko.Done
+import org.mockito.ArgumentCaptor
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.{SecondaryContactNamePage, SecondaryContactPhoneNumberPage}
+import pages._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.GbUserQuery
 import repositories.SessionRepository
 import views.html.SecondaryContactPhoneNumberView
 
@@ -81,29 +87,100 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
       }
     }
 
-    "must redirect to the next page when valid data is submitted" in {
+    "must update the subscription, save user answers and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[SubscriptionConnector]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
+
+      val answers =
+        emptyUserAnswers
+          .set(GbUserQuery, true).success.value
+          .set(PrimaryContactNamePage, "name").success.value
+          .set(PrimaryContactEmailAddressPage, "foo@example.com").success.value
+          .set(CanPhonePrimaryContactPage, true).success.value
+          .set(PrimaryContactPhoneNumberPage, "07777 777777").success.value
+          .set(HasSecondaryContactPage, true).success.value
+          .set(SecondaryContactNamePage, "second name").success.value
+          .set(SecondaryContactEmailAddressPage, "bar@example.com").success.value
+          .set(CanPhoneSecondaryContactPage, true).success.value
+          .set(SecondaryContactPhoneNumberPage, "07777 123456").success.value
 
       val application =
-        applicationBuilder(userAnswers = Some(baseAnswers))
+        applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
-            bind[SessionRepository].toInstance(mockSessionRepository)
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubscriptionConnector].toInstance(mockConnector)
           )
           .build()
 
       running(application) {
         val request =
           FakeRequest(POST, secondaryContactPhoneNumberRoute)
-            .withFormUrlEncodedBody(("value", "07777 777777"))
+            .withFormUrlEncodedBody(("value", "07777 654321"))
+
+        val expectedPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
+        val expectedSecondaryaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 654321"))
+        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryaryContact))
+        val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val result = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+
+        val savedAnswers = answersCaptor.getValue
+        savedAnswers.get(SecondaryContactPhoneNumberPage).value mustEqual "07777 654321"
+      }
+    }
+
+    "must return a failed future and not save user answers when valid data is submitted but the update fails" in {
+
+      val mockSessionRepository = mock[SessionRepository]
+      val mockConnector = mock[SubscriptionConnector]
+
+      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
+
+      val answers =
+        emptyUserAnswers
+          .set(GbUserQuery, true).success.value
+          .set(PrimaryContactNamePage, "name").success.value
+          .set(PrimaryContactEmailAddressPage, "foo@example.com").success.value
+          .set(CanPhonePrimaryContactPage, true).success.value
+          .set(PrimaryContactPhoneNumberPage, "07777 777777").success.value
+          .set(HasSecondaryContactPage, true).success.value
+          .set(SecondaryContactNamePage, "second name").success.value
+          .set(SecondaryContactEmailAddressPage, "bar@example.com").success.value
+          .set(CanPhoneSecondaryContactPage, true).success.value
+          .set(SecondaryContactPhoneNumberPage, "07777 123456").success.value
+
+      val application =
+        applicationBuilder(userAnswers = Some(answers))
+          .overrides(
+            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[SessionRepository].toInstance(mockSessionRepository),
+            bind[SubscriptionConnector].toInstance(mockConnector)
+          )
+          .build()
+
+      running(application) {
+        val request =
+          FakeRequest(POST, secondaryContactPhoneNumberRoute)
+            .withFormUrlEncodedBody(("value", "07777 654321"))
+
+        val expectedPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
+        val expectedSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 654321"))
+        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryContact))
+
+        route(application, request).value.failed.futureValue
+
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockSessionRepository, never()).set(any())
       }
     }
 
