@@ -62,28 +62,28 @@ unauthorised.heading = You can’t access this service with this account
 
 canPhoneIndividual.title = Can we contact you by telephone?
 canPhoneIndividual.heading = Can we contact you by telephone?
-canPhoneIndividual.hint = We will use this phone number if we have any questions about your reports.
+canPhoneIndividual.p1 = We will use this phone number if we have any questions about your reports.
 canPhoneIndividual.checkYourAnswersLabel = Can we contact you by telephone?
 canPhoneIndividual.error.required = Select yes if we can contact you by telephone
 canPhoneIndividual.change.hidden = if we can contact you by telephone
 
 canPhonePrimaryContact.title = Can we contact the person or team by telephone?
 canPhonePrimaryContact.heading = Can we contact {0} by telephone?
-canPhonePrimaryContact.hint = We will use this phone number if we have any questions about your reports.
+canPhonePrimaryContact.p1 = We will use this phone number if we have any questions about your reports.
 canPhonePrimaryContact.checkYourAnswersLabel = Can we telephone?
 canPhonePrimaryContact.error.required = Select yes if we can contact {0} by telephone
 canPhonePrimaryContact.change.hidden = if we can contact {0} by telephone
 
 canPhoneSecondaryContact.title = Can we contact the second person or team by telephone?
 canPhoneSecondaryContact.heading = Can we contact {0} by telephone?
-canPhoneSecondaryContact.hint = We will use this phone number if we have any questions about your reports.
+canPhoneSecondaryContact.p1 = We will use this phone number if we have any questions about your reports.
 canPhoneSecondaryContact.checkYourAnswersLabel = Can we telephone?
 canPhoneSecondaryContact.error.required = Select yes if we can contact {0} by telephone
 canPhoneSecondaryContact.change.hidden = if we can contact {0} by telephone
 
 hasSecondaryContact.title = Is there someone else we can contact if the first person or team is not available?
 hasSecondaryContact.heading = Is there someone else we can contact if {0} is not available?
-hasSecondaryContact.checkYourAnswersLabel = is there a second contact?
+hasSecondaryContact.checkYourAnswersLabel = Is there a second contact?
 hasSecondaryContact.error.required = Select yes if there is someone else we can contact if {0} is not available
 hasSecondaryContact.change.hidden = if there is a second contact
 
