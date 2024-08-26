@@ -129,7 +129,7 @@ primaryContactName.hint = For example, ‘Ashley Smith’ or ‘Tax Team’.
 primaryContactName.checkYourAnswersLabel = Contact name
 primaryContactName.error.required = Enter the name of the person or team we should contact
 primaryContactName.error.length = Name must be {0} characters or less
-primaryContactName.error.format = Name must only include letters, numbers, hyphens, spaces and apostrophes
+primaryContactName.error.format = Name must only include letters, numbers, hyphens, spaces, full stops, commas and apostrophes
 primaryContactName.change.hidden = the name of the person or team we should contact
 
 primaryContactPhoneNumber.title = What is the telephone number for the person or team we can contact?
@@ -159,7 +159,7 @@ secondaryContactName.hint = For example, ‘Ashley Smith’ or ‘Tax Team’.
 secondaryContactName.checkYourAnswersLabel = Contact name
 secondaryContactName.error.required = Enter the name of the second person or team we should contact
 secondaryContactName.error.length = Name must be {0} characters or less
-secondaryContactName.error.format = Name must only include letters, numbers, hyphens, spaces and apostrophes
+secondaryContactName.error.format = Name must only include letters, numbers, hyphens, spaces, full stops, commas and apostrophes
 secondaryContactName.change.hidden = the name of the second person or team we should contact
 
 secondaryContactPhoneNumber.title = What is the telephone number for the second person or team we should contact?
