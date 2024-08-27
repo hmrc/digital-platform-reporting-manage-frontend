@@ -16,9 +16,11 @@
 
 package repositories
 
+import com.fasterxml.jackson.core.JsonParseException
 import config.FrontendAppConfig
 import models.UserAnswers
 import org.mockito.Mockito.when
+import org.mongodb.scala.bson.BsonDocument
 import org.mongodb.scala.model.Filters
 import org.scalactic.source.Position
 import org.scalatest.OptionValues
@@ -27,12 +29,16 @@ import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.slf4j.MDC
+import play.api.Configuration
 import play.api.libs.json.Json
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, SymmetricCryptoFactory}
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import uk.gov.hmrc.play.bootstrap.dispatchers.MDCPropagatingExecutorService
 
+import java.security.SecureRandom
 import java.time.{Clock, Instant, ZoneId}
 import java.time.temporal.ChronoUnit
+import java.util.Base64
 import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -53,11 +59,22 @@ class SessionRepositorySpec
   private val mockAppConfig = mock[FrontendAppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1L
 
+  private val aesKey = {
+    val aesKey = new Array[Byte](32)
+    new SecureRandom().nextBytes(aesKey)
+    Base64.getEncoder.encodeToString(aesKey)
+  }
+
+  private val configuration = Configuration("crypto.key" -> aesKey)
+
+  private implicit val crypto: Encrypter with Decrypter =
+    SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
+
   protected override val repository: SessionRepository = new SessionRepository(
     mongoComponent = mongoComponent,
     appConfig      = mockAppConfig,
     clock          = stubClock
-  )(scala.concurrent.ExecutionContext.Implicits.global)
+  )(scala.concurrent.ExecutionContext.Implicits.global, implicitly)
 
   ".set" - {
 
@@ -65,10 +82,29 @@ class SessionRepositorySpec
 
       val expectedResult = userAnswers copy (lastUpdated = instant)
 
-      val setResult     = repository.set(userAnswers).futureValue
+      repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
       updatedRecord mustEqual expectedResult
+    }
+
+    "must store the data section as encrypted bytes" in {
+
+      repository.set(userAnswers).futureValue
+
+      val record = repository.collection
+        .find[BsonDocument](Filters.equal("_id", userAnswers.id))
+        .headOption()
+        .futureValue
+        .value
+
+      val json = Json.parse(record.toJson)
+
+      val data = (json \ "data").as[String]
+
+      assertThrows[JsonParseException] {
+        Json.parse(data)
+      }
     }
 
     mustPreserveMdc(repository.set(userAnswers))
