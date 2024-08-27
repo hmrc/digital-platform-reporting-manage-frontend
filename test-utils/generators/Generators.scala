@@ -126,6 +126,8 @@ trait Generators extends ModelGenerators {
     Gen.const('\''),
     Gen.const('.'),
     Gen.const(','),
+    Gen.const('_'),
+    Gen.const('&'),
     Gen.oneOf('À' to 'Å'),
     Gen.oneOf('Ç' to 'Ö'),
     Gen.oneOf('Ø' to 'Ý'),
