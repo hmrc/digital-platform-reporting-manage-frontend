@@ -145,7 +145,11 @@ trait Generators extends ModelGenerators {
     Gen.const('<'),
     Gen.const('>'),
     Gen.const('='),
-    Gen.const('|')
+    Gen.const('|'),
+    Gen.const('!'),
+    Gen.const('"'),
+    Gen.const('$'),
+    Gen.const('(')
   )
 
   def safeTextInputsWithMaxLength(length: Int): Gen[String] =
