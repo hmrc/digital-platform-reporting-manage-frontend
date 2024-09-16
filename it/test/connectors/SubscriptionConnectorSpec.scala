@@ -17,8 +17,8 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import connector.SubscriptionConnector
-import connector.SubscriptionConnector.{GetSubscriptionFailure, UpdateSubscriptionFailure}
+import connectors.SubscriptionConnector
+import connectors.SubscriptionConnector.{GetSubscriptionFailure, UpdateSubscriptionFailure}
 import models.requests.subscription.requests.SubscriptionRequest
 import models.requests.subscription.responses.SubscriptionInfo
 import models.requests.subscription.{Individual, IndividualContact, Organisation, OrganisationContact}

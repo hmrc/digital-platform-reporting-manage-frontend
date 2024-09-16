@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package connector
+package connectors
 
 import config.Service
-import connector.SubscriptionConnector.{GetSubscriptionFailure, UpdateSubscriptionFailure}
+import connectors.SubscriptionConnector.{GetSubscriptionFailure, UpdateSubscriptionFailure}
 import models.requests.subscription.requests.SubscriptionRequest
 import models.requests.subscription.responses.SubscriptionInfo
 import org.apache.pekko.Done

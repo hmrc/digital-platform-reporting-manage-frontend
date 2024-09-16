@@ -17,7 +17,7 @@
 package controllers
 
 import com.google.inject.Inject
-import connector.SubscriptionConnector
+import connectors.SubscriptionConnector
 import controllers.actions.IdentifierAction
 import models.requests.subscription.{IndividualContact, OrganisationContact}
 import play.api.i18n.{I18nSupport, MessagesApi}

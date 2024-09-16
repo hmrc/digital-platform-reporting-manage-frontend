@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import connector.SubscriptionConnector
+import connectors.SubscriptionConnector
 import models.requests.subscription.responses.SubscriptionInfo
 import models.requests.subscription.{Individual, IndividualContact, Organisation, OrganisationContact}
 import org.mockito.ArgumentMatchers.any
