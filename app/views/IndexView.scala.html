@@ -14,11 +14,16 @@
  * limitations under the License.
  *@
 
+@import viewmodels.IndexViewModel
+
 @this(
         layout: templates.Layout,
+        contactDetailsCard: components.ContactDetailsCard,
+        platformOperatorCard: components.PlatformOperatorCard,
+        reportingNotificationCard: components.ReportingNotificationCard
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(viewModel: IndexViewModel)(implicit request: Request[_], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("index.title")),
@@ -36,24 +41,11 @@
 
   <div class="flex-container grid-row">
 
-    <div class="card">
-      <div class="card-body">
-        <h2 class="govuk-heading-s card-heading">
-          @messages("index.contactDetails.heading")
-        </h2>
-        <p class="govuk-body-s">@messages("index.contactDetails.p")</p>
-      </div>
-      <div class="card-action">
-        <ul class="govuk-list">
-          <li>
-            <a href="@routes.ContactDetailsController.onPageLoad()" class="govuk-link">@messages("index.contactDetails.actions.view")</a>
-          </li>
-          <li>
-            <a href="@routes.ContactDetailsController.onPageLoad()" class="govuk-link">@messages("index.contactDetails.actions.change")</a>
-          </li>
-        </ul>
-      </div>
-    </div>
+      @contactDetailsCard()
+
+      @platformOperatorCard(viewModel.platformOperatorCard)
+
+      @reportingNotificationCard(viewModel.reportingNotificationCard)
 
   </div>
 }
