@@ -16,20 +16,52 @@
 
 package controllers
 
+import config.FrontendAppConfig
+import connectors.PlatformOperatorConnector
 import controllers.actions.IdentifierAction
+
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import viewmodels.{CardState, IndexViewModel}
 import views.html.IndexView
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class IndexController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
                                  identify: IdentifierAction,
-                                 view: IndexView
-                               ) extends FrontendBaseController with I18nSupport {
+                                 view: IndexView,
+                                 connector: PlatformOperatorConnector,
+                                 appConfig: FrontendAppConfig
+                               )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
-  def onPageLoad(): Action[AnyContent] = identify { implicit request =>
-    Ok(view())
+  def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
+
+    if (appConfig.platformOperatorsEnabled)  {
+      connector.viewPlatformOperators.map { response =>
+        val viewModel = IndexViewModel(
+          platformOperatorCard = response.platformOperators match {
+            case Nil => CardState.AddOnly
+            case _   => CardState.AddAndView
+          },
+          reportingNotificationCard = response.platformOperators match {
+            case Nil                                                     => CardState.Inactive
+            case operators if operators.exists(_.notifications.nonEmpty) => CardState.AddAndView
+            case _                                                       => CardState.AddOnly
+          }
+        )
+
+        Ok(view(viewModel))
+      }
+    } else {
+      val viewModel = IndexViewModel(
+        platformOperatorCard = CardState.Hidden,
+        reportingNotificationCard = CardState.Hidden
+      )
+
+      Future.successful(Ok(view(viewModel)))
+    }
   }
 }

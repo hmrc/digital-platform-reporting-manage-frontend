@@ -36,6 +36,16 @@ index.contactDetails.heading = Contact Details
 index.contactDetails.p = View or change the contact details you entered when registering for this service.
 index.contactDetails.actions.view = View contact details
 index.contactDetails.actions.change = Change contact details
+index.platformOperators.heading = Platform operators
+index.platformOperators.p = Add, view or change the details of the platform operators you have added.
+index.platformOperators.actions.view = View platform operators
+index.platformOperators.actions.add = Add a platform operator
+index.platformOperators.actions.addAnother = Add another platform operator
+index.notifications.heading = Reporting notifications
+index.notifications.p = Add, view or change the reporting notification for a platform operator.
+index.notifications.actions.view = View reporting notifications
+index.notifications.actions.add = Add a reporting notification
+index.notifications.inactive = You must add a platform operator
 
 contactDetails.individual.title = Your contact details
 contactDetails.individual.heading = Your contact details

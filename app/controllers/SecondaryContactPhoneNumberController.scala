@@ -16,7 +16,7 @@
 
 package controllers
 
-import connector.SubscriptionConnector
+import connectors.SubscriptionConnector
 import controllers.actions._
 import forms.SecondaryContactPhoneNumberFormProvider
 

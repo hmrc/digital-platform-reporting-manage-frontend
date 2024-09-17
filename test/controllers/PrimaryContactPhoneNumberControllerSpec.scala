@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import connector.SubscriptionConnector
+import connectors.SubscriptionConnector
 import forms.PrimaryContactPhoneNumberFormProvider
 import models.requests.subscription.requests.SubscriptionRequest
 import models.requests.subscription.{Individual, IndividualContact, Organisation, OrganisationContact}

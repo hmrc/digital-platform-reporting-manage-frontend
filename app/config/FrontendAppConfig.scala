@@ -52,4 +52,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+
+  val platformOperatorsEnabled: Boolean = configuration.get[Boolean]("features.platform-operators")
+
+  val platformOperatorFrontendBaseUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-operator-frontend.baseUrl")
+  val addPlatformOperatorUrl = s"$platformOperatorFrontendBaseUrl/add-platform-operator/start"
+  val viewPlatformOperatorsUrl= s"$platformOperatorFrontendBaseUrl/platform-operators/view"
+  val addNotificationUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/start"
+  val viewNotificationsUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator"
 }

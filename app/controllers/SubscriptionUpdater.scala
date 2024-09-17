@@ -17,7 +17,7 @@
 package controllers
 
 import cats.data.NonEmptyChain
-import connector.SubscriptionConnector
+import connectors.SubscriptionConnector
 import controllers.SubscriptionUpdater.BuildSubscriptionRequestFailure
 import models.UserAnswers
 import models.requests.DataRequest
