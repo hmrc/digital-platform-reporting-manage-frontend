@@ -46,8 +46,11 @@
             .withWidth(Full)
         )
 
-        @govukButton(
-            ButtonViewModel(messages("site.continue"))
-        )
+        <div class="govuk-button-group">
+            @govukButton(
+                ButtonViewModel(messages("site.continue"))
+            )
+            <a class="govuk-link" href="@routes.ContactDetailsController.onPageLoad().url">@messages("site.cancel")</a>
+        </div>
     }
 }
