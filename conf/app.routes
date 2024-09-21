@@ -1,20 +1,20 @@
 # microservice specific routes
 
-->          /hmrc-frontend                               hmrcfrontend.Routes
+->          /manage-reporting/hmrc-frontend                               hmrcfrontend.Routes
 
-GET         /manage                                            controllers.IndexController.onPageLoad()
+GET         /manage-reporting                                           controllers.IndexController.onPageLoad()
 
-GET         /manage/assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET         /manage-reporting/assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /manage/refresh-session                             controllers.KeepAliveController.keepAlive()
+GET         /manage-reporting/refresh-session                             controllers.KeepAliveController.keepAlive()
 
-GET         /manage/there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /manage-rpeorting/there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /manage/account/sign-out-survey                     controllers.auth.AuthController.signOut()
-GET         /manage/account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
-GET         /manage/account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
+GET         /manage-reporting/account/sign-out-survey                     controllers.auth.AuthController.signOut()
+GET         /manage-reporting/account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
+GET         /manage-reporting/account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
 
-GET         /manage/unauthorised                                controllers.UnauthorisedController.onPageLoad()
+GET         /manage-reporting/unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
 GET         /contact-details/view-contact-details                          controllers.ContactDetailsController.onPageLoad()
 
