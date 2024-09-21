@@ -17,7 +17,7 @@
 package viewmodels
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.Aliases.Card
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
@@ -43,7 +43,7 @@ object ContactDetailsOrganisationViewModel {
         actions = Some(Actions(
           items = Seq(ActionItem(
             content = Text(messages("site.change")),
-            href = routes.PrimaryContactNameController.onPageLoad(NormalMode).url,
+            href = routes.PrimaryContactNameController.onPageLoad.url,
             visuallyHiddenText = Some(messages("contactDetails.organisation.primaryContact.change.hidden"))
           ))
         ))
@@ -63,7 +63,7 @@ object ContactDetailsOrganisationViewModel {
         actions = Some(Actions(
           items = Seq(ActionItem(
             content = Text(messages("site.change")),
-            href = routes.HasSecondaryContactController.onPageLoad(NormalMode).url,
+            href = routes.HasSecondaryContactController.onPageLoad.url,
             visuallyHiddenText = Some(messages("contactDetails.organisation.secondaryContact.change.hidden"))
           ))
         ))

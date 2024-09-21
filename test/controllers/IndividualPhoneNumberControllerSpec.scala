@@ -21,7 +21,7 @@ import connectors.SubscriptionConnector
 import forms.IndividualPhoneNumberFormProvider
 import models.requests.subscription.{Individual, IndividualContact}
 import models.requests.subscription.requests.SubscriptionRequest
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
 import org.mockito.ArgumentCaptor
@@ -49,7 +49,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new IndividualPhoneNumberFormProvider()
   private val form = formProvider()
 
-  private lazy val individualPhoneNumberRoute = routes.IndividualPhoneNumberController.onPageLoad(NormalMode).url
+  private lazy val individualPhoneNumberRoute = routes.IndividualPhoneNumberController.onPageLoad.url
 
   "IndividualPhoneNumber Controller" - {
 
@@ -65,7 +65,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[IndividualPhoneNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
       }
     }
 
@@ -83,7 +83,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("07777 777777"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("07777 777777"))(request, messages(application)).toString
       }
     }
 
@@ -186,7 +186,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
       }
     }
 

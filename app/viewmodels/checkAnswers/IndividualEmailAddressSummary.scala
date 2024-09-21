@@ -17,7 +17,7 @@
 package viewmodels.checkAnswers
 
 import controllers.routes
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import pages.IndividualEmailAddressPage
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
@@ -35,7 +35,7 @@ object IndividualEmailAddressSummary  {
           key     = "individualEmailAddress.checkYourAnswersLabel",
           value   = ValueViewModel(HtmlFormat.escape(answer).toString),
           actions = Seq(
-            ActionItemViewModel("site.change", routes.IndividualEmailAddressController.onPageLoad(NormalMode).url)
+            ActionItemViewModel("site.change", routes.IndividualEmailAddressController.onPageLoad.url)
               .withVisuallyHiddenText(messages("individualEmailAddress.change.hidden"))
           )
         )

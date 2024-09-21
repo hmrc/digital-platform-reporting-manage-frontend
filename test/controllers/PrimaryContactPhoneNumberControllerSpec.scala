@@ -21,7 +21,7 @@ import connectors.SubscriptionConnector
 import forms.PrimaryContactPhoneNumberFormProvider
 import models.requests.subscription.requests.SubscriptionRequest
 import models.requests.subscription.{Individual, IndividualContact, Organisation, OrganisationContact}
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
 import org.mockito.ArgumentCaptor
@@ -47,7 +47,7 @@ class PrimaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar
   private val form = formProvider(contactName)
   private val baseAnswers = emptyUserAnswers.set(PrimaryContactNamePage, contactName).success.value
 
-  private lazy val primaryContactPhoneNumberRoute = routes.PrimaryContactPhoneNumberController.onPageLoad(NormalMode).url
+  private lazy val primaryContactPhoneNumberRoute = routes.PrimaryContactPhoneNumberController.onPageLoad.url
 
   "PrimaryContactPhoneNumber Controller" - {
 
@@ -63,7 +63,7 @@ class PrimaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar
         val view = application.injector.instanceOf[PrimaryContactPhoneNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, contactName)(request, messages(application)).toString
       }
     }
 
@@ -81,7 +81,7 @@ class PrimaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("07777 777777"), NormalMode, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("07777 777777"), contactName)(request, messages(application)).toString
       }
     }
 
@@ -188,7 +188,7 @@ class PrimaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, contactName)(request, messages(application)).toString
       }
     }
 

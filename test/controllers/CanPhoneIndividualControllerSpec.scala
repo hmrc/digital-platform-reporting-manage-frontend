@@ -21,7 +21,7 @@ import connectors.SubscriptionConnector
 import forms.CanPhoneIndividualFormProvider
 import models.requests.subscription.{Individual, IndividualContact}
 import models.requests.subscription.requests.SubscriptionRequest
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
 import org.mockito.ArgumentCaptor
@@ -46,7 +46,7 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new CanPhoneIndividualFormProvider()
   private val form = formProvider()
 
-  private lazy val canPhoneIndividualRoute = routes.CanPhoneIndividualController.onPageLoad(NormalMode).url
+  private lazy val canPhoneIndividualRoute = routes.CanPhoneIndividualController.onPageLoad.url
 
   "CanPhoneIndividual Controller" - {
 
@@ -62,7 +62,7 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CanPhoneIndividualView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
       }
     }
 
@@ -80,7 +80,7 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true))(request, messages(application)).toString
       }
     }
 
@@ -221,7 +221,7 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
       }
     }
 

@@ -21,7 +21,6 @@ import controllers.actions._
 import forms.CanPhonePrimaryContactFormProvider
 
 import javax.inject.Inject
-import models.Mode
 import navigation.Navigator
 import org.apache.pekko.Done
 import pages.{CanPhonePrimaryContactPage, PrimaryContactNamePage}
@@ -49,7 +48,7 @@ class CanPhonePrimaryContactController @Inject()(
                                  )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with AnswerExtractor with SubscriptionUpdater {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       getAnswer(PrimaryContactNamePage) { contactName =>
 
@@ -60,11 +59,11 @@ class CanPhonePrimaryContactController @Inject()(
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, contactName))
+        Ok(view(preparedForm, contactName))
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       getAnswerAsync(PrimaryContactNamePage) { contactName =>
 
@@ -72,14 +71,14 @@ class CanPhonePrimaryContactController @Inject()(
 
         form.bindFromRequest().fold(
           formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, mode, contactName))),
+            Future.successful(BadRequest(view(formWithErrors, contactName))),
 
           canPhone =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(CanPhonePrimaryContactPage, canPhone))
               _              <- if (canPhone) Future.successful(Done) else updateSubscription(updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CanPhonePrimaryContactPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(CanPhonePrimaryContactPage, updatedAnswers))
         )
       }
   }

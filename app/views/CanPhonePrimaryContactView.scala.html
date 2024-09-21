@@ -22,11 +22,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode, contactName: String)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], contactName: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("canPhonePrimaryContact.title"))) {
 
-    @formHelper(action = routes.CanPhonePrimaryContactController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.CanPhonePrimaryContactController.onSubmit, Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

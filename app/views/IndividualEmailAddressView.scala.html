@@ -24,11 +24,11 @@
     govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_])(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = title(form, messages("individualEmailAddress.title"))) {
 
-    @formHelper(action = routes.IndividualEmailAddressController.onSubmit(mode)) {
+    @formHelper(action = routes.IndividualEmailAddressController.onSubmit) {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

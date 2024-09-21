@@ -21,7 +21,7 @@ import connectors.SubscriptionConnector
 import forms.IndividualEmailAddressFormProvider
 import models.requests.subscription.{Individual, IndividualContact}
 import models.requests.subscription.requests.SubscriptionRequest
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
 import org.mockito.ArgumentCaptor
@@ -46,7 +46,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
   private val formProvider = new IndividualEmailAddressFormProvider()
   private val form = formProvider()
 
-  private lazy val individualEmailAddressRoute = routes.IndividualEmailAddressController.onPageLoad(NormalMode).url
+  private lazy val individualEmailAddressRoute = routes.IndividualEmailAddressController.onPageLoad.url
 
   "IndividualEmailAddress Controller" - {
 
@@ -62,7 +62,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[IndividualEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
       }
     }
 
@@ -80,7 +80,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("foo@example.com"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("foo@example.com"))(request, messages(application)).toString
       }
     }
 
@@ -182,7 +182,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
       }
     }
 
