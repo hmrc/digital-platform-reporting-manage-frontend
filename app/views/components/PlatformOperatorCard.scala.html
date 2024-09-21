@@ -15,15 +15,15 @@
  *@
 
 @import config.FrontendAppConfig
-@import viewmodels.CardState
+@import viewmodels.{CardState, PlatformOperatorCardViewModel}
 
 @this(
     appConfig: FrontendAppConfig
 )
 
-@(cardState: CardState)(implicit messages: Messages)
+@(card: PlatformOperatorCardViewModel)(implicit messages: Messages)
 
-@if(cardState != CardState.Hidden) {
+@if(card.cardState != CardState.Hidden) {
     <div class="card">
         <div class="card-body">
             <h2 class="govuk-heading-s card-heading">
@@ -32,19 +32,10 @@
             <p class="govuk-body-s">@messages("index.platformOperators.p")</p>
         </div>
         <div class="card-action">
-            @if(cardState == CardState.AddOnly) {
+            @card.links.map { link =>
                 <p class="govuk-body">
-                    <a href="@appConfig.addPlatformOperatorUrl" class="govuk-link">@messages("index.platformOperators.actions.add")</a>
+                    <a href="@link.href" class="govuk-link">@link.text</a>
                 </p>
-            } else {
-                <ul class="govuk-list">
-                    <li>
-                        <a href="@appConfig.viewPlatformOperatorsUrl" class="govuk-link">@messages("index.platformOperators.actions.view")</a>
-                    </li>
-                    <li>
-                        <a href="@appConfig.addPlatformOperatorUrl" class="govuk-link">@messages("index.platformOperators.actions.addAnother")</a>
-                    </li>
-                </ul>
             }
         </div>
     </div>

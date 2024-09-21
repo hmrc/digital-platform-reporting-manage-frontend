@@ -26,13 +26,8 @@
         <p class="govuk-body-s">@messages("index.contactDetails.p")</p>
     </div>
     <div class="card-action">
-        <ul class="govuk-list">
-            <li>
-                <a href="@routes.ContactDetailsController.onPageLoad()" class="govuk-link">@messages("index.contactDetails.actions.view")</a>
-            </li>
-            <li>
-                <a href="@routes.ContactDetailsController.onPageLoad()" class="govuk-link">@messages("index.contactDetails.actions.change")</a>
-            </li>
-        </ul>
+        <p class="govuk-body">
+            <a href="@routes.ContactDetailsController.onPageLoad()" class="govuk-link">@messages("index.contactDetails.actions.change")</a>
+        </p>
     </div>
 </div>

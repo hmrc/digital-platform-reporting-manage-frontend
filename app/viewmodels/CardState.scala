@@ -21,7 +21,6 @@ sealed trait CardState
 object CardState {
 
   case object Hidden extends CardState
+  case object Active extends CardState
   case object Inactive extends CardState
-  case object AddOnly extends CardState
-  case object AddAndView extends CardState
 }

@@ -16,5 +16,4 @@
 
 package viewmodels
 
-case class IndexViewModel(platformOperatorCard: PlatformOperatorCardViewModel,
-                          reportingNotificationCard: ReportingNotificationCardViewModel)
+final case class Link(text: String, href: String)

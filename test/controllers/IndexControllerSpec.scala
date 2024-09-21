@@ -17,6 +17,7 @@
 package controllers
 
 import base.SpecBase
+import config.FrontendAppConfig
 import connectors.PlatformOperatorConnector
 import models.operator.{AddressDetails, ContactDetails, NotificationType}
 import models.operator.responses.{NotificationDetails, PlatformOperator, ViewPlatformOperatorsResponse}
@@ -28,7 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import viewmodels.{CardState, IndexViewModel}
+import viewmodels.{CardState, IndexViewModel, PlatformOperatorCardViewModel, ReportingNotificationCardViewModel}
 import views.html.IndexView
 
 import java.time.Instant
@@ -63,7 +64,9 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
           status(result) mustEqual OK
 
-          val viewModel = IndexViewModel(CardState.Hidden, CardState.Hidden)
+          val operatorCard = PlatformOperatorCardViewModel(CardState.Hidden, Nil)
+          val notificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil)
+          val viewModel = IndexViewModel(operatorCard, notificationCard)
           contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
         }
       }
@@ -71,121 +74,31 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
     "when platform operators are enabled" - {
 
-      "and the user has not set up any platform operators" - {
+      "must display the  platform operator and reporting notification cards" in {
 
-        "must set the platform operators care to Add and the reporting notifications card to Inactive" in {
+        when(mockConnector.viewPlatformOperators(any())) thenReturn Future.successful(ViewPlatformOperatorsResponse(Nil))
 
-          when(mockConnector.viewPlatformOperators(any())) thenReturn Future.successful(ViewPlatformOperatorsResponse(Nil))
+        val application =
+          applicationBuilder(userAnswers = None)
+            .overrides(bind[PlatformOperatorConnector].toInstance(mockConnector))
+            .configure("features.platform-operators" -> true)
+            .build()
 
-          val application =
-            applicationBuilder(userAnswers = None)
-              .overrides(bind[PlatformOperatorConnector].toInstance(mockConnector))
-              .configure("features.platform-operators" -> true)
-              .build()
+        running(application) {
+          val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
-          running(application) {
-            val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+          val result = route(application, request).value
 
-            val result = route(application, request).value
+          val view = application.injector.instanceOf[IndexView]
+          val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
-            val view = application.injector.instanceOf[IndexView]
+          status(result) mustEqual OK
 
-            status(result) mustEqual OK
+          val operatorCard = PlatformOperatorCardViewModel(Nil, appConfig)(messages(application))
+          val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
 
-            val viewModel = IndexViewModel(CardState.AddOnly, CardState.Inactive)
-            contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
-          }
-        }
-      }
-
-      "and the user has set up platform operators, but none have a reporting notification" - {
-
-        "must set the platform operators care to Add or View and the reporting notifications card to Add" in {
-
-          val platformOperator = PlatformOperator(
-            operatorId = "operatorId",
-            operatorName = "operatorName",
-            tinDetails = Nil,
-            businessName = None,
-            tradingName = None,
-            primaryContactDetails = ContactDetails(None, "name", "email"),
-            secondaryContactDetails = None,
-            addressDetails = AddressDetails("line 1", None, None, None, None, None),
-            notifications = Nil
-          )
-
-          when(mockConnector.viewPlatformOperators(any())) thenReturn Future.successful(ViewPlatformOperatorsResponse(Seq(platformOperator)))
-
-          val application =
-            applicationBuilder(userAnswers = None)
-              .overrides(bind[PlatformOperatorConnector].toInstance(mockConnector))
-              .configure("features.platform-operators" -> true)
-              .build()
-
-          running(application) {
-            val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
-
-            val result = route(application, request).value
-
-            val view = application.injector.instanceOf[IndexView]
-
-            status(result) mustEqual OK
-
-            val viewModel = IndexViewModel(CardState.AddAndView, CardState.AddOnly)
-            contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
-          }
-        }
-      }
-
-      "and the user has set up platform operators, and at least one has a reporting notification" - {
-
-        "must set the platform operators care to Add or View and the reporting notifications card to Add or View" in {
-
-          val platformOperator1 = PlatformOperator(
-            operatorId = "operatorId1",
-            operatorName = "operatorName1",
-            tinDetails = Nil,
-            businessName = None,
-            tradingName = None,
-            primaryContactDetails = ContactDetails(None, "name", "email"),
-            secondaryContactDetails = None,
-            addressDetails = AddressDetails("line 1", None, None, None, None, None),
-            notifications = Nil
-          )
-
-          val platformOperator2 = PlatformOperator(
-            operatorId = "operatorId2",
-            operatorName = "operatorName2",
-            tinDetails = Nil,
-            businessName = None,
-            tradingName = None,
-            primaryContactDetails = ContactDetails(None, "name", "email"),
-            secondaryContactDetails = None,
-            addressDetails = AddressDetails("line 1", None, None, None, None, None),
-            notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
-          )
-          val platformOperatorResponse = ViewPlatformOperatorsResponse(Seq(platformOperator1, platformOperator2))
-
-          when(mockConnector.viewPlatformOperators(any())) thenReturn Future.successful(platformOperatorResponse)
-
-          val application =
-            applicationBuilder(userAnswers = None)
-              .overrides(bind[PlatformOperatorConnector].toInstance(mockConnector))
-              .configure("features.platform-operators" -> true)
-              .build()
-
-          running(application) {
-            val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
-
-            val result = route(application, request).value
-
-            val view = application.injector.instanceOf[IndexView]
-
-            status(result) mustEqual OK
-
-            val viewModel = IndexViewModel(CardState.AddAndView, CardState.AddAndView)
-            contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
-          }
+          val viewModel = IndexViewModel(operatorCard, notificationCard)
+          contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
         }
       }
     }
