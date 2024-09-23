@@ -40,14 +40,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting-manage-frontend"
 
-  val languageTranslationEnabled: Boolean =
-    configuration.get[Boolean]("features.welsh-translation")
-
-  def languageMap: Map[String, Lang] = Map(
-    "en" -> Lang("en"),
-    "cy" -> Lang("cy")
-  )
-
   val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 
@@ -56,8 +48,8 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val platformOperatorsEnabled: Boolean = configuration.get[Boolean]("features.platform-operators")
 
   val platformOperatorFrontendBaseUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-operator-frontend.baseUrl")
-  val addPlatformOperatorUrl = s"$platformOperatorFrontendBaseUrl/add-platform-operator/start"
-  val viewPlatformOperatorsUrl= s"$platformOperatorFrontendBaseUrl/platform-operators/view"
-  val addNotificationUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/start"
-  val viewNotificationsUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator"
+  val addPlatformOperatorUrl = s"$platformOperatorFrontendBaseUrl/platform-operator/add-platform-operator/start"
+  val viewPlatformOperatorsUrl= s"$platformOperatorFrontendBaseUrl/platform-operator/view"
+  val addNotificationUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator"
+  val viewNotificationsUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator-to-view"
 }

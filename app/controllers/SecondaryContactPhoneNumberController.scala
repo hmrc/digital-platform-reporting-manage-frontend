@@ -21,7 +21,6 @@ import controllers.actions._
 import forms.SecondaryContactPhoneNumberFormProvider
 
 import javax.inject.Inject
-import models.Mode
 import navigation.Navigator
 import pages.{SecondaryContactNamePage, SecondaryContactPhoneNumberPage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -48,7 +47,7 @@ class SecondaryContactPhoneNumberController @Inject()(
                                                      )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with AnswerExtractor with SubscriptionUpdater{
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       getAnswer(SecondaryContactNamePage) { contactName =>
 
@@ -59,11 +58,11 @@ class SecondaryContactPhoneNumberController @Inject()(
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, contactName))
+        Ok(view(preparedForm, contactName))
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       getAnswerAsync(SecondaryContactNamePage) { contactName =>
 
@@ -71,14 +70,14 @@ class SecondaryContactPhoneNumberController @Inject()(
 
         form.bindFromRequest().fold(
           formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, mode, contactName))),
+            Future.successful(BadRequest(view(formWithErrors, contactName))),
 
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactPhoneNumberPage, value))
               _              <- updateSubscription(updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SecondaryContactPhoneNumberPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(SecondaryContactPhoneNumberPage, updatedAnswers))
         )
       }
   }

@@ -1,91 +1,65 @@
 # microservice specific routes
 
-->          /hmrc-frontend                               hmrcfrontend.Routes
+->          /manage-reporting/hmrc-frontend                                     hmrcfrontend.Routes
 
-GET         /                                            controllers.IndexController.onPageLoad()
+GET         /manage-reporting                                                   controllers.IndexController.onPageLoad()
 
-GET         /assets/*file                                controllers.Assets.versioned(path="/public", file: Asset)
+GET         /manage-reporting/assets/*file                                      controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /language/:lang                              controllers.LanguageSwitchController.switchToLanguage(lang: String)
+GET         /manage-reporting/refresh-session                                   controllers.KeepAliveController.keepAlive()
 
-GET         /refresh-session                             controllers.KeepAliveController.keepAlive()
+GET         /manage-rpeorting/there-is-a-problem                                controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /manage-reporting/account/sign-out-survey                           controllers.auth.AuthController.signOut()
+GET         /manage-reporting/account/sign-out                                  controllers.auth.AuthController.signOutNoSurvey()
+GET         /manage-reporting/account/signed-out                                controllers.auth.SignedOutController.onPageLoad()
 
-GET         /view-contact-details                          controllers.ContactDetailsController.onPageLoad()
+GET         /manage-reporting/unauthorised                                      controllers.UnauthorisedController.onPageLoad()
 
-GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
-GET         /account/sign-out                            controllers.auth.AuthController.signOutNoSurvey()
-GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
+GET         /contact-details/view-contact-details                               controllers.ContactDetailsController.onPageLoad()
 
-GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
+GET         /contact-details/change-contact/can-we-telephone                    controllers.CanPhoneIndividualController.onPageLoad
+POST        /contact-details/change-contact/can-we-telephone                    controllers.CanPhoneIndividualController.onSubmit
 
-GET        /contact-details/change-contact/can-we-telephone                        controllers.CanPhoneIndividualController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-contact/can-we-telephone                        controllers.CanPhoneIndividualController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changeCanPhoneIndividual                  controllers.CanPhoneIndividualController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changeCanPhoneIndividual                  controllers.CanPhoneIndividualController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-first-contact/can-we-telephone              controllers.CanPhonePrimaryContactController.onPageLoad
+POST        /contact-details/change-first-contact/can-we-telephone              controllers.CanPhonePrimaryContactController.onSubmit
 
-GET        /contact-details/change-first-contact/can-we-telephone                        controllers.CanPhonePrimaryContactController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-first-contact/can-we-telephone                        controllers.CanPhonePrimaryContactController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changeCanPhonePrimaryContact                  controllers.CanPhonePrimaryContactController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changeCanPhonePrimaryContact                  controllers.CanPhonePrimaryContactController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-second-contact/can-we-telephone             controllers.CanPhoneSecondaryContactController.onPageLoad
+POST        /contact-details/change-second-contact/can-we-telephone             controllers.CanPhoneSecondaryContactController.onSubmit
 
-GET        /contact-details/change-second-contact/can-we-telephone                        controllers.CanPhoneSecondaryContactController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-second-contact/can-we-telephone                        controllers.CanPhoneSecondaryContactController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changeCanPhoneSecondaryContact                  controllers.CanPhoneSecondaryContactController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changeCanPhoneSecondaryContact                  controllers.CanPhoneSecondaryContactController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-second-contact/is-there-second-contact      controllers.HasSecondaryContactController.onPageLoad
+POST        /contact-details/change-second-contact/is-there-second-contact      controllers.HasSecondaryContactController.onSubmit
 
-GET        /contact-details/change-second-contact/is-there-second-contact                        controllers.HasSecondaryContactController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-second-contact/is-there-second-contact                        controllers.HasSecondaryContactController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changeHasSecondaryContact                  controllers.HasSecondaryContactController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changeHasSecondaryContact                  controllers.HasSecondaryContactController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-contact/email                               controllers.IndividualEmailAddressController.onPageLoad
+POST        /contact-details/change-contact/email                               controllers.IndividualEmailAddressController.onSubmit
 
-GET        /contact-details/change-contact/email                        controllers.IndividualEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-contact/email                        controllers.IndividualEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changeIndividualEmailAddress                  controllers.IndividualEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changeIndividualEmailAddress                  controllers.IndividualEmailAddressController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-contact/email-success                       controllers.IndividualEmailAddressUpdatedController.onPageLoad()
 
-GET        /contact-details/change-contact/email-success                       controllers.IndividualEmailAddressUpdatedController.onPageLoad()
+GET         /contact-details/change-contact/telephone-number                    controllers.IndividualPhoneNumberController.onPageLoad
+POST        /contact-details/change-contact/telephone-number                    controllers.IndividualPhoneNumberController.onSubmit
 
-GET        /contact-details/change-contact/telephone-number                        controllers.IndividualPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-contact/telephone-number                        controllers.IndividualPhoneNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changeIndividualPhoneNumber                  controllers.IndividualPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changeIndividualPhoneNumber                  controllers.IndividualPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-contact/telephone-number-removed            controllers.IndividualPhoneNumberRemovedController.onPageLoad()
 
-GET        /contact-details/change-contact/telephone-number-removed                       controllers.IndividualPhoneNumberRemovedController.onPageLoad()
+GET         /contact-details/change-contact/telephone-number-success            controllers.IndividualPhoneNumberUpdatedController.onPageLoad()
 
-GET        /contact-details/change-contact/telephone-number-success                       controllers.IndividualPhoneNumberUpdatedController.onPageLoad()
+GET         /contact-details/change-first-contact/email                         controllers.PrimaryContactEmailAddressController.onPageLoad
+POST        /contact-details/change-first-contact/email                         controllers.PrimaryContactEmailAddressController.onSubmit
 
-GET        /contact-details/change-first-contact/email                        controllers.PrimaryContactEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-first-contact/email                        controllers.PrimaryContactEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changePrimaryContactEmailAddress                  controllers.PrimaryContactEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changePrimaryContactEmailAddress                  controllers.PrimaryContactEmailAddressController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-first-contact/name                          controllers.PrimaryContactNameController.onPageLoad
+POST        /contact-details/change-first-contact/name                          controllers.PrimaryContactNameController.onSubmit
 
-GET        /contact-details/change-first-contact/name                        controllers.PrimaryContactNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-first-contact/name                        controllers.PrimaryContactNameController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changePrimaryContactName                  controllers.PrimaryContactNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changePrimaryContactName                  controllers.PrimaryContactNameController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-first-contact/telephone-number              controllers.PrimaryContactPhoneNumberController.onPageLoad
+POST        /contact-details/change-first-contact/telephone-number              controllers.PrimaryContactPhoneNumberController.onSubmit
 
-GET        /contact-details/change-first-contact/telephone-number                        controllers.PrimaryContactPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-first-contact/telephone-number                        controllers.PrimaryContactPhoneNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changePrimaryContactPhoneNumber                  controllers.PrimaryContactPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changePrimaryContactPhoneNumber                  controllers.PrimaryContactPhoneNumberController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-first-contact/success                       controllers.PrimaryContactUpdatedController.onPageLoad()
 
-GET        /contact-details/change-first-contact/success                       controllers.PrimaryContactUpdatedController.onPageLoad()
+GET         /contact-details/change-second-contact/email                        controllers.SecondaryContactEmailAddressController.onPageLoad
+POST        /contact-details/change-second-contact/email                        controllers.SecondaryContactEmailAddressController.onSubmit
 
-GET        /contact-details/change-second-contact/email                        controllers.SecondaryContactEmailAddressController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-second-contact/email                        controllers.SecondaryContactEmailAddressController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changeSecondaryContactEmailAddress                  controllers.SecondaryContactEmailAddressController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changeSecondaryContactEmailAddress                  controllers.SecondaryContactEmailAddressController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-second-contact/name                         controllers.SecondaryContactNameController.onPageLoad
+POST        /contact-details/change-second-contact/name                         controllers.SecondaryContactNameController.onSubmit
 
-GET        /contact-details/change-second-contact/name                        controllers.SecondaryContactNameController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-second-contact/name                        controllers.SecondaryContactNameController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changeSecondaryContactName                  controllers.SecondaryContactNameController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changeSecondaryContactName                  controllers.SecondaryContactNameController.onSubmit(mode: Mode = CheckMode)
+GET         /contact-details/change-second-contact/telephone-number             controllers.SecondaryContactPhoneNumberController.onPageLoad
+POST        /contact-details/change-second-contact/telephone-number             controllers.SecondaryContactPhoneNumberController.onSubmit
 
-GET        /contact-details/change-second-contact/telephone-number                        controllers.SecondaryContactPhoneNumberController.onPageLoad(mode: Mode = NormalMode)
-POST       /contact-details/change-second-contact/telephone-number                        controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = NormalMode)
-GET        /contact-details/changeSecondaryContactPhoneNumber                  controllers.SecondaryContactPhoneNumberController.onPageLoad(mode: Mode = CheckMode)
-POST       /contact-details/changeSecondaryContactPhoneNumber                  controllers.SecondaryContactPhoneNumberController.onSubmit(mode: Mode = CheckMode)
-
-GET        /contact-details/change-second-contact/success                       controllers.SecondaryContactUpdatedController.onPageLoad()
+GET         /contact-details/change-second-contact/success                      controllers.SecondaryContactUpdatedController.onPageLoad()

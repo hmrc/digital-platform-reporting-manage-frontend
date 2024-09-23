@@ -21,7 +21,7 @@ import connectors.SubscriptionConnector
 import forms.CanPhonePrimaryContactFormProvider
 import models.requests.subscription.requests.SubscriptionRequest
 import models.requests.subscription.{Organisation, OrganisationContact}
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
 import org.mockito.ArgumentCaptor
@@ -47,7 +47,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
   private val form = formProvider(contactName)
   private val baseAnswers = emptyUserAnswers.set(PrimaryContactNamePage, contactName).success.value
 
-  private lazy val canPhonePrimaryContactRoute = routes.CanPhonePrimaryContactController.onPageLoad(NormalMode).url
+  private lazy val canPhonePrimaryContactRoute = routes.CanPhonePrimaryContactController.onPageLoad.url
 
   "CanPhonePrimaryContact Controller" - {
 
@@ -63,7 +63,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CanPhonePrimaryContactView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, contactName)(request, messages(application)).toString
       }
     }
 
@@ -81,7 +81,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), NormalMode, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), contactName)(request, messages(application)).toString
       }
     }
 
@@ -226,7 +226,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, contactName)(request, messages(application)).toString
       }
     }
 

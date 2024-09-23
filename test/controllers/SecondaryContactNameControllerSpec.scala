@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.SecondaryContactNameFormProvider
-import models.NormalMode
+
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -41,7 +41,7 @@ class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
   private val form = formProvider(primaryContactName)
   private val baseAnswers = emptyUserAnswers.set(PrimaryContactNamePage, primaryContactName).success.value
 
-  private lazy val secondaryContactNameRoute = routes.SecondaryContactNameController.onPageLoad(NormalMode).url
+  private lazy val secondaryContactNameRoute = routes.SecondaryContactNameController.onPageLoad.url
 
   "SecondaryContactName Controller" - {
 
@@ -57,7 +57,7 @@ class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[SecondaryContactNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode, primaryContactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, primaryContactName)(request, messages(application)).toString
       }
     }
 
@@ -75,7 +75,7 @@ class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode, primaryContactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"), primaryContactName)(request, messages(application)).toString
       }
     }
 
@@ -121,7 +121,7 @@ class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode, primaryContactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, primaryContactName)(request, messages(application)).toString
       }
     }
 

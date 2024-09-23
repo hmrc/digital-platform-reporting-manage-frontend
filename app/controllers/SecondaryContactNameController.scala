@@ -20,7 +20,6 @@ import controllers.actions._
 import forms.SecondaryContactNameFormProvider
 
 import javax.inject.Inject
-import models.Mode
 import navigation.Navigator
 import pages.{PrimaryContactNamePage, SecondaryContactNamePage}
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -44,7 +43,7 @@ class SecondaryContactNameController @Inject()(
                                     )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with AnswerExtractor {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       getAnswer(PrimaryContactNamePage) { primaryContactName =>
 
@@ -55,11 +54,11 @@ class SecondaryContactNameController @Inject()(
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, primaryContactName))
+        Ok(view(preparedForm, primaryContactName))
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       getAnswerAsync(PrimaryContactNamePage) { primaryContactName =>
 
@@ -67,13 +66,13 @@ class SecondaryContactNameController @Inject()(
 
         form.bindFromRequest().fold(
           formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, mode, primaryContactName))),
+            Future.successful(BadRequest(view(formWithErrors, primaryContactName))),
 
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactNamePage, value))
               _ <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SecondaryContactNamePage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(SecondaryContactNamePage, updatedAnswers))
         )
       }
   }

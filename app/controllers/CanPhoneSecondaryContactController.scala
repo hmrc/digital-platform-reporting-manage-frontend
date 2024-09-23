@@ -19,7 +19,6 @@ package controllers
 import connectors.SubscriptionConnector
 import controllers.actions._
 import forms.CanPhoneSecondaryContactFormProvider
-import models.Mode
 import navigation.Navigator
 import org.apache.pekko.Done
 import pages.{CanPhoneSecondaryContactPage, SecondaryContactNamePage}
@@ -48,7 +47,7 @@ class CanPhoneSecondaryContactController @Inject()(
                                                   )(implicit ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with AnswerExtractor with SubscriptionUpdater {
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) {
+  def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
       getAnswer(SecondaryContactNamePage) { contactName =>
 
@@ -59,11 +58,11 @@ class CanPhoneSecondaryContactController @Inject()(
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, mode, contactName))
+        Ok(view(preparedForm, contactName))
       }
   }
 
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+  def onSubmit: Action[AnyContent] = (identify andThen getData andThen requireData).async {
     implicit request =>
       getAnswerAsync(SecondaryContactNamePage) { contactName =>
 
@@ -71,14 +70,14 @@ class CanPhoneSecondaryContactController @Inject()(
 
         form.bindFromRequest().fold(
           formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, mode, contactName))),
+            Future.successful(BadRequest(view(formWithErrors, contactName))),
 
           canPhone =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(CanPhoneSecondaryContactPage, canPhone))
               _              <- if (canPhone) Future.successful(Done) else updateSubscription(updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CanPhoneSecondaryContactPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(CanPhoneSecondaryContactPage, updatedAnswers))
         )
       }
   }

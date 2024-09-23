@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import forms.PrimaryContactNameFormProvider
-import models.{NormalMode, UserAnswers}
+import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
@@ -40,7 +40,7 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
   val formProvider = new PrimaryContactNameFormProvider()
   val form = formProvider()
 
-  lazy val primaryContactNameRoute = routes.PrimaryContactNameController.onPageLoad(NormalMode).url
+  lazy val primaryContactNameRoute = routes.PrimaryContactNameController.onPageLoad.url
 
   "PrimaryContactName Controller" - {
 
@@ -56,7 +56,7 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[PrimaryContactNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
       }
     }
 
@@ -74,7 +74,7 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("answer"))(request, messages(application)).toString
       }
     }
 
@@ -120,7 +120,7 @@ class PrimaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, NormalMode)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
       }
     }
 
