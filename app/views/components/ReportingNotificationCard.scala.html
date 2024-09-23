@@ -14,37 +14,27 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
-@import viewmodels.CardState
+@import viewmodels.{CardState, ReportingNotificationCardViewModel}
 
-@this(
-        appConfig: FrontendAppConfig
-)
+@this()
 
-@(cardState: CardState)(implicit messages: Messages)
+@(card: ReportingNotificationCardViewModel)(implicit messages: Messages)
 
-@if(cardState != CardState.Hidden) {
+@if(card.cardState != CardState.Hidden) {
     <div class="card">
-        <div class="@if(cardState == CardState.Inactive){inactive} card-body">
+        <div class="@if(card.cardState == CardState.Inactive){inactive} card-body">
             <h2 class="govuk-heading-s card-heading">
             @messages("index.notifications.heading")
             </h2>
             <p class="govuk-body-s">@messages("index.notifications.p")</p>
         </div>
         <div class="card-action">
-            @if(cardState == CardState.AddOnly) {
-                <p class="govuk-body">
-                    <a href="@appConfig.addPlatformOperatorUrl" class="govuk-link">@messages("index.notifications.actions.add")</a>
-                </p>
-            } else if (cardState == CardState.AddAndView) {
-                <ul class="govuk-list">
-                    <li>
-                        <a href="@appConfig.viewNotificationsUrl" class="govuk-link">@messages("index.notifications.actions.view")</a>
-                    </li>
-                    <li>
-                        <a href="@appConfig.addNotificationUrl" class="govuk-link">@messages("index.notifications.actions.add")</a>
-                    </li>
-                </ul>
+            @if(card.cardState == CardState.Active) {
+                @card.links.map { link =>
+                    <p class="govuk-body">
+                        <a href="@link.href" class="govuk-link">@link.text</a>
+                    </p>
+                }
             } else {
                 <p class="govuk-body">@messages("index.notifications.inactive")</p>
             }

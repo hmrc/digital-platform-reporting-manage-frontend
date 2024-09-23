@@ -24,7 +24,7 @@ import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.{CardState, IndexViewModel}
+import viewmodels.{CardState, IndexViewModel, PlatformOperatorCardViewModel, ReportingNotificationCardViewModel}
 import views.html.IndexView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,23 +42,16 @@ class IndexController @Inject()(
     if (appConfig.platformOperatorsEnabled)  {
       connector.viewPlatformOperators.map { response =>
         val viewModel = IndexViewModel(
-          platformOperatorCard = response.platformOperators match {
-            case Nil => CardState.AddOnly
-            case _   => CardState.AddAndView
-          },
-          reportingNotificationCard = response.platformOperators match {
-            case Nil                                                     => CardState.Inactive
-            case operators if operators.exists(_.notifications.nonEmpty) => CardState.AddAndView
-            case _                                                       => CardState.AddOnly
-          }
+          platformOperatorCard      = PlatformOperatorCardViewModel(response.platformOperators, appConfig),
+          reportingNotificationCard = ReportingNotificationCardViewModel(response.platformOperators, appConfig)
         )
 
         Ok(view(viewModel))
       }
     } else {
       val viewModel = IndexViewModel(
-        platformOperatorCard = CardState.Hidden,
-        reportingNotificationCard = CardState.Hidden
+        platformOperatorCard = PlatformOperatorCardViewModel(CardState.Hidden, Nil),
+        reportingNotificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil)
       )
 
       Future.successful(Ok(view(viewModel)))

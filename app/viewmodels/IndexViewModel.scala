@@ -16,5 +16,5 @@
 
 package viewmodels
 
-case class IndexViewModel(platformOperatorCard: CardState,
-                          reportingNotificationCard: CardState)
+case class IndexViewModel(platformOperatorCard: PlatformOperatorCardViewModel,
+                          reportingNotificationCard: ReportingNotificationCardViewModel)

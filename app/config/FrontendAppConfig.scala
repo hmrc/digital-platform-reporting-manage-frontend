@@ -18,7 +18,6 @@ package config
 
 import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
-import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 
 @Singleton
@@ -48,8 +47,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val platformOperatorsEnabled: Boolean = configuration.get[Boolean]("features.platform-operators")
 
   val platformOperatorFrontendBaseUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-operator-frontend.baseUrl")
+
   val addPlatformOperatorUrl = s"$platformOperatorFrontendBaseUrl/platform-operator/add-platform-operator/start"
   val viewPlatformOperatorsUrl= s"$platformOperatorFrontendBaseUrl/platform-operator/view"
+
   val addNotificationUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator"
   val viewNotificationsUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator-to-view"
+  def viewNotificationsSingleUrl(operatorId: String) = s"$platformOperatorFrontendBaseUrl/reporting-notification/$operatorId/view"
 }

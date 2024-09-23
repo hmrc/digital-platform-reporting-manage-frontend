@@ -14,22 +14,6 @@
  * limitations under the License.
  */
 
-package forms
+package viewmodels
 
-import forms.mappings.Mappings
-import play.api.data.Form
-
-import javax.inject.Inject
-
-class IndividualPhoneNumberFormProvider @Inject() extends Mappings {
-
-  def apply(): Form[String] =
-    Form(
-      "value" -> text("individualPhoneNumber.error.required")
-        .verifying(firstError(
-          maxLength(24, "individualPhoneNumber.error.length"),
-          regexp(Validation.phoneNumberPattern.toString, "individualPhoneNumber.error.format"),
-          validPhoneNumber("individualPhoneNumber.error.format")
-        ))
-    )
-}
+final case class Link(text: String, href: String)
