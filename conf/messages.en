@@ -72,21 +72,21 @@ unauthorised.heading = You can’t access this service with this account
 
 canPhoneIndividual.title = Can we contact you by telephone?
 canPhoneIndividual.heading = Can we contact you by telephone?
-canPhoneIndividual.p1 = We will use this phone number if we have any questions about your reports.
+canPhoneIndividual.p1 = We may call if we have any questions about your reports.
 canPhoneIndividual.checkYourAnswersLabel = Can we contact you by telephone?
 canPhoneIndividual.error.required = Select yes if we can contact you by telephone
 canPhoneIndividual.change.hidden = if we can contact you by telephone
 
 canPhonePrimaryContact.title = Can we contact the person or team by telephone?
 canPhonePrimaryContact.heading = Can we contact {0} by telephone?
-canPhonePrimaryContact.p1 = We will use this phone number if we have any questions about your reports.
+canPhonePrimaryContact.p1 = We may use this phone number if we have any questions about your reports.
 canPhonePrimaryContact.checkYourAnswersLabel = Can we telephone?
 canPhonePrimaryContact.error.required = Select yes if we can contact {0} by telephone
 canPhonePrimaryContact.change.hidden = if we can contact {0} by telephone
 
 canPhoneSecondaryContact.title = Can we contact the second person or team by telephone?
 canPhoneSecondaryContact.heading = Can we contact {0} by telephone?
-canPhoneSecondaryContact.p1 = We will use this phone number if we have any questions about your reports.
+canPhoneSecondaryContact.p1 = We may use this phone number if we have any questions about your reports.
 canPhoneSecondaryContact.checkYourAnswersLabel = Can we telephone?
 canPhoneSecondaryContact.error.required = Select yes if we can contact {0} by telephone
 canPhoneSecondaryContact.change.hidden = if we can contact {0} by telephone
@@ -151,8 +151,8 @@ primaryContactPhoneNumber.error.length = Telephone number must be {0} characters
 primaryContactPhoneNumber.error.format = Enter a telephone number in the correct format, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 primaryContactPhoneNumber.change.hidden = the telephone number for {0}
 
-primaryContactUpdated.title = First contact has been changed successfully
-primaryContactUpdated.heading = First contact has been changed successfully
+primaryContactUpdated.title = First contact details have been changed successfully
+primaryContactUpdated.heading = First contact details have been changed successfully
 
 secondaryContactEmailAddress.title = What is the email address for the second person or team we should contact?
 secondaryContactEmailAddress.heading = What is the email address for {0}?
@@ -181,5 +181,5 @@ secondaryContactPhoneNumber.error.length = Telephone number must be {0} characte
 secondaryContactPhoneNumber.error.format = Enter a telephone number in the correct format, like 01632 960 001, 07700 900 982 or +44 808 157 0192
 secondaryContactPhoneNumber.change.hidden = the telephone number for {0}
 
-secondaryContactUpdated.title = Second contact has been changed successfully
-secondaryContactUpdated.heading = Second contact has been changed successfully
+secondaryContactUpdated.title = Second contact details have been changed successfully
+secondaryContactUpdated.heading = Second contact details have been changed successfully
