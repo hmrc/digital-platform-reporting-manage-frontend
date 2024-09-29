@@ -17,8 +17,8 @@
 package viewmodels
 
 import config.FrontendAppConfig
-import models.operator.{AddressDetails, ContactDetails}
-import models.operator.responses.PlatformOperator
+import models.operator.{AddressDetails, ContactDetails, NotificationType, TinType}
+import models.operator.responses.{NotificationDetails, PlatformOperator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
@@ -28,6 +28,8 @@ import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
+
+import java.time.Instant
 
 class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
 
@@ -49,7 +51,7 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
       card.links mustBe empty
     }
 
-    "must be active and have a `view single` link and an add link when there is one platform operator" in {
+    "must be active and have only an add link when there is one platform operator with no notifications" in {
 
       when(mockAppConfig.addNotificationUrl) thenReturn "add-link"
       when(mockAppConfig.viewNotificationsSingleUrl(any())) thenReturn "view-link"
@@ -69,13 +71,36 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
       val card = ReportingNotificationCardViewModel(Seq(operator), mockAppConfig)
 
       card.cardState mustEqual CardState.Active
+      card.links must contain only Link(msgs("reportingNotificationCard.add"), "add-link")
+    }
+
+    "must be active and have a `view single` link and an add link when there is one platform operator" in {
+
+      when(mockAppConfig.addNotificationUrl) thenReturn "add-link"
+      when(mockAppConfig.viewNotificationsSingleUrl(any())) thenReturn "view-link"
+
+      val operator = PlatformOperator(
+        operatorId = "operatorId",
+        operatorName = "operatorName",
+        tinDetails = Nil,
+        businessName = None,
+        tradingName = None,
+        primaryContactDetails = ContactDetails(None, "name", "email"),
+        secondaryContactDetails = None,
+        addressDetails = AddressDetails("line 1", None, None, None, None, None),
+        notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
+      )
+
+      val card = ReportingNotificationCardViewModel(Seq(operator), mockAppConfig)
+
+      card.cardState mustEqual CardState.Active
       card.links must contain theSameElementsInOrderAs Seq(
         Link(msgs("reportingNotificationCard.view"), "view-link"),
         Link(msgs("reportingNotificationCard.add"), "add-link")
       )
     }
 
-    "must be active have a view link and an add link when there is more than one platform operator" in {
+    "must be active have an add link when there is more than one platform operator and none have any notifications" in {
 
       when(mockAppConfig.addNotificationUrl) thenReturn "add-link"
       when(mockAppConfig.viewNotificationsUrl) thenReturn "view-link"
@@ -90,6 +115,30 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
         secondaryContactDetails = None,
         addressDetails = AddressDetails("line 1", None, None, None, None, None),
         notifications = Nil
+      )
+
+      val card = ReportingNotificationCardViewModel(Seq(operator, operator), mockAppConfig)
+
+      card.cardState mustEqual CardState.Active
+      card.links must contain only Link(msgs("reportingNotificationCard.add"), "add-link")
+
+    }
+
+    "must be active have a view link and an add link when there is more than one platform operator and at least one has a notification" in {
+
+      when(mockAppConfig.addNotificationUrl) thenReturn "add-link"
+      when(mockAppConfig.viewNotificationsUrl) thenReturn "view-link"
+
+      val operator = PlatformOperator(
+        operatorId = "operatorId",
+        operatorName = "operatorName",
+        tinDetails = Nil,
+        businessName = None,
+        tradingName = None,
+        primaryContactDetails = ContactDetails(None, "name", "email"),
+        secondaryContactDetails = None,
+        addressDetails = AddressDetails("line 1", None, None, None, None, None),
+        notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
       )
 
       val card = ReportingNotificationCardViewModel(Seq(operator, operator), mockAppConfig)
