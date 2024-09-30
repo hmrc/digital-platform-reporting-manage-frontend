@@ -28,10 +28,11 @@ object ReportingNotificationCardViewModel {
   def apply(operators: Seq[PlatformOperator], appConfig: FrontendAppConfig)
            (implicit messages: Messages): ReportingNotificationCardViewModel = {
 
-    val viewLink = operators.size match {
-      case 0 => None
-      case 1 => Some(Link(messages("reportingNotificationCard.view"), appConfig.viewNotificationsSingleUrl(operators.head.operatorId)))
-      case _ => Some(Link(messages("reportingNotificationCard.view"), appConfig.viewNotificationsUrl))
+    val viewLink = operators.find(_.notifications.nonEmpty).map { _ =>
+      operators.size match {
+        case 1 => Link(messages("reportingNotificationCard.view"), appConfig.viewNotificationsSingleUrl(operators.head.operatorId))
+        case _ => Link(messages("reportingNotificationCard.view"), appConfig.viewNotificationsUrl)
+      }
     }
 
     val addLink = operators.size match {
