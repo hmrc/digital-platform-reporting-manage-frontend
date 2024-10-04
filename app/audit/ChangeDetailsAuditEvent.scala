@@ -19,7 +19,10 @@ package audit
 import models.subscription._
 import play.api.libs.json.{JsObject, Json, OWrites}
 
-final case class ChangeDetailsAuditEvent(original: SubscriptionInfo, updated: SubscriptionInfo)
+final case class ChangeDetailsAuditEvent(original: SubscriptionInfo, updated: SubscriptionInfo) {
+
+  val auditType = "ChangeContactDetails"
+}
 
 object ChangeDetailsAuditEvent {
 

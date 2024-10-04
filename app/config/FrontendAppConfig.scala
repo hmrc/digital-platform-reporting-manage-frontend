@@ -54,4 +54,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val addNotificationUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator"
   val viewNotificationsUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator-to-view"
   def viewNotificationsSingleUrl(operatorId: String) = s"$platformOperatorFrontendBaseUrl/reporting-notification/$operatorId/view"
+
+  val auditSource: String = configuration.get[String]("auditing.auditSource")
 }
