@@ -16,10 +16,10 @@
 
 package queries
 
-import models.subscription.Individual
+import models.subscription.SubscriptionInfo
 import play.api.libs.json.JsPath
 
-case object IndividualQuery extends Gettable[Individual] with Settable[Individual] {
+case object OriginalSubscriptionInfoQuery extends Gettable[SubscriptionInfo] with Settable[SubscriptionInfo] {
 
-  override def path: JsPath = JsPath \ "individual"
+  override def path: JsPath = JsPath \ "originalSubscriptionInfo"
 }

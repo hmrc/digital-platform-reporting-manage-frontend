@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package models.requests.subscription.responses
+package models.subscription
 
-import models.requests.subscription.Contact
 import play.api.libs.json._
 
 final case class SubscriptionInfo(
@@ -24,7 +23,7 @@ final case class SubscriptionInfo(
                                    gbUser: Boolean,
                                    tradingName: Option[String],
                                    primaryContact: Contact,
-                                   secondaryContact: Option[Contact]
+                                   secondaryContact: Option[OrganisationContact]
                                  )
 
 object SubscriptionInfo {

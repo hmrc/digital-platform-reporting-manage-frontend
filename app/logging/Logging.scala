@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package models.requests.subscription.requests
+package logging
 
-import models.requests.subscription.Contact
-import play.api.libs.json._
+import org.slf4j.{Logger, LoggerFactory}
 
-final case class SubscriptionRequest(
-                                      id: String,
-                                      gbUser: Boolean,
-                                      tradingName: Option[String],
-                                      primaryContact: Contact,
-                                      secondaryContact: Option[Contact]
-                                    )
+trait Logging {
 
-object SubscriptionRequest {
-
-  implicit lazy val format: OFormat[SubscriptionRequest] = Json.format
+  protected val logger: Logger =
+    LoggerFactory.getLogger("application." + getClass.getCanonicalName)
 }

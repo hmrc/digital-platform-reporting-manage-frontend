@@ -16,6 +16,7 @@
 
 package controllers
 
+import audit.AuditService
 import connectors.SubscriptionConnector
 import controllers.actions._
 import forms.CanPhoneIndividualFormProvider
@@ -44,8 +45,9 @@ class CanPhoneIndividualController @Inject()(
                                          val controllerComponents: MessagesControllerComponents,
                                          view: CanPhoneIndividualView,
                                          val connector: SubscriptionConnector,
-                                         val userAnswersService: UserAnswersService
-                                 )(implicit ec: ExecutionContext)
+                                         val userAnswersService: UserAnswersService,
+                                         val auditService: AuditService
+                                 )(implicit val ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with SubscriptionUpdater {
 
   val form = formProvider()

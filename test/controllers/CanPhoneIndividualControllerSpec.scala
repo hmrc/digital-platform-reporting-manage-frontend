@@ -16,11 +16,11 @@
 
 package controllers
 
+import audit.{AuditService, ChangeDetailsAuditEvent}
 import base.SpecBase
 import connectors.SubscriptionConnector
 import forms.CanPhoneIndividualFormProvider
-import models.requests.subscription.{Individual, IndividualContact}
-import models.requests.subscription.requests.SubscriptionRequest
+import models.subscription._
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
@@ -33,7 +33,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.{GbUserQuery, IndividualQuery}
+import queries.{GbUserQuery, IndividualQuery, OriginalSubscriptionInfoQuery}
 import repositories.SessionRepository
 import views.html.CanPhoneIndividualView
 
@@ -84,13 +84,17 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must update the subscription, save user answers and redirect to the next page when the answer is no" in {
+    "must update the subscription, save user answers, send an audit event, and redirect to the next page when the answer is no" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
+
+      val originalContact = IndividualContact(Individual("first", "last"), "foo@example.com", Some("07777 777777"))
+      val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
 
       val answers =
         emptyUserAnswers
@@ -99,13 +103,15 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
           .set(IndividualEmailAddressPage, "foo@example.com").success.value
           .set(CanPhoneIndividualPage, true).success.value
           .set(IndividualPhoneNumberPage, "07777 777777").success.value
+          .set(OriginalSubscriptionInfoQuery, originalInfo).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -115,7 +121,8 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "false"))
 
         val expectedContact = IndividualContact(Individual("first", "last"), "foo@example.com", None)
-        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedContact, None)
+        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
+        val expectedAuditEvent = ChangeDetailsAuditEvent(originalInfo, expectedRequest)
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val result = route(application, request).value
@@ -124,6 +131,7 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
         verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditEvent))(any())
 
         val savedAnswers = answersCaptor.getValue
         savedAnswers.get(IndividualPhoneNumberPage) must not be defined
@@ -134,6 +142,7 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -150,7 +159,8 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -165,15 +175,20 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockConnector, never()).updateSubscription(any())(any())
         verify(mockSessionRepository, times(1)).set(any())
+        verify(mockAuditService, never()).sendAudit(any())(any())
       }
     }
 
-    "must return a failed future and not save user answers when valid data is submitted but the update fails" in {
+    "must return a failed future and not save user answers or audit the event when valid data is submitted but the update fails" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
+
+      val originalContact = IndividualContact(Individual("first", "last"), "foo@example.com", Some("07777 777777"))
+      val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
 
       val answers =
         emptyUserAnswers
@@ -181,13 +196,16 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
           .set(IndividualQuery, Individual("first", "last")).success.value
           .set(IndividualEmailAddressPage, "foo@example.com").success.value
           .set(CanPhoneIndividualPage, true).success.value
+          .set(IndividualPhoneNumberPage, "07777 777777").success.value
+          .set(OriginalSubscriptionInfoQuery, originalInfo).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -197,11 +215,12 @@ class CanPhoneIndividualControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "false"))
 
         val expectedContact = IndividualContact(Individual("first", "last"), "foo@example.com", None)
-        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedContact, None)
+        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
         route(application, request).value.failed.futureValue
 
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
         verify(mockSessionRepository, never()).set(any())
+        verify(mockAuditService, never()).sendAudit(any())(any())
       }
     }
 

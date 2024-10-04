@@ -19,9 +19,10 @@ package controllers
 import com.google.inject.Inject
 import connectors.SubscriptionConnector
 import controllers.actions.IdentifierAction
-import models.requests.subscription.{IndividualContact, OrganisationContact}
+import models.subscription._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import queries.OriginalSubscriptionInfoQuery
 import repositories.SessionRepository
 import services.UserAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -47,15 +48,16 @@ class ContactDetailsController @Inject()(
       for {
         subscriptionInfo <- connector.getSubscription
         userAnswers      <- Future.fromTry(userAnswersService.fromSubscription(request.userId, subscriptionInfo))
-        _                <- sessionRepository.set(userAnswers)
+        updatedAnswers   <- Future.fromTry(userAnswers.set(OriginalSubscriptionInfoQuery, subscriptionInfo))
+        _                <- sessionRepository.set(updatedAnswers)
       } yield {
 
         subscriptionInfo.primaryContact match {
           case _: IndividualContact =>
-            Ok(individualView(ContactDetailsIndividualViewModel(userAnswers)))
+            Ok(individualView(ContactDetailsIndividualViewModel(updatedAnswers)))
 
           case _: OrganisationContact =>
-            Ok(organisationView(ContactDetailsOrganisationViewModel(userAnswers)))
+            Ok(organisationView(ContactDetailsOrganisationViewModel(updatedAnswers)))
         }
       }
   }

@@ -18,10 +18,10 @@ package controllers
 
 import base.SpecBase
 import connectors.SubscriptionConnector
-import models.requests.subscription.responses.SubscriptionInfo
-import models.requests.subscription.{Individual, IndividualContact, Organisation, OrganisationContact}
+import models.UserAnswers
+import models.subscription._
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
+import org.mockito.{ArgumentCaptor, Mockito}
 import org.mockito.Mockito.{times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,6 +29,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import queries.OriginalSubscriptionInfoQuery
 import repositories.SessionRepository
 import services.UserAnswersService
 import viewmodels.govuk.SummaryListFluency
@@ -78,16 +79,20 @@ class ContactDetailsControllerSpec
 
           val view = application.injector.instanceOf[ContactDetailsIndividualView]
           val userAnswersService = application.injector.instanceOf[UserAnswersService]
-          val userAnswers = userAnswersService.fromSubscription("id", subscriptionInfo).success.value
           implicit val msgs: Messages = messages(application)
+          val userAnswers = userAnswersService.fromSubscription("id", subscriptionInfo).success.value
 
+          val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
           val viewModel = ContactDetailsIndividualViewModel(userAnswers)
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(viewModel)(request, implicitly).toString
 
           verify(mockConnector, times(1)).getSubscription(any())
-          verify(mockRepository, times(1)).set(any())
+          verify(mockRepository, times(1)).set(answersCaptor.capture())
+
+          val answers = answersCaptor.getValue
+          answers.get(OriginalSubscriptionInfoQuery).value mustEqual subscriptionInfo
         }
       }
 

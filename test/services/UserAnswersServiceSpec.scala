@@ -17,9 +17,7 @@
 package services
 
 import models.UserAnswers
-import models.requests.subscription.requests.SubscriptionRequest
-import models.requests.subscription.responses.SubscriptionInfo
-import models.requests.subscription.{Individual, IndividualContact, Organisation, OrganisationContact}
+import models.subscription._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.{EitherValues, OptionValues, TryValues}
@@ -249,29 +247,6 @@ class UserAnswersServiceSpec
         }
       }
     }
-
-    "must fail when the secondary contact is an individual contact" in {
-
-      val subscription = SubscriptionInfo(
-        id = "id",
-        gbUser = true,
-        tradingName = Some("tradingName"),
-        primaryContact = OrganisationContact(
-          organisation = Organisation("primaryContactName"),
-          email = "primaryEmail",
-          phone = Some("primaryPhone")
-        ),
-        secondaryContact = Some(
-          IndividualContact(
-            individual = Individual("first", "last"),
-            email = "secondaryEmail",
-            phone = Some("secondaryPhone")
-          )
-        )
-      )
-
-      userAnswersService.fromSubscription("id", subscription).failed.success.value
-    }
   }
 
   "toSubscription" - {
@@ -297,7 +272,7 @@ class UserAnswersServiceSpec
                 .set(CanPhoneSecondaryContactPage, true).success.value
                 .set(SecondaryContactPhoneNumberPage, "secondary phone").success.value
 
-            val expectedResult = SubscriptionRequest(
+            val expectedResult = SubscriptionInfo(
               "dprsId",
               true,
               None,
@@ -305,7 +280,7 @@ class UserAnswersServiceSpec
               Some(OrganisationContact(Organisation("secondary name"), "secondary email", Some("secondary phone")))
             )
 
-            val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+            val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
             result.value mustEqual expectedResult
           }
@@ -323,7 +298,7 @@ class UserAnswersServiceSpec
                 .set(SecondaryContactEmailAddressPage, "secondary email").success.value
                 .set(CanPhoneSecondaryContactPage, false).success.value
 
-            val expectedResult = SubscriptionRequest(
+            val expectedResult = SubscriptionInfo(
               "dprsId",
               true,
               None,
@@ -331,7 +306,7 @@ class UserAnswersServiceSpec
               Some(OrganisationContact(Organisation("secondary name"), "secondary email", None))
             )
 
-            val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+            val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
             result.value mustEqual expectedResult
           }
@@ -348,7 +323,7 @@ class UserAnswersServiceSpec
               .set(PrimaryContactPhoneNumberPage, "primary phone").success.value
               .set(HasSecondaryContactPage, false).success.value
 
-          val expectedResult = SubscriptionRequest(
+          val expectedResult = SubscriptionInfo(
             "dprsId",
             true,
             None,
@@ -356,7 +331,7 @@ class UserAnswersServiceSpec
             None
           )
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.value mustEqual expectedResult
         }
@@ -373,7 +348,7 @@ class UserAnswersServiceSpec
               .set(PrimaryContactPhoneNumberPage, "primary phone").success.value
               .set(HasSecondaryContactPage, false).success.value
 
-          val expectedResult = SubscriptionRequest(
+          val expectedResult = SubscriptionInfo(
             "dprsId",
             true,
             Some("trading name"),
@@ -381,7 +356,7 @@ class UserAnswersServiceSpec
             None
           )
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.value mustEqual expectedResult
         }
@@ -399,7 +374,7 @@ class UserAnswersServiceSpec
               .set(CanPhoneIndividualPage, true).success.value
               .set(IndividualPhoneNumberPage, "phone").success.value
 
-          val expectedResult = SubscriptionRequest(
+          val expectedResult = SubscriptionInfo(
             "dprsId",
             true,
             None,
@@ -407,7 +382,7 @@ class UserAnswersServiceSpec
             None
           )
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.value mustEqual expectedResult
         }
@@ -421,7 +396,7 @@ class UserAnswersServiceSpec
               .set(IndividualEmailAddressPage, "email").success.value
               .set(CanPhoneIndividualPage, false).success.value
 
-          val expectedResult = SubscriptionRequest(
+          val expectedResult = SubscriptionInfo(
             "dprsId",
             true,
             None,
@@ -429,7 +404,7 @@ class UserAnswersServiceSpec
             None
           )
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.value mustEqual expectedResult
         }
@@ -444,7 +419,7 @@ class UserAnswersServiceSpec
 
           val answers = UserAnswers("id").set(IndividualQuery, Individual("first", "last")).success.value
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.left.value.toChain.toList must contain theSameElementsAs Seq(
             GbUserQuery, IndividualEmailAddressPage, CanPhoneIndividualPage
@@ -460,7 +435,7 @@ class UserAnswersServiceSpec
               .set(IndividualEmailAddressPage, "email").success.value
               .set(CanPhoneIndividualPage, true).success.value
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.left.value.toChain.toList must contain only IndividualPhoneNumberPage
         }
@@ -472,7 +447,7 @@ class UserAnswersServiceSpec
 
           val answers = UserAnswers("id")
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.left.value.toChain.toList must contain theSameElementsAs Seq(
             GbUserQuery,
@@ -493,7 +468,7 @@ class UserAnswersServiceSpec
               .set(CanPhonePrimaryContactPage, true).success.value
               .set(HasSecondaryContactPage, false).success.value
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.left.value.toChain.toList must contain only PrimaryContactPhoneNumberPage
         }
@@ -508,7 +483,7 @@ class UserAnswersServiceSpec
               .set(CanPhonePrimaryContactPage, false).success.value
               .set(HasSecondaryContactPage, true).success.value
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.left.value.toChain.toList must contain theSameElementsAs Seq(
             SecondaryContactNamePage, SecondaryContactEmailAddressPage, CanPhoneSecondaryContactPage
@@ -528,7 +503,7 @@ class UserAnswersServiceSpec
               .set(SecondaryContactEmailAddressPage, "secondary email").success.value
               .set(CanPhoneSecondaryContactPage, true).success.value
 
-          val result = userAnswersService.toSubscriptionRequest(answers, "dprsId")
+          val result = userAnswersService.toSubscriptionInfo(answers, "dprsId")
 
           result.left.value.toChain.toList must contain only SecondaryContactPhoneNumberPage
         }
