@@ -16,6 +16,7 @@
 
 package controllers
 
+import audit.{AuditService, ChangeDetailsAuditEvent}
 import base.SpecBase
 import connectors.SubscriptionConnector
 import forms.IndividualEmailAddressFormProvider
@@ -32,7 +33,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.{GbUserQuery, IndividualQuery}
+import queries.{GbUserQuery, IndividualQuery, OriginalSubscriptionInfoQuery}
 import repositories.SessionRepository
 import views.html.IndividualEmailAddressView
 
@@ -83,13 +84,17 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must update the subscription, save user answers and redirect to the next page when valid data is submitted" in {
+    "must update the subscription, save user answers, audit the event, and redirect to the next page when valid data is submitted" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
+
+      val originalContact = IndividualContact(Individual("first", "last"), "foo@example.com", None)
+      val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
 
       val answers =
         emptyUserAnswers
@@ -97,13 +102,15 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
           .set(IndividualQuery, Individual("first", "last")).success.value
           .set(IndividualEmailAddressPage, "foo@example.com").success.value
           .set(CanPhoneIndividualPage, false).success.value
+          .set(OriginalSubscriptionInfoQuery, originalInfo).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -112,9 +119,9 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, individualEmailAddressRoute)
             .withFormUrlEncodedBody(("value", "bar@example.com"))
 
-
         val expectedContact = IndividualContact(Individual("first", "last"), "bar@example.com", None)
         val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
+        val expectedAuditEvent = ChangeDetailsAuditEvent(originalInfo, expectedRequest)
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
         val result = route(application, request).value
 
@@ -122,18 +129,23 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
         verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditEvent))(any())
 
         val savedAnswers = answersCaptor.getValue
         savedAnswers.get(IndividualEmailAddressPage).value mustEqual "bar@example.com"
       }
     }
 
-    "must return a failed future and not save user answers when valid data is submitted but the update fails" in {
+    "must return a failed future and not save user answers or audit the event when valid data is submitted but the update fails" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
+
+      val originalContact = IndividualContact(Individual("first", "last"), "foo@example.com", None)
+      val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
 
       val answers =
         emptyUserAnswers
@@ -141,13 +153,15 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
           .set(IndividualQuery, Individual("first", "last")).success.value
           .set(IndividualEmailAddressPage, "foo@example.com").success.value
           .set(CanPhoneIndividualPage, false).success.value
+          .set(OriginalSubscriptionInfoQuery, originalInfo).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -162,6 +176,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
         verify(mockSessionRepository, never()).set(any())
+        verify(mockAuditService, never()).sendAudit(any())(any())
       }
     }
 

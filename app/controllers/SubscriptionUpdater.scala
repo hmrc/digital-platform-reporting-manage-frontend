@@ -16,33 +16,43 @@
 
 package controllers
 
+import audit.{AuditService, ChangeDetailsAuditEvent}
 import cats.data.NonEmptyChain
 import connectors.SubscriptionConnector
 import controllers.SubscriptionUpdater.BuildSubscriptionRequestFailure
+import logging.Logging
 import models.UserAnswers
 import models.requests.DataRequest
 import org.apache.pekko.Done
-import queries.Query
+import queries.{OriginalSubscriptionInfoQuery, Query}
 import services.UserAnswersService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-trait SubscriptionUpdater { self: FrontendBaseController =>
+trait SubscriptionUpdater extends Logging { self: FrontendBaseController =>
 
   val userAnswersService: UserAnswersService
   val connector: SubscriptionConnector
+  val auditService: AuditService
+  implicit val ec: ExecutionContext
 
   protected def updateSubscription(answers: UserAnswers)(implicit request: DataRequest[_]): Future[Done] =
     userAnswersService.toSubscriptionInfo(answers, request.dprsId)
       .fold(
         errors => Future.failed(BuildSubscriptionRequestFailure(errors)),
         subscriptionRequest => {
-          val subscriptionFuture = connector.updateSubscription(subscriptionRequest)
+          connector.updateSubscription(subscriptionRequest).map { response =>
 
-          // TODO: Audit
+            answers.get(OriginalSubscriptionInfoQuery).map { originalInfo =>
+              val auditEvent = ChangeDetailsAuditEvent(originalInfo, subscriptionRequest)
+              auditService.sendAudit(auditEvent)
+            }.getOrElse(
+              logger.warn("Unable to find original subscription info")
+            )
 
-          subscriptionFuture
+            response
+          }
         }
       )
 }

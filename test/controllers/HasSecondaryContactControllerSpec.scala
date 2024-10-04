@@ -16,6 +16,7 @@
 
 package controllers
 
+import audit.{AuditService, ChangeDetailsAuditEvent}
 import base.SpecBase
 import connectors.SubscriptionConnector
 import forms.HasSecondaryContactFormProvider
@@ -32,7 +33,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.GbUserQuery
+import queries.{GbUserQuery, OriginalSubscriptionInfoQuery}
 import repositories.SessionRepository
 import views.html.HasSecondaryContactView
 
@@ -84,13 +85,18 @@ class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
       }
     }
 
-    "must update the subscription, save user answers and redirect to the next page when the answer is no" in {
+    "must update the subscription, save user answers, audit the evenr, and redirect to the next page when the answer is no" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
+
+      val originalPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
+      val originalSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 888888"))
+      val originalInfo = SubscriptionInfo("dprsId", true, None, originalPrimaryContact, Some(originalSecondaryContact))
 
       val answers =
         emptyUserAnswers
@@ -100,18 +106,19 @@ class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
           .set(CanPhonePrimaryContactPage, true).success.value
           .set(PrimaryContactPhoneNumberPage, "07777 777777").success.value
           .set(HasSecondaryContactPage, true).success.value
-          .set(HasSecondaryContactPage, true).success.value
           .set(SecondaryContactNamePage, "second name").success.value
           .set(SecondaryContactEmailAddressPage, "bar@example.com").success.value
           .set(CanPhoneSecondaryContactPage, true).success.value
           .set(SecondaryContactPhoneNumberPage, "07777 888888").success.value
+          .set(OriginalSubscriptionInfoQuery, originalInfo).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -122,6 +129,7 @@ class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
 
         val expectedContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
         val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
+        val expectedAuditEvent = ChangeDetailsAuditEvent(originalInfo, expectedRequest)
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val result = route(application, request).value
@@ -130,6 +138,7 @@ class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
         verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditEvent))(any())
 
         val savedAnswers = answersCaptor.getValue
         savedAnswers.get(SecondaryContactNamePage) must not be defined
@@ -143,6 +152,7 @@ class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
 
@@ -160,7 +170,8 @@ class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -175,34 +186,43 @@ class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
         redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockConnector, never()).updateSubscription(any())(any())
         verify(mockSessionRepository, times(1)).set(any())
+        verify(mockAuditService, never()).sendAudit(any())(any())
       }
     }
 
-    "must return a failed future and not save user answers when valid data is submitted but the update fails" in {
+    "must return a failed future and not save user answers or audit the event when valid data is submitted but the update fails" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
+
+      val originalPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
+      val originalSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 888888"))
+      val originalInfo = SubscriptionInfo("dprsId", true, None, originalPrimaryContact, Some(originalSecondaryContact))
 
       val answers =
         emptyUserAnswers
           .set(GbUserQuery, true).success.value
           .set(PrimaryContactNamePage, "name").success.value
           .set(PrimaryContactEmailAddressPage, "foo@example.com").success.value
-          .set(CanPhonePrimaryContactPage, false).success.value
-          .set(HasSecondaryContactPage, true).success.value
+          .set(CanPhonePrimaryContactPage, true).success.value
+          .set(PrimaryContactPhoneNumberPage, "07777 777777").success.value
           .set(HasSecondaryContactPage, true).success.value
           .set(SecondaryContactNamePage, "second name").success.value
           .set(SecondaryContactEmailAddressPage, "bar@example.com").success.value
-          .set(CanPhoneSecondaryContactPage, false).success.value
+          .set(CanPhoneSecondaryContactPage, true).success.value
+          .set(SecondaryContactPhoneNumberPage, "07777 888888").success.value
+          .set(OriginalSubscriptionInfoQuery, originalInfo).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -211,12 +231,13 @@ class HasSecondaryContactControllerSpec extends SpecBase with MockitoSugar {
           FakeRequest(POST, hasSecondaryContactRoute)
             .withFormUrlEncodedBody(("value", "false"))
 
-        val expectedContact = OrganisationContact(Organisation("name"), "foo@example.com", None)
+        val expectedContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
         val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
         route(application, request).value.failed.futureValue
 
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
         verify(mockSessionRepository, never()).set(any())
+        verify(mockAuditService, never()).sendAudit(any())(any())
       }
     }
 

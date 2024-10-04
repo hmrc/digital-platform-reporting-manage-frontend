@@ -16,6 +16,7 @@
 
 package controllers
 
+import audit.{AuditService, ChangeDetailsAuditEvent}
 import base.SpecBase
 import connectors.SubscriptionConnector
 import forms.SecondaryContactPhoneNumberFormProvider
@@ -33,7 +34,7 @@ import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import queries.GbUserQuery
+import queries.{GbUserQuery, OriginalSubscriptionInfoQuery}
 import repositories.SessionRepository
 import views.html.SecondaryContactPhoneNumberView
 
@@ -90,9 +91,14 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
+
+      val originalPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
+      val originalSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 123456"))
+      val originalInfo = SubscriptionInfo("dprsId", true, None, originalPrimaryContact, Some(originalSecondaryContact))
 
       val answers =
         emptyUserAnswers
@@ -106,13 +112,15 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
           .set(SecondaryContactEmailAddressPage, "bar@example.com").success.value
           .set(CanPhoneSecondaryContactPage, true).success.value
           .set(SecondaryContactPhoneNumberPage, "07777 123456").success.value
+          .set(OriginalSubscriptionInfoQuery, originalInfo).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -122,8 +130,9 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
             .withFormUrlEncodedBody(("value", "07777 654321"))
 
         val expectedPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
-        val expectedSecondaryaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 654321"))
-        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryaryContact))
+        val expectedSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 654321"))
+        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryContact))
+        val expectedAuditService = ChangeDetailsAuditEvent(originalInfo, expectedRequest)
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val result = route(application, request).value
@@ -132,18 +141,24 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
         redirectLocation(result).value mustEqual onwardRoute.url
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
         verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
+        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditService))(any())
 
         val savedAnswers = answersCaptor.getValue
         savedAnswers.get(SecondaryContactPhoneNumberPage).value mustEqual "07777 654321"
       }
     }
 
-    "must return a failed future and not save user answers when valid data is submitted but the update fails" in {
+    "must return a failed future and not save user answers or audit the event when valid data is submitted but the update fails" in {
 
       val mockSessionRepository = mock[SessionRepository]
       val mockConnector = mock[SubscriptionConnector]
+      val mockAuditService = mock[AuditService]
 
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
+
+      val originalPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
+      val originalSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 123456"))
+      val originalInfo = SubscriptionInfo("dprsId", true, None, originalPrimaryContact, Some(originalSecondaryContact))
 
       val answers =
         emptyUserAnswers
@@ -157,13 +172,15 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
           .set(SecondaryContactEmailAddressPage, "bar@example.com").success.value
           .set(CanPhoneSecondaryContactPage, true).success.value
           .set(SecondaryContactPhoneNumberPage, "07777 123456").success.value
+          .set(OriginalSubscriptionInfoQuery, originalInfo).success.value
 
       val application =
         applicationBuilder(userAnswers = Some(answers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[SessionRepository].toInstance(mockSessionRepository),
-            bind[SubscriptionConnector].toInstance(mockConnector)
+            bind[SubscriptionConnector].toInstance(mockConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -180,6 +197,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
         verify(mockSessionRepository, never()).set(any())
+        verify(mockAuditService, never()).sendAudit(any())(any())
       }
     }
 

@@ -16,6 +16,7 @@
 
 package controllers
 
+import audit.AuditService
 import connectors.SubscriptionConnector
 import controllers.actions._
 import forms.HasSecondaryContactFormProvider
@@ -44,8 +45,9 @@ class HasSecondaryContactController @Inject()(
                                                val controllerComponents: MessagesControllerComponents,
                                                view: HasSecondaryContactView,
                                                val connector: SubscriptionConnector,
-                                               val userAnswersService: UserAnswersService
-                                             )(implicit ec: ExecutionContext)
+                                               val userAnswersService: UserAnswersService,
+                                               val auditService: AuditService
+                                             )(implicit val ec: ExecutionContext)
   extends FrontendBaseController with I18nSupport with AnswerExtractor with SubscriptionUpdater {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
