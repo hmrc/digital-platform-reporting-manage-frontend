@@ -27,34 +27,49 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
 
     "must write details for an individual" - {
 
-      "with minimal details" in {
+      val baseContact = IndividualContact(Individual("first", "last"), "email", None)
+      val baseInfo = SubscriptionInfo(
+        id = "id",
+        gbUser = true,
+        tradingName = None,
+        primaryContact = baseContact,
+        secondaryContact = None
+      )
 
-        val info = SubscriptionInfo(
-          id = "id",
-          gbUser = true,
-          tradingName = None,
-          primaryContact = IndividualContact(Individual("first", "last"), "email", None),
-          secondaryContact = None
-        )
+      "when email has changed" in {
 
-        val request = SubscriptionInfo(
-          id = "id",
-          gbUser = true,
-          tradingName = None,
-          primaryContact = IndividualContact(Individual("first", "last"), "new email", None),
-          secondaryContact = None
-        )
+        val original = baseInfo
+        val updated = baseInfo.copy(primaryContact = baseContact.copy(email = "new email"))
 
-        val auditEvent = ChangeDetailsAuditEvent(info, request)
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
             "userJourney" -> "individual",
-            "individualEmailAddress" -> "email",
-            "canContactIndividualByPhone" -> false
+            "individualEmailAddress" -> "email"
           ),
           "to" -> Json.obj(
             "userJourney" -> "individual",
-            "individualEmailAddress" -> "new email",
+            "individualEmailAddress" -> "new email"
+          )
+        )
+
+        Json.toJson(auditEvent) mustEqual expectedJson
+      }
+
+      "when `can phone` has from true to false" in {
+
+        val original = baseInfo.copy(primaryContact = baseContact.copy(phone = Some("phone")))
+        val updated = baseInfo
+
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
+        val expectedJson = Json.obj(
+          "from" -> Json.obj(
+            "userJourney" -> "individual",
+            "canContactIndividualByPhone" -> true,
+            "individualPhoneNumber" -> "phone"
+          ),
+          "to" -> Json.obj(
+            "userJourney" -> "individual",
             "canContactIndividualByPhone" -> false
           )
         )
@@ -62,37 +77,21 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         Json.toJson(auditEvent) mustEqual expectedJson
       }
 
-      "with complete details" in {
+      "when `can phone` has from false to true" in {
 
-        val info = SubscriptionInfo(
-          id = "id",
-          gbUser = true,
-          tradingName = None,
-          primaryContact = IndividualContact(Individual("first", "last"), "email", Some("phone")),
-          secondaryContact = None
-        )
+        val original = baseInfo
+        val updated = baseInfo.copy(primaryContact = baseContact.copy(phone = Some("phone")))
 
-        val request = SubscriptionInfo(
-          id = "id",
-          gbUser = true,
-          tradingName = None,
-          primaryContact = IndividualContact(Individual("first", "last"), "new email", Some("new phone")),
-          secondaryContact = None
-        )
-
-        val auditEvent = ChangeDetailsAuditEvent(info, request)
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
             "userJourney" -> "individual",
-            "individualEmailAddress" -> "email",
-            "canContactIndividualByPhone" -> true,
-            "individualPhoneNumber" -> "phone"
+            "canContactIndividualByPhone" -> false
           ),
           "to" -> Json.obj(
             "userJourney" -> "individual",
-            "individualEmailAddress" -> "new email",
             "canContactIndividualByPhone" -> true,
-            "individualPhoneNumber" -> "new phone"
+            "individualPhoneNumber" -> "phone"
           )
         )
 
@@ -102,185 +101,173 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
 
     "must write details for an organisation" - {
 
-      "with no secondary contact" - {
+      val baseContact = OrganisationContact(Organisation("name"), "email", None)
+      val baseContact2 = OrganisationContact(Organisation("name 2"), "email 2", None)
+      val baseInfo = SubscriptionInfo(
+        id = "id",
+        gbUser = true,
+        tradingName = None,
+        primaryContact = baseContact,
+        secondaryContact = None
+      )
 
-        "with minimal details" in {
+      "when basic details change" in {
 
-          val info = SubscriptionInfo(
-            id = "id",
-            gbUser = true,
-            tradingName = None,
-            primaryContact = OrganisationContact(Organisation("name"), "email", None),
-            secondaryContact = None
+        val original = baseInfo.copy(secondaryContact = Some(baseContact2))
+        val updated = baseInfo.copy(
+          primaryContact = baseContact.copy(organisation = Organisation("new name"), email = "new email"),
+          secondaryContact = Some(baseContact2.copy(organisation = Organisation("new name 2"), email = "new email 2"))
+        )
+
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
+        val expectedJson = Json.obj(
+          "from" -> Json.obj(
+            "userJourney" -> "organisation",
+            "primaryContactName" -> "name",
+            "primaryContactEmailAddress" -> "email",
+            "secondaryContactName" -> "name 2",
+            "secondaryContactEmailAddress" -> "email 2"
+          ),
+          "to" -> Json.obj(
+            "userJourney" -> "organisation",
+            "primaryContactName" -> "new name",
+            "primaryContactEmailAddress" -> "new email",
+            "secondaryContactName" -> "new name 2",
+            "secondaryContactEmailAddress" -> "new email 2"
           )
+        )
 
-          val request = SubscriptionInfo(
-            id = "id",
-            gbUser = true,
-            tradingName = None,
-            primaryContact = OrganisationContact(Organisation("new name"), "new email", None),
-            secondaryContact = None
-          )
-
-          val auditEvent = ChangeDetailsAuditEvent(info, request)
-          val expectedJson = Json.obj(
-            "from" -> Json.obj(
-              "userJourney" -> "organisation",
-              "primaryContactName" -> "name",
-              "primaryContactEmailAddress" -> "email",
-              "canPhonePrimaryContact" -> false,
-              "hasSecondaryContact" -> false
-            ),
-            "to" -> Json.obj(
-              "userJourney" -> "organisation",
-              "primaryContactName" -> "new name",
-              "primaryContactEmailAddress" -> "new email",
-              "canPhonePrimaryContact" -> false,
-              "hasSecondaryContact" -> false
-            )
-          )
-
-          Json.toJson(auditEvent) mustEqual expectedJson
-        }
-
-        "with complete details" in {
-
-          val info = SubscriptionInfo(
-            id = "id",
-            gbUser = true,
-            tradingName = None,
-            primaryContact = OrganisationContact(Organisation("name"), "email", Some("phone")),
-            secondaryContact = None
-          )
-
-          val request = SubscriptionInfo(
-            id = "id",
-            gbUser = true,
-            tradingName = None,
-            primaryContact = OrganisationContact(Organisation("new name"), "new email", Some("new phone")),
-            secondaryContact = None
-          )
-
-          val auditEvent = ChangeDetailsAuditEvent(info, request)
-          val expectedJson = Json.obj(
-            "from" -> Json.obj(
-              "userJourney" -> "organisation",
-              "primaryContactName" -> "name",
-              "primaryContactEmailAddress" -> "email",
-              "canPhonePrimaryContact" -> true,
-              "primaryContactPhoneNumber" -> "phone",
-              "hasSecondaryContact" -> false
-            ),
-            "to" -> Json.obj(
-              "userJourney" -> "organisation",
-              "primaryContactName" -> "new name",
-              "primaryContactEmailAddress" -> "new email",
-              "canPhonePrimaryContact" -> true,
-              "primaryContactPhoneNumber" -> "new phone",
-              "hasSecondaryContact" -> false
-            )
-          )
-
-          Json.toJson(auditEvent) mustEqual expectedJson
-        }
+        Json.toJson(auditEvent) mustEqual expectedJson
       }
 
-      "with a secondary contact" - {
+      "when `can phone primary contact` changes from true to false" in {
 
-        "with minimal details" in {
+        val original = baseInfo.copy(primaryContact = baseContact.copy(phone = Some("phone")))
+        val updated = baseInfo
 
-          val info = SubscriptionInfo(
-            id = "id",
-            gbUser = true,
-            tradingName = None,
-            primaryContact = OrganisationContact(Organisation("name"), "email", None),
-            secondaryContact = Some(OrganisationContact(Organisation("name 2"), "email 2", None))
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
+        val expectedJson = Json.obj(
+          "from" -> Json.obj(
+            "userJourney" -> "organisation",
+            "canPhonePrimaryContact" -> true,
+            "primaryContactPhoneNumber" -> "phone"
+          ),
+          "to" -> Json.obj(
+            "userJourney" -> "organisation",
+            "canPhonePrimaryContact" -> false
           )
+        )
 
-          val request = SubscriptionInfo(
-            id = "id",
-            gbUser = true,
-            tradingName = None,
-            primaryContact = OrganisationContact(Organisation("new name"), "new email", None),
-            secondaryContact = Some(OrganisationContact(Organisation("new name 2"), "new email 2", None))
+        Json.toJson(auditEvent) mustEqual expectedJson
+      }
+
+      "when `can phone primary contact` changes from false to true" in {
+
+        val original = baseInfo
+        val updated = baseInfo.copy(primaryContact = baseContact.copy(phone = Some("phone")))
+
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
+        val expectedJson = Json.obj(
+          "from" -> Json.obj(
+            "userJourney" -> "organisation",
+            "canPhonePrimaryContact" -> false
+          ),
+          "to" -> Json.obj(
+            "userJourney" -> "organisation",
+            "canPhonePrimaryContact" -> true,
+            "primaryContactPhoneNumber" -> "phone"
           )
+        )
 
-          val auditEvent = ChangeDetailsAuditEvent(info, request)
-          val expectedJson = Json.obj(
-            "from" -> Json.obj(
-              "userJourney" -> "organisation",
-              "primaryContactName" -> "name",
-              "primaryContactEmailAddress" -> "email",
-              "canPhonePrimaryContact" -> false,
-              "hasSecondaryContact" -> true,
-              "secondaryContactName" -> "name 2",
-              "secondaryContactEmailAddress" -> "email 2",
-              "canPhoneSecondaryContact" -> false,
-            ),
-            "to" -> Json.obj(
-              "userJourney" -> "organisation",
-              "primaryContactName" -> "new name",
-              "primaryContactEmailAddress" -> "new email",
-              "canPhonePrimaryContact" -> false,
-              "hasSecondaryContact" -> true,
-              "secondaryContactName" -> "new name 2",
-              "secondaryContactEmailAddress" -> "new email 2",
-              "canPhoneSecondaryContact" -> false,
-            )
+        Json.toJson(auditEvent) mustEqual expectedJson
+      }
+
+      "when `has secondary contact` changes from true to false" in {
+
+        val original = baseInfo.copy(secondaryContact = Some(baseContact2))
+        val updated = baseInfo
+
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
+        val expectedJson = Json.obj(
+          "from" -> Json.obj(
+            "userJourney" -> "organisation",
+            "hasSecondaryContact" -> true,
+            "secondaryContactName" -> "name 2",
+            "secondaryContactEmailAddress" -> "email 2",
+            "canPhoneSecondaryContact" -> false
+          ),
+          "to" -> Json.obj(
+            "userJourney" -> "organisation",
+            "hasSecondaryContact" -> false
           )
+        )
 
-          Json.toJson(auditEvent) mustEqual expectedJson
-        }
+        Json.toJson(auditEvent) mustEqual expectedJson
+      }
 
-        "with complete details" in {
+      "when `has secondary contact` changes from false to true" in {
 
-          val info = SubscriptionInfo(
-            id = "id",
-            gbUser = true,
-            tradingName = None,
-            primaryContact = OrganisationContact(Organisation("name"), "email", Some("phone")),
-            secondaryContact = Some(OrganisationContact(Organisation("name 2"), "email 2", Some("phone 2")))
+        val original = baseInfo
+        val updated = baseInfo.copy(secondaryContact = Some(baseContact2))
+
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
+        val expectedJson = Json.obj(
+          "from" -> Json.obj(
+            "userJourney" -> "organisation",
+            "hasSecondaryContact" -> false
+          ),
+          "to" -> Json.obj(
+            "userJourney" -> "organisation",
+            "hasSecondaryContact" -> true,
+            "secondaryContactName" -> "name 2",
+            "secondaryContactEmailAddress" -> "email 2",
+            "canPhoneSecondaryContact" -> false
           )
+        )
 
-          val request = SubscriptionInfo(
-            id = "id",
-            gbUser = true,
-            tradingName = None,
-            primaryContact = OrganisationContact(Organisation("new name"), "new email", Some("new phone")),
-            secondaryContact = Some(OrganisationContact(Organisation("new name 2"), "new email 2", Some("new phone 2")))
+        Json.toJson(auditEvent) mustEqual expectedJson
+      }
+
+      "when `can phone secondary contact` goes from true to false" in {
+
+        val original = baseInfo.copy(secondaryContact = Some(baseContact2.copy(phone = Some("phone 2"))))
+        val updated = baseInfo.copy(secondaryContact = Some(baseContact2))
+
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
+        val expectedJson = Json.obj(
+          "from" -> Json.obj(
+            "userJourney" -> "organisation",
+            "canPhoneSecondaryContact" -> true,
+            "secondaryContactPhoneNumber" -> "phone 2"
+          ),
+          "to" -> Json.obj(
+            "userJourney" -> "organisation",
+            "canPhoneSecondaryContact" -> false
           )
+        )
 
-          val auditEvent = ChangeDetailsAuditEvent(info, request)
-          val expectedJson = Json.obj(
-            "from" -> Json.obj(
-              "userJourney" -> "organisation",
-              "primaryContactName" -> "name",
-              "primaryContactEmailAddress" -> "email",
-              "canPhonePrimaryContact" -> true,
-              "primaryContactPhoneNumber" -> "phone",
-              "hasSecondaryContact" -> true,
-              "secondaryContactName" -> "name 2",
-              "secondaryContactEmailAddress" -> "email 2",
-              "canPhoneSecondaryContact" -> true,
-              "secondaryContactPhoneNumber" -> "phone 2"
-            ),
-            "to" -> Json.obj(
-              "userJourney" -> "organisation",
-              "primaryContactName" -> "new name",
-              "primaryContactEmailAddress" -> "new email",
-              "canPhonePrimaryContact" -> true,
-              "primaryContactPhoneNumber" -> "new phone",
-              "hasSecondaryContact" -> true,
-              "secondaryContactName" -> "new name 2",
-              "secondaryContactEmailAddress" -> "new email 2",
-              "canPhoneSecondaryContact" -> true,
-              "secondaryContactPhoneNumber" -> "new phone 2"
-            )
+        Json.toJson(auditEvent) mustEqual expectedJson
+      }
+
+      "when `can phone secondary contact` goes from false to true" in {
+
+        val original = baseInfo.copy(secondaryContact = Some(baseContact2))
+        val updated = baseInfo.copy(secondaryContact = Some(baseContact2.copy(phone = Some("phone 2"))))
+
+        val auditEvent = ChangeDetailsAuditEvent(original, updated)
+        val expectedJson = Json.obj(
+          "from" -> Json.obj(
+            "userJourney" -> "organisation",
+            "canPhoneSecondaryContact" -> false
+          ),
+          "to" -> Json.obj(
+            "userJourney" -> "organisation",
+            "canPhoneSecondaryContact" -> true,
+            "secondaryContactPhoneNumber" -> "phone 2"
           )
+        )
 
-          Json.toJson(auditEvent) mustEqual expectedJson
-
-        }
+        Json.toJson(auditEvent) mustEqual expectedJson
       }
     }
   }

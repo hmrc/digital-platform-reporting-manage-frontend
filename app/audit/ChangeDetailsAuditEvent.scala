@@ -28,14 +28,26 @@ object ChangeDetailsAuditEvent {
 
   implicit lazy val writes: OWrites[ChangeDetailsAuditEvent] = new OWrites[ChangeDetailsAuditEvent] {
     override def writes(o: ChangeDetailsAuditEvent): JsObject = {
+
+      val originalJson = toJson(o.original)
+      val updatedJson = toJson(o.updated)
+
+      val changedFieldsInOriginal = JsObject(originalJson.fieldSet.diff(updatedJson.fieldSet).toSeq)
+      val changedFieldsInUpdated = JsObject(updatedJson.fieldSet.diff(originalJson.fieldSet).toSeq)
+
+      val userJourneyJson = o.original.primaryContact match {
+        case _: OrganisationContact => Json.obj("userJourney" -> "organisation")
+        case _: IndividualContact => Json.obj("userJourney" -> "individual")
+      }
+
       Json.obj(
-        "from" -> infoJson(o.original),
-        "to" -> infoJson(o.updated)
+        "from" -> (changedFieldsInOriginal ++ userJourneyJson),
+        "to" -> (changedFieldsInUpdated ++ userJourneyJson)
       )
     }
   }
-  
-  private def infoJson(info: SubscriptionInfo): JsObject =
+
+  private def toJson(info: SubscriptionInfo): JsObject =
     info.primaryContact match {
       case contact: IndividualContact =>
 
@@ -47,7 +59,6 @@ object ChangeDetailsAuditEvent {
           .getOrElse(Json.obj("canContactIndividualByPhone" -> false))
 
         Json.obj(
-          "userJourney" -> "individual",
           "individualEmailAddress" -> contact.email
         ) ++ phoneJson
 
@@ -77,7 +88,6 @@ object ChangeDetailsAuditEvent {
         }.getOrElse(Json.obj("hasSecondaryContact" -> false))
 
         Json.obj(
-          "userJourney" -> "organisation",
           "primaryContactName" -> contact.organisation.name,
           "primaryContactEmailAddress" -> contact.email
         ) ++ primaryPhoneJson ++ secondaryContactJson
