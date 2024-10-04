@@ -37,7 +37,13 @@ trait SubscriptionUpdater { self: FrontendBaseController =>
     userAnswersService.toSubscriptionRequest(answers, request.dprsId)
       .fold(
         errors => Future.failed(BuildSubscriptionRequestFailure(errors)),
-        subscriptionRequest => connector.updateSubscription(subscriptionRequest)
+        subscriptionRequest => {
+          val subscriptionFuture = connector.updateSubscription(subscriptionRequest)
+
+          // TODO: Audit
+
+          subscriptionFuture
+        }
       )
 }
 

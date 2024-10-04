@@ -249,29 +249,6 @@ class UserAnswersServiceSpec
         }
       }
     }
-
-    "must fail when the secondary contact is an individual contact" in {
-
-      val subscription = SubscriptionInfo(
-        id = "id",
-        gbUser = true,
-        tradingName = Some("tradingName"),
-        primaryContact = OrganisationContact(
-          organisation = Organisation("primaryContactName"),
-          email = "primaryEmail",
-          phone = Some("primaryPhone")
-        ),
-        secondaryContact = Some(
-          IndividualContact(
-            individual = Individual("first", "last"),
-            email = "secondaryEmail",
-            phone = Some("secondaryPhone")
-          )
-        )
-      )
-
-      userAnswersService.fromSubscription("id", subscription).failed.success.value
-    }
   }
 
   "toSubscription" - {

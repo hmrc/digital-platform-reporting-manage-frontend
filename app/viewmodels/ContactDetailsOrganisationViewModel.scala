@@ -24,8 +24,8 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{ActionItem, Actions, CardTitle, SummaryList}
 import viewmodels.checkAnswers._
 
-case class ContactDetailsOrganisationViewModel(primaryContactList: SummaryList,
-                                               secondaryContactList: SummaryList)
+final case class ContactDetailsOrganisationViewModel(primaryContactList: SummaryList,
+                                                     secondaryContactList: SummaryList)
 
 object ContactDetailsOrganisationViewModel {
 

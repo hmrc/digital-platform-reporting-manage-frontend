@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package models.requests.subscription.responses
+package models.requests.subscription
 
-import models.requests.subscription.{Contact, OrganisationContact}
 import play.api.libs.json._
 
 final case class SubscriptionInfo(

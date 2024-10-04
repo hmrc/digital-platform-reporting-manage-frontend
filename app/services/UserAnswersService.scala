@@ -44,7 +44,7 @@ class UserAnswersService @Inject() {
     transformation.runS(UserAnswers(userId))
   }
 
-  private def setContacts(primary: Contact, secondary: Option[Contact]): StateT[Try, UserAnswers, Unit] =
+  private def setContacts(primary: Contact, secondary: Option[OrganisationContact]): StateT[Try, UserAnswers, Unit] =
     primary match {
       case contact: OrganisationContact =>
         for {
@@ -64,16 +64,14 @@ class UserAnswersService @Inject() {
       _ <- setOptional(PrimaryContactPhoneNumberPage, contact.phone)
     } yield ()
 
-  private def setSecondaryContact(optionalContact: Option[Contact]): StateT[Try, UserAnswers, Unit] = {
-    optionalContact.map {
-      case contact: OrganisationContact =>
-        for {
-          _ <- set(SecondaryContactNamePage, contact.organisation.name)
-          _ <- set(SecondaryContactEmailAddressPage, contact.email)
-          _ <- set(CanPhoneSecondaryContactPage, contact.phone.isDefined)
-          _ <- setOptional(SecondaryContactPhoneNumberPage, contact.phone)
-        } yield ()
-      case _ => StateT.liftF[Try, UserAnswers, Unit](Failure(InvalidSecondaryContact))
+  private def setSecondaryContact(optionalContact: Option[OrganisationContact]): StateT[Try, UserAnswers, Unit] = {
+    optionalContact.map { contact =>
+      for {
+        _ <- set(SecondaryContactNamePage, contact.organisation.name)
+        _ <- set(SecondaryContactEmailAddressPage, contact.email)
+        _ <- set(CanPhoneSecondaryContactPage, contact.phone.isDefined)
+        _ <- setOptional(SecondaryContactPhoneNumberPage, contact.phone)
+      } yield ()
     }.getOrElse(StateT.pure(()))
   }
 
@@ -121,7 +119,7 @@ class UserAnswersService @Inject() {
       }
     }
 
-  private def getSecondaryContact(answers: UserAnswers): EitherNec[Query, Option[Contact]] =
+  private def getSecondaryContact(answers: UserAnswers): EitherNec[Query, Option[OrganisationContact]] =
     answers.get(IndividualQuery).map { _ =>
       Right(None)
     }.getOrElse {
