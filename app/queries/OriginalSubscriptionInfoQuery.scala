@@ -19,7 +19,7 @@ package queries
 import models.subscription.SubscriptionInfo
 import play.api.libs.json.JsPath
 
-case object OriginalSubscriptionInfo extends Gettable[SubscriptionInfo] with Settable[SubscriptionInfo] {
+case object OriginalSubscriptionInfoQuery extends Gettable[SubscriptionInfo] with Settable[SubscriptionInfo] {
 
   override def path: JsPath = JsPath \ "originalSubscriptionInfo"
 }
