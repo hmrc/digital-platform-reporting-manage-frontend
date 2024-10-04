@@ -35,14 +35,9 @@ object ChangeDetailsAuditEvent {
       val changedFieldsInOriginal = JsObject(originalJson.fieldSet.diff(updatedJson.fieldSet).toSeq)
       val changedFieldsInUpdated = JsObject(updatedJson.fieldSet.diff(originalJson.fieldSet).toSeq)
 
-      val userJourneyJson = o.original.primaryContact match {
-        case _: OrganisationContact => Json.obj("userJourney" -> "organisation")
-        case _: IndividualContact => Json.obj("userJourney" -> "individual")
-      }
-
       Json.obj(
-        "from" -> (changedFieldsInOriginal ++ userJourneyJson),
-        "to" -> (changedFieldsInUpdated ++ userJourneyJson)
+        "from" -> changedFieldsInOriginal,
+        "to" -> changedFieldsInUpdated
       )
     }
   }

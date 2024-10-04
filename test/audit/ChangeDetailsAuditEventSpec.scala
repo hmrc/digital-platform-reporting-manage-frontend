@@ -44,11 +44,9 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "individual",
             "individualEmailAddress" -> "email"
           ),
           "to" -> Json.obj(
-            "userJourney" -> "individual",
             "individualEmailAddress" -> "new email"
           )
         )
@@ -64,12 +62,10 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "individual",
             "canContactIndividualByPhone" -> true,
             "individualPhoneNumber" -> "phone"
           ),
           "to" -> Json.obj(
-            "userJourney" -> "individual",
             "canContactIndividualByPhone" -> false
           )
         )
@@ -85,11 +81,9 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "individual",
             "canContactIndividualByPhone" -> false
           ),
           "to" -> Json.obj(
-            "userJourney" -> "individual",
             "canContactIndividualByPhone" -> true,
             "individualPhoneNumber" -> "phone"
           )
@@ -122,14 +116,12 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "organisation",
             "primaryContactName" -> "name",
             "primaryContactEmailAddress" -> "email",
             "secondaryContactName" -> "name 2",
             "secondaryContactEmailAddress" -> "email 2"
           ),
           "to" -> Json.obj(
-            "userJourney" -> "organisation",
             "primaryContactName" -> "new name",
             "primaryContactEmailAddress" -> "new email",
             "secondaryContactName" -> "new name 2",
@@ -148,12 +140,10 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "organisation",
             "canPhonePrimaryContact" -> true,
             "primaryContactPhoneNumber" -> "phone"
           ),
           "to" -> Json.obj(
-            "userJourney" -> "organisation",
             "canPhonePrimaryContact" -> false
           )
         )
@@ -169,11 +159,9 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "organisation",
             "canPhonePrimaryContact" -> false
           ),
           "to" -> Json.obj(
-            "userJourney" -> "organisation",
             "canPhonePrimaryContact" -> true,
             "primaryContactPhoneNumber" -> "phone"
           )
@@ -190,14 +178,12 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "organisation",
             "hasSecondaryContact" -> true,
             "secondaryContactName" -> "name 2",
             "secondaryContactEmailAddress" -> "email 2",
             "canPhoneSecondaryContact" -> false
           ),
           "to" -> Json.obj(
-            "userJourney" -> "organisation",
             "hasSecondaryContact" -> false
           )
         )
@@ -213,11 +199,9 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "organisation",
             "hasSecondaryContact" -> false
           ),
           "to" -> Json.obj(
-            "userJourney" -> "organisation",
             "hasSecondaryContact" -> true,
             "secondaryContactName" -> "name 2",
             "secondaryContactEmailAddress" -> "email 2",
@@ -236,12 +220,10 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "organisation",
             "canPhoneSecondaryContact" -> true,
             "secondaryContactPhoneNumber" -> "phone 2"
           ),
           "to" -> Json.obj(
-            "userJourney" -> "organisation",
             "canPhoneSecondaryContact" -> false
           )
         )
@@ -257,11 +239,9 @@ class ChangeDetailsAuditEventSpec extends AnyFreeSpec with Matchers {
         val auditEvent = ChangeDetailsAuditEvent(original, updated)
         val expectedJson = Json.obj(
           "from" -> Json.obj(
-            "userJourney" -> "organisation",
             "canPhoneSecondaryContact" -> false
           ),
           "to" -> Json.obj(
-            "userJourney" -> "organisation",
             "canPhoneSecondaryContact" -> true,
             "secondaryContactPhoneNumber" -> "phone 2"
           )
