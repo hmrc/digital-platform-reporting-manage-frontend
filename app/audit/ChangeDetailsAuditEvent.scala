@@ -16,8 +16,7 @@
 
 package audit
 
-import models.requests.subscription.{IndividualContact, OrganisationContact}
-import models.requests.subscription.responses.SubscriptionInfo
+import models.subscription._
 import play.api.libs.json.{JsObject, Json, OWrites}
 
 final case class ChangeDetailsAuditEvent(original: SubscriptionInfo, updated: SubscriptionInfo)

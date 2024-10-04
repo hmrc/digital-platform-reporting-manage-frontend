@@ -19,8 +19,7 @@ package controllers
 import base.SpecBase
 import connectors.SubscriptionConnector
 import forms.SecondaryContactPhoneNumberFormProvider
-import models.requests.subscription.requests.SubscriptionRequest
-import models.requests.subscription.{Organisation, OrganisationContact}
+import models.subscription._
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
@@ -124,7 +123,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
         val expectedPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
         val expectedSecondaryaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 654321"))
-        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryaryContact))
+        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryaryContact))
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val result = route(application, request).value
@@ -175,7 +174,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
         val expectedPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
         val expectedSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 654321"))
-        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryContact))
+        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryContact))
 
         route(application, request).value.failed.futureValue
 

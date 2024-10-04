@@ -19,8 +19,7 @@ package controllers
 import base.SpecBase
 import connectors.SubscriptionConnector
 import forms.IndividualEmailAddressFormProvider
-import models.requests.subscription.{Individual, IndividualContact}
-import models.requests.subscription.requests.SubscriptionRequest
+import models.subscription._
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
@@ -115,7 +114,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
 
         val expectedContact = IndividualContact(Individual("first", "last"), "bar@example.com", None)
-        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedContact, None)
+        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
         val result = route(application, request).value
 
@@ -158,7 +157,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "bar@example.com"))
 
         val expectedContact = IndividualContact(Individual("first", "last"), "bar@example.com", None)
-        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedContact, None)
+        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
         route(application, request).value.failed.futureValue
 
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())

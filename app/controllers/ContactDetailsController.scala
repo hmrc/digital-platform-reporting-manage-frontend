@@ -19,7 +19,7 @@ package controllers
 import com.google.inject.Inject
 import connectors.SubscriptionConnector
 import controllers.actions.IdentifierAction
-import models.requests.subscription.{IndividualContact, OrganisationContact}
+import models.subscription._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import repositories.SessionRepository

@@ -16,7 +16,7 @@
 
 package queries
 
-import models.requests.subscription.Individual
+import models.subscription.Individual
 import play.api.libs.json.JsPath
 
 case object IndividualQuery extends Gettable[Individual] with Settable[Individual] {

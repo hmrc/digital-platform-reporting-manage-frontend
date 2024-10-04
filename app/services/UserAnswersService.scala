@@ -19,16 +19,13 @@ package services
 import cats.data.{EitherNec, StateT}
 import cats.implicits._
 import models.UserAnswers
-import models.requests.subscription.requests.SubscriptionRequest
-import models.requests.subscription.responses.SubscriptionInfo
-import models.requests.subscription.{Contact, IndividualContact, Organisation, OrganisationContact}
+import models.subscription._
 import pages._
 import play.api.libs.json.Writes
 import queries.{GbUserQuery, IndividualQuery, Query, Settable, TradingNameQuery}
-import services.UserAnswersService.InvalidSecondaryContact
 
 import javax.inject.{Inject, Singleton}
-import scala.util.{Failure, Try}
+import scala.util.Try
 
 @Singleton
 class UserAnswersService @Inject() {
@@ -92,13 +89,13 @@ class UserAnswersService @Inject() {
       set(settable, value)
     }.getOrElse(StateT.pure(()))
 
-  def toSubscriptionRequest(answers: UserAnswers, dprsId: String): EitherNec[Query, SubscriptionRequest] =
+  def toSubscriptionInfo(answers: UserAnswers, dprsId: String): EitherNec[Query, SubscriptionInfo] =
     (
       answers.getEither(GbUserQuery),
       getPrimaryContact(answers),
       getSecondaryContact(answers)
     ).parMapN { (gbUser, primaryContact, secondaryContact) =>
-      SubscriptionRequest(dprsId, gbUser, answers.get(TradingNameQuery), primaryContact, secondaryContact)
+      SubscriptionInfo(dprsId, gbUser, answers.get(TradingNameQuery), primaryContact, secondaryContact)
     }
 
   private def getPrimaryContact(answers: UserAnswers): EitherNec[Query, Contact] =
@@ -153,11 +150,4 @@ class UserAnswersService @Inject() {
       case true  => answers.getEither(SecondaryContactPhoneNumberPage).map(Some(_))
       case false => Right(None)
     }
-}
-
-object UserAnswersService {
-
-  final case object InvalidSecondaryContact extends Throwable {
-    override def getMessage: String = "Provided secondary contact is an individual contact"
-  }
 }

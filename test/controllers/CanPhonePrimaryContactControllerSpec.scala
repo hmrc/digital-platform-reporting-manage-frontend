@@ -19,8 +19,7 @@ package controllers
 import base.SpecBase
 import connectors.SubscriptionConnector
 import forms.CanPhonePrimaryContactFormProvider
-import models.requests.subscription.requests.SubscriptionRequest
-import models.requests.subscription.{Organisation, OrganisationContact}
+import models.subscription._
 import models.UserAnswers
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
@@ -117,7 +116,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "false"))
 
         val expectedContact = OrganisationContact(Organisation("name"), "foo@example.com", None)
-        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedContact, None)
+        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
         val result = route(application, request).value
@@ -201,7 +200,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "false"))
 
         val expectedContact = OrganisationContact(Organisation("name"), "foo@example.com", None)
-        val expectedRequest = SubscriptionRequest("dprsId", true, None, expectedContact, None)
+        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
 
         route(application, request).value.failed.futureValue
 

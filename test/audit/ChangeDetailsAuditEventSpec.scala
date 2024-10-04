@@ -16,8 +16,7 @@
 
 package audit
 
-import models.requests.subscription.responses.SubscriptionInfo
-import models.requests.subscription.{Individual, IndividualContact, Organisation, OrganisationContact}
+import models.subscription._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import play.api.libs.json.Json

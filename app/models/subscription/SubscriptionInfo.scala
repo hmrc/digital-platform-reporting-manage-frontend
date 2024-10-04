@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.requests.subscription
+package models.subscription
 
 import play.api.libs.json._
 

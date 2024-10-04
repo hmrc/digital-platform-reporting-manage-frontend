@@ -34,7 +34,7 @@ trait SubscriptionUpdater { self: FrontendBaseController =>
   val connector: SubscriptionConnector
 
   protected def updateSubscription(answers: UserAnswers)(implicit request: DataRequest[_]): Future[Done] =
-    userAnswersService.toSubscriptionRequest(answers, request.dprsId)
+    userAnswersService.toSubscriptionInfo(answers, request.dprsId)
       .fold(
         errors => Future.failed(BuildSubscriptionRequestFailure(errors)),
         subscriptionRequest => {

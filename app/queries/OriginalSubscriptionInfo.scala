@@ -16,7 +16,7 @@
 
 package queries
 
-import models.requests.subscription.responses.SubscriptionInfo
+import models.subscription.SubscriptionInfo
 import play.api.libs.json.JsPath
 
 case object OriginalSubscriptionInfo extends Gettable[SubscriptionInfo] with Settable[SubscriptionInfo] {

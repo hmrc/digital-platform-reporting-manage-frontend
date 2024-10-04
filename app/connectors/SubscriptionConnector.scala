@@ -18,8 +18,7 @@ package connectors
 
 import config.Service
 import connectors.SubscriptionConnector.{GetSubscriptionFailure, UpdateSubscriptionFailure}
-import models.requests.subscription.requests.SubscriptionRequest
-import models.requests.subscription.responses.SubscriptionInfo
+import models.subscription.SubscriptionInfo
 import org.apache.pekko.Done
 import play.api.Configuration
 import play.api.http.Status.OK
@@ -49,8 +48,7 @@ class SubscriptionConnector @Inject() (
         }
       }
 
-
-  def updateSubscription(request: SubscriptionRequest)(implicit hc: HeaderCarrier): Future[Done] =
+  def updateSubscription(request: SubscriptionInfo)(implicit hc: HeaderCarrier): Future[Done] =
     httpClient.put(url"$digitalPlatformReporting/digital-platform-reporting/subscribe")
       .withBody(Json.toJson(request))
       .execute[HttpResponse]
