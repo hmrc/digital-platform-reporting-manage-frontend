@@ -17,14 +17,15 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.PlatformOperatorConnector
+import connectors.{PlatformOperatorConnector, SubmissionsConnector}
 import controllers.actions.IdentifierAction
+import models.operator.responses.PlatformOperator
 
 import javax.inject.Inject
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.{CardState, IndexViewModel, PlatformOperatorCardViewModel, ReportingNotificationCardViewModel}
+import viewmodels._
 import views.html.IndexView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,28 +34,64 @@ class IndexController @Inject()(
                                  val controllerComponents: MessagesControllerComponents,
                                  identify: IdentifierAction,
                                  view: IndexView,
-                                 connector: PlatformOperatorConnector,
+                                 platformOperatorConnector: PlatformOperatorConnector,
+                                 submissionsConnector: SubmissionsConnector,
                                  appConfig: FrontendAppConfig
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
 
     if (appConfig.platformOperatorsEnabled)  {
-      connector.viewPlatformOperators.map { response =>
-        val viewModel = IndexViewModel(
-          platformOperatorCard      = PlatformOperatorCardViewModel(response.platformOperators, appConfig),
-          reportingNotificationCard = ReportingNotificationCardViewModel(response.platformOperators, appConfig)
-        )
+      platformOperatorConnector.viewPlatformOperators.flatMap { platformOperatorResponse =>
 
-        Ok(view(viewModel))
+        val operators = platformOperatorResponse.platformOperators
+
+        for {
+          fileSubmissionsCard  <- getFileSubmissionsCard(operators, appConfig)
+          assumedReportingCard <- getAssumedReportingCard(operators, appConfig)
+        } yield {
+
+          val viewModel = IndexViewModel(
+            platformOperatorCard      = PlatformOperatorCardViewModel(operators, appConfig),
+            reportingNotificationCard = ReportingNotificationCardViewModel(operators, appConfig),
+            fileSubmissionsCard       = fileSubmissionsCard,
+            assumedReportingCard      = assumedReportingCard
+          )
+
+          Ok(view(viewModel))
+        }
       }
     } else {
       val viewModel = IndexViewModel(
         platformOperatorCard = PlatformOperatorCardViewModel(CardState.Hidden, Nil),
-        reportingNotificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil)
+        reportingNotificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil),
+        fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil),
+        assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil)
       )
 
       Future.successful(Ok(view(viewModel)))
+    }
+  }
+
+  private def getFileSubmissionsCard(operators: Seq[PlatformOperator], appConfig: FrontendAppConfig)
+                                    (implicit request: Request[_]): Future[FileSubmissionsCardViewModel] = {
+    if (appConfig.fileSubmissionsEnabled) {
+      submissionsConnector.submissionsExist(assumedReporting = false).map { response =>
+        FileSubmissionsCardViewModel(response, operators, appConfig)
+      }
+    } else {
+      Future.successful(FileSubmissionsCardViewModel(CardState.Hidden, Nil))
+    }
+  }
+
+  private def getAssumedReportingCard(operators: Seq[PlatformOperator], appConfig: FrontendAppConfig)
+                                     (implicit request: Request[_]): Future[AssumedReportingCardViewModel] = {
+    if (appConfig.assumedReportingEnabled) {
+      submissionsConnector.submissionsExist(assumedReporting = true).map { response =>
+        AssumedReportingCardViewModel(response, operators, appConfig)
+      }
+    } else {
+      Future.successful(AssumedReportingCardViewModel(CardState.Hidden, Nil))
     }
   }
 }
