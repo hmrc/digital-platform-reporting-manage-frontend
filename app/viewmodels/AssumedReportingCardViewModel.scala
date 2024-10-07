@@ -29,8 +29,8 @@ object AssumedReportingCardViewModel {
            (implicit messages: Messages): AssumedReportingCardViewModel = {
 
     if (operators.exists(_.notifications.nonEmpty)) {
-      val addLink = Link(messages("assumedReportingCard.add"), appConfig.addSubmissionUrl)
-      val viewLink = Link(messages("assumedReportingCard.view"), appConfig.viewSubmissionsUrl)
+      val addLink = Link(messages("assumedReportingCard.add"), appConfig.addAssumedReportUrl)
+      val viewLink = Link(messages("assumedReportingCard.view"), appConfig.viewAssumedReportsUrl)
 
       val links = if (assumedReportsExist) Seq(viewLink, addLink) else Seq(addLink)
 

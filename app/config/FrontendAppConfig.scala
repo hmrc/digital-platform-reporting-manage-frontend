@@ -58,10 +58,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   def viewNotificationsSingleUrl(operatorId: String) = s"$platformOperatorFrontendBaseUrl/reporting-notification/$operatorId/view"
 
   private val submissionsFrontendBaeUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-submission-frontend.baseUrl")
-  val addSubmissionUrl = s"$submissionsFrontendBaeUrl/submissions/which-platform-operator"
-  val viewSubmissionsUrl = s"$submissionsFrontendBaeUrl/submissions/view" // TODO: Check URL
+  val addSubmissionUrl = s"$submissionsFrontendBaeUrl/submission/which-platform-operator"
+  val viewSubmissionsUrl = s"$submissionsFrontendBaeUrl/submission/view"
   val addAssumedReportUrl = s"$submissionsFrontendBaeUrl/assumed-reporting/which-platform-operator"
-  val viewAssumedReportsUrl = s"$submissionsFrontendBaeUrl/assumed-reporting/view" // TODO: Check URL
+  val viewAssumedReportsUrl = s"$submissionsFrontendBaeUrl/assumed-reporting/view"
 
   val auditSource: String = configuration.get[String]("auditing.auditSource")
 }

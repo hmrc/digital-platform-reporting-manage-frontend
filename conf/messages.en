@@ -54,8 +54,8 @@ reportingNotificationCard.view = View reporting notifications
 reportingNotificationCard.add = Add a reporting notification
 fileSubmissionsCard.view = View XML submissions
 fileSubmissionsCard.add = Make an XML submission
-assumedReporting.view = View assumed reporting submissions
-assumedReporting.add = Make an assumed reporting submission
+assumedReportingCard.view = View assumed reporting submissions
+assumedReportingCard.add = Make an assumed reporting submission
 
 contactDetails.individual.title = Your contact details
 contactDetails.individual.heading = Your contact details
