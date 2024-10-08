@@ -45,8 +45,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
 
   val platformOperatorsEnabled: Boolean = configuration.get[Boolean]("features.platform-operators")
+  val fileSubmissionsEnabled: Boolean = configuration.get[Boolean]("features.file-submissions")
+  val assumedReportingEnabled: Boolean = configuration.get[Boolean]("features.assumed-reporting")
 
-  val platformOperatorFrontendBaseUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-operator-frontend.baseUrl")
+  private val platformOperatorFrontendBaseUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-operator-frontend.baseUrl")
 
   val addPlatformOperatorUrl = s"$platformOperatorFrontendBaseUrl/platform-operator/add-platform-operator/start"
   val viewPlatformOperatorsUrl= s"$platformOperatorFrontendBaseUrl/platform-operator/view"
@@ -54,6 +56,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val addNotificationUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator"
   val viewNotificationsUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator-to-view"
   def viewNotificationsSingleUrl(operatorId: String) = s"$platformOperatorFrontendBaseUrl/reporting-notification/$operatorId/view"
+
+  private val submissionsFrontendBaeUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-submission-frontend.baseUrl")
+  val addSubmissionUrl = s"$submissionsFrontendBaeUrl/submission/which-platform-operator"
+  val viewSubmissionsUrl = s"$submissionsFrontendBaeUrl/submission/view"
+  val addAssumedReportUrl = s"$submissionsFrontendBaeUrl/assumed-reporting/which-platform-operator"
+  val viewAssumedReportsUrl = s"$submissionsFrontendBaeUrl/assumed-reporting/view"
 
   val auditSource: String = configuration.get[String]("auditing.auditSource")
 }

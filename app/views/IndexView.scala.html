@@ -20,7 +20,9 @@
         layout: templates.Layout,
         contactDetailsCard: components.ContactDetailsCard,
         platformOperatorCard: components.PlatformOperatorCard,
-        reportingNotificationCard: components.ReportingNotificationCard
+        reportingNotificationCard: components.ReportingNotificationCard,
+        fileSubmissionsCard: components.FileSubmissionsCard,
+        assumedReportingCard: components.AssumedReportingCard
 )
 
 @(viewModel: IndexViewModel)(implicit request: Request[_], messages: Messages)
@@ -44,6 +46,10 @@
       @platformOperatorCard(viewModel.platformOperatorCard)
 
       @reportingNotificationCard(viewModel.reportingNotificationCard)
+
+      @fileSubmissionsCard(viewModel.fileSubmissionsCard)
+
+      @assumedReportingCard(viewModel.assumedReportingCard)
 
       @contactDetailsCard()
 

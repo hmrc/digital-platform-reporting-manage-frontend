@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package viewmodels
+package models.submissions
 
-case class IndexViewModel(platformOperatorCard: PlatformOperatorCardViewModel,
-                          reportingNotificationCard: ReportingNotificationCardViewModel,
-                          fileSubmissionsCard: FileSubmissionsCardViewModel,
-                          assumedReportingCard: AssumedReportingCardViewModel)
+import play.api.libs.json.{Json, OWrites}
+
+final case class ViewSubmissionsRequest(assumedReporting: Boolean)
+
+object ViewSubmissionsRequest {
+
+  implicit lazy val writes: OWrites[ViewSubmissionsRequest] = Json.writes
+}
