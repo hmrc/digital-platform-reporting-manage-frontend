@@ -51,7 +51,7 @@ class SubmissionsConnectorSpec extends AnyFreeSpec
     "must return true when the server returns OK" in {
 
       wireMockServer.stubFor(
-        post(urlPathEqualTo("/digital-platform-reporting/submissions/list"))
+        post(urlPathEqualTo("/digital-platform-reporting/submission/list"))
           .withHeader("Authorization", equalTo("authToken"))
           .willReturn(ok())
       )
@@ -63,7 +63,7 @@ class SubmissionsConnectorSpec extends AnyFreeSpec
     "must return false when the server returns NOT_FOUND" in {
 
       wireMockServer.stubFor(
-        post(urlPathEqualTo("/digital-platform-reporting/submissions/list"))
+        post(urlPathEqualTo("/digital-platform-reporting/submission/list"))
           .withHeader("Authorization", equalTo("authToken"))
           .willReturn(notFound())
       )
@@ -75,7 +75,7 @@ class SubmissionsConnectorSpec extends AnyFreeSpec
     "must return a failed future when the server returns an error" in {
 
       wireMockServer.stubFor(
-        post(urlPathEqualTo("/digital-platform-reporting/submissions/list"))
+        post(urlPathEqualTo("/digital-platform-reporting/submission/list"))
           .withHeader("Authorization", equalTo("authToken"))
           .willReturn(serverError())
       )
