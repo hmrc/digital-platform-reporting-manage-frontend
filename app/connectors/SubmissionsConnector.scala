@@ -38,7 +38,7 @@ class SubmissionsConnector @Inject()(configuration: Configuration,
 
     val request = ViewSubmissionsRequest(assumedReporting)
 
-    httpClient.post(url"$digitalPlatformReporting/digital-platform-reporting/submissions/list")
+    httpClient.post(url"$digitalPlatformReporting/digital-platform-reporting/submission/list")
       .withBody(Json.toJson(request))
       .execute[HttpResponse]
       .flatMap { response =>
