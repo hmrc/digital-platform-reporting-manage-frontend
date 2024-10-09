@@ -21,7 +21,7 @@ import play.api.Configuration
 import play.api.mvc.RequestHeader
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration) {
+class FrontendAppConfig @Inject()(configuration: Configuration) {
 
   val host: String    = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
@@ -64,4 +64,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
   val viewAssumedReportsUrl = s"$submissionsFrontendBaeUrl/assumed-reporting/view"
 
   val auditSource: String = configuration.get[String]("auditing.auditSource")
+
+  val digitalPlatformReportingUrl: String = configuration.get[Service]("microservice.services.digital-platform-reporting")
+  val taxEnrolmentsBaseUrl: String = configuration.get[Service]("microservice.services.tax-enrolments").baseUrl
 }
