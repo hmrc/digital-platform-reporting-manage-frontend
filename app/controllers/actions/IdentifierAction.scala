@@ -18,10 +18,13 @@ package controllers.actions
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
+import connectors.PendingEnrolmentConnector
 import controllers.routes
+import models.eacd.EnrolmentDetails
 import models.requests.IdentifierRequest
-import play.api.mvc.Results._
+import play.api.mvc.Results.Redirect
 import play.api.mvc._
+import services.EnrolmentService
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -29,14 +32,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
 
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
-class AuthenticatedIdentifierAction @Inject()(
-                                               override val authConnector: AuthConnector,
-                                               config: FrontendAppConfig,
-                                               val parser: BodyParsers.Default
-                                             )
+class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthConnector,
+                                              config: FrontendAppConfig,
+                                              val parser: BodyParsers.Default,
+                                              pendingEnrolmentConnector: PendingEnrolmentConnector,
+                                              enrolmentService: EnrolmentService)
                                              (implicit val executionContext: ExecutionContext) extends IdentifierAction with AuthorisedFunctions {
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
@@ -51,14 +55,27 @@ class AuthenticatedIdentifierAction @Inject()(
           Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
         }
 
-      case _ =>
-        Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
-    } recover {
+      case _ => reEnrol(request, block)(hc).recover {
+        case NonFatal(_) => Redirect(routes.UnauthorisedController.onPageLoad())
+      }
+    } recoverWith {
       case _: NoActiveSession =>
-        Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
+        Future.successful(Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl))))
+      case _: InsufficientEnrolments => reEnrol(request, block)(hc).recover {
+        case NonFatal(_) => Redirect(routes.UnauthorisedController.onPageLoad())
+      }
       case _: AuthorisationException =>
-        Redirect(routes.UnauthorisedController.onPageLoad())
+        Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
     }
+  }
+
+  private def reEnrol[A](request: Request[A], block: IdentifierRequest[A] => Future[Result])(hc: HeaderCarrier): Future[Result] = {
+    for {
+      pendingEnrolment <- pendingEnrolmentConnector.getPendingEnrolment()(hc)
+      _ <- enrolmentService.enrol(EnrolmentDetails(pendingEnrolment))(hc)
+      _ <- pendingEnrolmentConnector.remove()(hc)
+      result <- block(IdentifierRequest(request, pendingEnrolment.userId, pendingEnrolment.dprsId))
+    } yield result
   }
 
   private def getEnrolment(enrolments: Enrolments): Option[String] =
