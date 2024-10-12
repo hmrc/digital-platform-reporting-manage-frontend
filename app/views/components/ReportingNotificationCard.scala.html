@@ -14,15 +14,16 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTag
 @import viewmodels.{CardState, ReportingNotificationCardViewModel}
 
-@this()
+@this(govukTag: GovukTag)
 
 @(card: ReportingNotificationCardViewModel)(implicit messages: Messages)
 
 @if(card.cardState != CardState.Hidden) {
     <div class="card">
-        <div class="@if(card.cardState == CardState.Inactive){inactive} card-body">
+        <div class="card-body">
             <h2 class="govuk-heading-s card-heading">
             @messages("index.notifications.heading")
             </h2>
@@ -37,6 +38,10 @@
                 }
             } else {
                 <p class="govuk-body">@messages("index.notifications.inactive")</p>
+            }
+
+            @card.tag.map { tag =>
+                @govukTag(tag)
             }
         </div>
     </div>

@@ -19,9 +19,11 @@ package viewmodels
 import config.FrontendAppConfig
 import models.operator.responses.PlatformOperator
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 final case class AssumedReportingCardViewModel(cardState: CardState,
-                                              links: Seq[Link])
+                                               links: Seq[Link],
+                                               tag: Option[Tag])
 
 object AssumedReportingCardViewModel {
 
@@ -34,12 +36,15 @@ object AssumedReportingCardViewModel {
 
       val links = if (assumedReportsExist) Seq(viewLink, addLink) else Seq(addLink)
 
+      val tag = if (assumedReportsExist) None else Some(CardTag.notStarted)
+
       AssumedReportingCardViewModel(
         cardState = CardState.Active,
-        links = links
+        links = links,
+        tag = tag
       )
     } else {
-      AssumedReportingCardViewModel(cardState = CardState.Inactive, links = Nil)
+      AssumedReportingCardViewModel(cardState = CardState.Inactive, links = Nil, tag = Some(CardTag.cannotStart))
     }
   }
 }

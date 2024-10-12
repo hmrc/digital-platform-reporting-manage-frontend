@@ -19,9 +19,11 @@ package viewmodels
 import config.FrontendAppConfig
 import models.operator.responses.PlatformOperator
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 final case class PlatformOperatorCardViewModel(cardState: CardState,
-                                               links: Seq[Link])
+                                               links: Seq[Link],
+                                               tag: Option[Tag])
 
 object PlatformOperatorCardViewModel {
 
@@ -38,9 +40,15 @@ object PlatformOperatorCardViewModel {
       case _ => Link (messages ("platformOperatorCard.addAnother"), appConfig.addPlatformOperatorUrl)
     }
 
+    val tag = operators.size match {
+      case 0 => Some(CardTag.notStarted)
+      case _ => None
+    }
+
     PlatformOperatorCardViewModel(
       cardState = CardState.Active,
-      links     = Seq(viewLink, Some(addLink)).flatten
+      links     = Seq(viewLink, Some(addLink)).flatten,
+      tag       = tag
     )
   }
 }

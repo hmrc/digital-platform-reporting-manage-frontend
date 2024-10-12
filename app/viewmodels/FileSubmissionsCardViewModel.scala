@@ -19,9 +19,11 @@ package viewmodels
 import config.FrontendAppConfig
 import models.operator.responses.PlatformOperator
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 final case class FileSubmissionsCardViewModel(cardState: CardState,
-                                              links: Seq[Link])
+                                              links: Seq[Link],
+                                              tag: Option[Tag])
 
 object FileSubmissionsCardViewModel {
 
@@ -34,12 +36,15 @@ object FileSubmissionsCardViewModel {
 
       val links = if (submissionsExist) Seq(viewLink, addLink) else Seq(addLink)
 
+      val tag = if (submissionsExist) None else Some(CardTag.notStarted)
+
       FileSubmissionsCardViewModel(
         cardState = CardState.Active,
-        links = links
+        links = links,
+        tag = tag
       )
     } else {
-      FileSubmissionsCardViewModel(cardState = CardState.Inactive, links = Nil)
+      FileSubmissionsCardViewModel(cardState = CardState.Inactive, links = Nil, tag = Some(CardTag.cannotStart))
     }
   }
 }

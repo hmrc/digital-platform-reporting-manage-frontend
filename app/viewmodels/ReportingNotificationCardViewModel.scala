@@ -19,9 +19,11 @@ package viewmodels
 import config.FrontendAppConfig
 import models.operator.responses.PlatformOperator
 import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 case class ReportingNotificationCardViewModel(cardState: CardState,
-                                              links: Seq[Link])
+                                              links: Seq[Link],
+                                              tag: Option[Tag])
 
 object ReportingNotificationCardViewModel {
 
@@ -40,11 +42,17 @@ object ReportingNotificationCardViewModel {
       case _ => Some(Link(messages("reportingNotificationCard.add"), appConfig.addNotificationUrl))
     }
 
+    val tag = operators.size match {
+      case 0 => Some(CardTag.cannotStart)
+      case _ => if (operators.exists(_.notifications.nonEmpty)) None else Some(CardTag.notStarted)
+    }
+
     val links = Seq(viewLink, addLink).flatten
 
     ReportingNotificationCardViewModel(
       cardState = if (links.isEmpty) CardState.Inactive else CardState.Active,
-      links     = links
+      links     = links,
+      tag       = tag
     )
   }
 }
