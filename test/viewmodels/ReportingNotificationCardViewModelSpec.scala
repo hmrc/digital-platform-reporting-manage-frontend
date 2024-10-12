@@ -22,16 +22,17 @@ import models.operator.responses.{NotificationDetails, PlatformOperator}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.when
-import org.scalatest.BeforeAndAfterEach
+import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 
 import java.time.Instant
 
-class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
+class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers with MockitoSugar with BeforeAndAfterEach with OptionValues {
 
   private val mockAppConfig = mock[FrontendAppConfig]
   private implicit val msgs: Messages = stubMessages()
@@ -43,15 +44,16 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
 
   ".apply" - {
 
-    "must be inactive and have no links when there are no platform operators" in {
+    "must be inactive, have no links, and have a `cannot start` tag when there are no platform operators" in {
 
       val card = ReportingNotificationCardViewModel(Nil, mockAppConfig)
 
       card.cardState mustEqual CardState.Inactive
       card.links mustBe empty
+      card.tag.value.content mustEqual Text(msgs("card.cannotStart"))
     }
 
-    "must be active and have only an add link when there is one platform operator with no notifications" in {
+    "must be active and have only an add link and a `not started` tag when there is one platform operator with no notifications" in {
 
       when(mockAppConfig.addNotificationUrl) thenReturn "add-link"
       when(mockAppConfig.viewNotificationsSingleUrl(any())) thenReturn "view-link"
@@ -72,9 +74,10 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
 
       card.cardState mustEqual CardState.Active
       card.links must contain only Link(msgs("reportingNotificationCard.add"), "add-link")
+      card.tag.value.content mustEqual Text(msgs("card.notStarted"))
     }
 
-    "must be active and have a `view single` link and an add link when there is one platform operator" in {
+    "must be active and have a `view single` link, an add link and no tag when there is one platform operator with notifications" in {
 
       when(mockAppConfig.addNotificationUrl) thenReturn "add-link"
       when(mockAppConfig.viewNotificationsSingleUrl(any())) thenReturn "view-link"
@@ -98,9 +101,10 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
         Link(msgs("reportingNotificationCard.view"), "view-link"),
         Link(msgs("reportingNotificationCard.add"), "add-link")
       )
+      card.tag must not be defined
     }
 
-    "must be active have an add link when there is more than one platform operator and none have any notifications" in {
+    "must be active have an add link and a `not started` tag when there is more than one platform operator and none have any notifications" in {
 
       when(mockAppConfig.addNotificationUrl) thenReturn "add-link"
       when(mockAppConfig.viewNotificationsUrl) thenReturn "view-link"
@@ -121,10 +125,10 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
 
       card.cardState mustEqual CardState.Active
       card.links must contain only Link(msgs("reportingNotificationCard.add"), "add-link")
-
+      card.tag.value.content mustEqual Text(msgs("card.notStarted"))
     }
 
-    "must be active have a view link and an add link when there is more than one platform operator and at least one has a notification" in {
+    "must be active have a view link and an add link, and no tag, when there is more than one platform operator and at least one has a notification" in {
 
       when(mockAppConfig.addNotificationUrl) thenReturn "add-link"
       when(mockAppConfig.viewNotificationsUrl) thenReturn "view-link"
@@ -148,6 +152,7 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
         Link(msgs("reportingNotificationCard.view"), "view-link"),
         Link(msgs("reportingNotificationCard.add"), "add-link")
       )
+      card.tag must not be defined
     }
   }
 }

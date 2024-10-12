@@ -36,9 +36,7 @@
   <h1 class="govuk-heading-xl">@messages("index.heading")</h1>
 
   <p class="govuk-body">
-    @messages("index.guidance.1")
-    <a class="govuk-link" href="#" target="_blank" rel="noreferrer noopener">@messages("index.guidance.link")</a>
-    @messages("index.guidance.2")
+    @messages("index.guidance", viewModel.operatorId)
   </p>
 
   <div class="flex-container grid-row">

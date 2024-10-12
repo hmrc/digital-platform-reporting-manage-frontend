@@ -21,16 +21,17 @@ import models.operator.{AddressDetails, ContactDetails, NotificationType}
 import models.operator.responses.{NotificationDetails, PlatformOperator}
 import org.mockito.Mockito
 import org.mockito.Mockito.when
-import org.scalatest.BeforeAndAfterEach
+import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
+import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 
 import java.time.Instant
 
-class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with MockitoSugar with BeforeAndAfterEach  {
+class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with MockitoSugar with BeforeAndAfterEach with OptionValues {
 
   private val mockAppConfig = mock[FrontendAppConfig]
   private implicit val msgs: Messages = stubMessages()
@@ -50,6 +51,7 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
         card.cardState mustEqual CardState.Inactive
         card.links mustBe empty
+        card.tag.value.content mustEqual Text(msgs("card.cannotStart"))
       }
     }
 
@@ -73,12 +75,13 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
         card.cardState mustEqual CardState.Inactive
         card.links mustBe empty
+        card.tag.value.content mustEqual Text(msgs("card.cannotStart"))
       }
     }
 
     "when at least one platform operator exists with a reporting notification" - {
 
-      "must contain an add link when there are no submissions" in {
+      "must contain an add link and a `not started` tag when there are no submissions" in {
 
         when(mockAppConfig.addAssumedReportUrl) thenReturn "add-link"
 
@@ -98,9 +101,10 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
         card.cardState mustEqual CardState.Active
         card.links must contain only Link(msgs("assumedReportingCard.add"), "add-link")
+        card.tag.value.content mustEqual Text(msgs("card.notStarted"))
       }
 
-      "must contain view and add links when there are some submissions" in {
+      "must contain view and add links, and no tag, when there are some submissions" in {
 
         when(mockAppConfig.addAssumedReportUrl) thenReturn "add-link"
         when(mockAppConfig.viewAssumedReportsUrl) thenReturn "view-link"
@@ -124,6 +128,7 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
           Link(msgs("assumedReportingCard.view"), "view-link"),
           Link(msgs("assumedReportingCard.add"), "add-link")
         )
+        card.tag must not be defined
       }
     }
   }

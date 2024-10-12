@@ -52,6 +52,7 @@ class IndexController @Inject()(
         } yield {
 
           val viewModel = IndexViewModel(
+            operatorId                = request.dprsId,
             platformOperatorCard      = PlatformOperatorCardViewModel(operators, appConfig),
             reportingNotificationCard = ReportingNotificationCardViewModel(operators, appConfig),
             fileSubmissionsCard       = fileSubmissionsCard,
@@ -63,10 +64,11 @@ class IndexController @Inject()(
       }
     } else {
       val viewModel = IndexViewModel(
-        platformOperatorCard = PlatformOperatorCardViewModel(CardState.Hidden, Nil),
-        reportingNotificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil),
-        fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil),
-        assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil)
+        operatorId                = request.dprsId,
+        platformOperatorCard      = PlatformOperatorCardViewModel(CardState.Hidden, Nil, None),
+        reportingNotificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil, None),
+        fileSubmissionsCard       = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None),
+        assumedReportingCard      = AssumedReportingCardViewModel(CardState.Hidden, Nil, None)
       )
 
       Future.successful(Ok(view(viewModel)))
@@ -80,7 +82,7 @@ class IndexController @Inject()(
         FileSubmissionsCardViewModel(response, operators, appConfig)
       }
     } else {
-      Future.successful(FileSubmissionsCardViewModel(CardState.Hidden, Nil))
+      Future.successful(FileSubmissionsCardViewModel(CardState.Hidden, Nil, None))
     }
   }
 
@@ -91,7 +93,7 @@ class IndexController @Inject()(
         AssumedReportingCardViewModel(response, operators, appConfig)
       }
     } else {
-      Future.successful(AssumedReportingCardViewModel(CardState.Hidden, Nil))
+      Future.successful(AssumedReportingCardViewModel(CardState.Hidden, Nil, None))
     }
   }
 }

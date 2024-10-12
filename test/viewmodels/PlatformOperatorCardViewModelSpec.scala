@@ -21,14 +21,15 @@ import models.operator.{AddressDetails, ContactDetails}
 import models.operator.responses.PlatformOperator
 import org.mockito.Mockito
 import org.mockito.Mockito.when
-import org.scalatest.BeforeAndAfterEach
+import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 
-class PlatformOperatorCardViewModelSpec extends AnyFreeSpec with Matchers with MockitoSugar with BeforeAndAfterEach {
+class PlatformOperatorCardViewModelSpec extends AnyFreeSpec with Matchers with MockitoSugar with BeforeAndAfterEach with OptionValues {
 
   private val mockAppConfig = mock[FrontendAppConfig]
   private implicit val msgs: Messages = stubMessages()
@@ -42,7 +43,7 @@ class PlatformOperatorCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
     "when there are no platform operators" - {
 
-      "must contain an add link" in {
+      "must contain an add link and a `not started` tag" in {
 
         when(mockAppConfig.addPlatformOperatorUrl) thenReturn "add-link"
 
@@ -50,12 +51,13 @@ class PlatformOperatorCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
         card.cardState mustEqual CardState.Active
         card.links must contain only Link(msgs("platformOperatorCard.add"), "add-link")
+        card.tag.value.content mustEqual Text(msgs("card.notStarted"))
       }
     }
 
     "when there is one or more platform operator" - {
 
-      "must contain an `add another` link and a view link" in {
+      "must contain an `add another` link and a view link, and have no tag" in {
 
         when(mockAppConfig.addPlatformOperatorUrl) thenReturn "add-link"
         when(mockAppConfig.viewPlatformOperatorsUrl) thenReturn "view-link"
@@ -79,6 +81,7 @@ class PlatformOperatorCardViewModelSpec extends AnyFreeSpec with Matchers with M
           Link(msgs("platformOperatorCard.view"), "view-link"),
           Link(msgs("platformOperatorCard.addAnother"), "add-link")
         )
+        card.tag must not be defined
       }
     }
   }

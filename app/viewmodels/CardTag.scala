@@ -16,8 +16,16 @@
 
 package viewmodels
 
-case class IndexViewModel(operatorId: String,
-                          platformOperatorCard: PlatformOperatorCardViewModel,
-                          reportingNotificationCard: ReportingNotificationCardViewModel,
-                          fileSubmissionsCard: FileSubmissionsCardViewModel,
-                          assumedReportingCard: AssumedReportingCardViewModel)
+import play.api.i18n.Messages
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
+import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
+import viewmodels.govuk.tag._
+
+object CardTag {
+
+  def cannotStart(implicit messages: Messages): Tag =
+    TagViewModel(Text(messages("card.cannotStart"))).grey()
+
+  def notStarted(implicit messages: Messages): Tag =
+    TagViewModel(Text(messages("card.notStarted"))).blue()
+}

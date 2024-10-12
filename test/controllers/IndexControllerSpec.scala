@@ -19,9 +19,7 @@ package controllers
 import base.SpecBase
 import config.FrontendAppConfig
 import connectors.{PlatformOperatorConnector, SubmissionsConnector}
-import models.operator.{AddressDetails, ContactDetails, NotificationType}
-import models.operator.responses.{NotificationDetails, PlatformOperator, ViewPlatformOperatorsResponse}
-import models.submissions.ViewSubmissionsRequest
+import models.operator.responses.ViewPlatformOperatorsResponse
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import org.mockito.Mockito.{never, times, verify, when}
@@ -30,10 +28,9 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import viewmodels.{AssumedReportingCardViewModel, CardState, FileSubmissionsCardViewModel, IndexViewModel, PlatformOperatorCardViewModel, ReportingNotificationCardViewModel}
+import viewmodels._
 import views.html.IndexView
 
-import java.time.Instant
 import scala.concurrent.Future
 
 class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfterEach {
@@ -66,11 +63,11 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
           status(result) mustEqual OK
 
-          val operatorCard = PlatformOperatorCardViewModel(CardState.Hidden, Nil)
-          val notificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil)
-          val fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil)
-          val assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil)
-          val viewModel = IndexViewModel(operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+          val operatorCard = PlatformOperatorCardViewModel(CardState.Hidden, Nil, None)
+          val notificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil, None)
+          val fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None)
+          val assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil, None)
+          val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
           contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
         }
       }
@@ -104,9 +101,9 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
             val operatorCard = PlatformOperatorCardViewModel(Nil, appConfig)(messages(application))
             val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
-            val fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil)
-            val assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil)
-            val viewModel = IndexViewModel(operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+            val fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None)
+            val assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil, None)
+            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
           }
@@ -144,8 +141,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
             val operatorCard = PlatformOperatorCardViewModel(Nil, appConfig)(messages(application))
             val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
             val fileSubmissionsCard = FileSubmissionsCardViewModel(false, Nil, appConfig)(messages(application))
-            val assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil)
-            val viewModel = IndexViewModel(operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+            val assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil, None)
+            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
 
@@ -185,9 +182,9 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
             val operatorCard = PlatformOperatorCardViewModel(Nil, appConfig)(messages(application))
             val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
-            val fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil)
+            val fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None)
             val assumedReportingCard = AssumedReportingCardViewModel(false, Nil, appConfig)(messages(application))
-            val viewModel = IndexViewModel(operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
 
@@ -229,7 +226,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
             val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
             val fileSubmissionsCard = FileSubmissionsCardViewModel(false, Nil, appConfig)(messages(application))
             val assumedReportingCard = AssumedReportingCardViewModel(false, Nil, appConfig)(messages(application))
-            val viewModel = IndexViewModel(operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
 

@@ -14,11 +14,11 @@
  * limitations under the License.
  *@
 
-@import config.FrontendAppConfig
+@import uk.gov.hmrc.govukfrontend.views.html.components.GovukTag
 @import viewmodels.{CardState, PlatformOperatorCardViewModel}
 
 @this(
-    appConfig: FrontendAppConfig
+        govukTag: GovukTag
 )
 
 @(card: PlatformOperatorCardViewModel)(implicit messages: Messages)
@@ -36,6 +36,10 @@
                 <p class="govuk-body">
                     <a href="@link.href" class="govuk-link">@link.text</a>
                 </p>
+            }
+
+            @card.tag.map { tag =>
+                @govukTag(tag)
             }
         </div>
     </div>

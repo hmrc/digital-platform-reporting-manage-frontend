@@ -91,7 +91,7 @@ html[data-useragent*="MSIE 10.0"] .flex-container {
   }
 
   .card-heading {
-    color: #1d70b8;
+    color: $black;
     margin-top: 0;
   }
 
@@ -104,14 +104,6 @@ html[data-useragent*="MSIE 10.0"] .flex-container {
     }
 
     background-color: $grey-4;
-
-    &.inactive {
-      background-color: $white;
-
-      .card-heading {
-        color: $grey-1;
-      }
-    }
 
     &.active {
       transition: 0.1s ease-in-out;
