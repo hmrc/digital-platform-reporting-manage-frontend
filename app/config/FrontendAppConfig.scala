@@ -67,4 +67,12 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
 
   val digitalPlatformReportingUrl: String = configuration.get[Service]("microservice.services.digital-platform-reporting")
   val taxEnrolmentsBaseUrl: String = configuration.get[Service]("microservice.services.tax-enrolments").baseUrl
+
+  val userAllowListService: Service = configuration.get[Service]("microservice.services.user-allow-list")
+  val internalAuthToken: String = configuration.get[String]("internal-auth.token")
+
+  val userAllowListEnabled: Boolean = configuration.get[Boolean]("features.user-allow-list")
+
+  val utrAllowListFeature = "UTR"
+  val vrnAllowListFeature = "VRN"
 }

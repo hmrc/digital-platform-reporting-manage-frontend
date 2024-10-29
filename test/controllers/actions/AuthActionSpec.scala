@@ -32,7 +32,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.EnrolmentService
+import services.{EnrolmentService, UserAllowListService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.Retrieval
@@ -54,6 +54,8 @@ class AuthActionSpec extends SpecBase
   private val emptyEnrolments = Enrolments(Set.empty)
   private val mockPendingEnrolmentConnector = mock[PendingEnrolmentConnector]
   private val mockEnrolmentService = mock[EnrolmentService]
+  private val mockAllowListService = mock[UserAllowListService]
+
 
   class Harness(authAction: IdentifierAction) {
     def onPageLoad(): Action[AnyContent] = authAction { request =>
@@ -72,6 +74,7 @@ class AuthActionSpec extends SpecBase
 
       "must redirect the user to log in " in {
         val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new MissingBearerToken),
+          mockAllowListService,
           appConfig,
           bodyParsers,
           mockPendingEnrolmentConnector,
@@ -89,6 +92,8 @@ class AuthActionSpec extends SpecBase
       "must redirect the user to log in " in {
 
         val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new BearerTokenExpired),
+
+          mockAllowListService,
           appConfig,
           bodyParsers,
           mockPendingEnrolmentConnector,
@@ -108,6 +113,7 @@ class AuthActionSpec extends SpecBase
 
           val authAction = new AuthenticatedIdentifierAction(
             new FakeFailingAuthConnector(InsufficientEnrolments("error")),
+            mockAllowListService,
             appConfig,
             bodyParsers,
             mockPendingEnrolmentConnector,
@@ -128,6 +134,7 @@ class AuthActionSpec extends SpecBase
 
           val authAction = new AuthenticatedIdentifierAction(
             new FakeFailingAuthConnector(InsufficientEnrolments("error")),
+            mockAllowListService,
             appConfig,
             bodyParsers,
             mockPendingEnrolmentConnector,
@@ -148,6 +155,7 @@ class AuthActionSpec extends SpecBase
       "must redirect to unauthorised page" in {
         val authAction = new AuthenticatedIdentifierAction(
           new FakeFailingAuthConnector(InternalError("error")),
+          mockAllowListService,
           appConfig,
           bodyParsers,
           mockPendingEnrolmentConnector,
@@ -170,6 +178,7 @@ class AuthActionSpec extends SpecBase
           when(mockPendingEnrolmentConnector.getPendingEnrolment()(any())).thenReturn(Future.failed(new RuntimeException()))
 
           val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ emptyEnrolments),
+            mockAllowListService,
             appConfig,
             bodyParsers,
             mockPendingEnrolmentConnector,
@@ -191,6 +200,7 @@ class AuthActionSpec extends SpecBase
         when(mockEnrolmentService.enrol(eqTo(EnrolmentDetails(aPendingEnrolment)))(any())).thenReturn(Future.failed(new RuntimeException()))
 
         val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ emptyEnrolments),
+          mockAllowListService,
           appConfig,
           bodyParsers,
           mockPendingEnrolmentConnector,
@@ -208,19 +218,39 @@ class AuthActionSpec extends SpecBase
 
     "when the user has a DPRS enrolment" - {
 
-      "must succeed" in {
+      "must succeed" - {
+        "when the user has a CT UTR enrolment" in {
+          when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
+          val enrolments = Enrolments(Set(Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None), Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ enrolments),
+            mockAllowListService,
+            appConfig,
+            bodyParsers,
+            mockPendingEnrolmentConnector,
+            mockEnrolmentService)
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
 
-        val enrolments = Enrolments(Set(Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None)))
-        val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ enrolments),
-          appConfig,
-          bodyParsers,
-          mockPendingEnrolmentConnector,
-          mockEnrolmentService)
-        val controller = new Harness(authAction)
-        val result = controller.onPageLoad()(FakeRequest())
+          status(result) mustBe OK
+          contentAsString(result) mustEqual "internalId dprsId"
+        }
 
-        status(result) mustBe OK
-        contentAsString(result) mustEqual "internalId dprsId"
+        "when the user has a HMRC-MTD-VAT enrolment" in {
+          when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
+          val enrolments = Enrolments(Set(Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None), Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "vrn")), "activated", None)))
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ enrolments),
+            mockAllowListService,
+            appConfig,
+            bodyParsers,
+            mockPendingEnrolmentConnector,
+            mockEnrolmentService)
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe OK
+          contentAsString(result) mustEqual "internalId dprsId"
+        }
+
       }
     }
   }
