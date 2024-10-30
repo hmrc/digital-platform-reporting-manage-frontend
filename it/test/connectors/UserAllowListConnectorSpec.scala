@@ -16,7 +16,7 @@
 
 package connectors
 
-import connectors.UserAllowListConnector.{CheckRequest, UnexpectedResponseException}
+import connectors.UserAllowListConnector.UnexpectedResponseException
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -27,6 +27,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.test.WireMockSupport
 import com.github.tomakehurst.wiremock.client.WireMock._
 import uk.gov.hmrc.http.HeaderCarrier
+import util.CheckRequest
 
 class UserAllowListConnectorSpec extends AnyFreeSpec
   with Matchers
@@ -47,11 +48,9 @@ class UserAllowListConnectorSpec extends AnyFreeSpec
 
     "must return true when the server returns OK" in {
 
-      val checkRequest = CheckRequest("value")
-
       wireMockServer.stubFor(
         post(urlMatching("/user-allow-list/digital-platform-reporting/feature-name/check"))
-          .withRequestBody(equalTo(Json.toJson(checkRequest).toString))
+          .withRequestBody(equalTo(Json.toJson(CheckRequest("value")).toString))
           .willReturn(ok())
       )
 
@@ -61,11 +60,10 @@ class UserAllowListConnectorSpec extends AnyFreeSpec
 
     "must return false when the server returns NOT_FOUND" in {
 
-      val checkRequest = CheckRequest("value")
 
       wireMockServer.stubFor(
         post(urlMatching("/user-allow-list/digital-platform-reporting/feature-name/check"))
-          .withRequestBody(equalTo(Json.toJson(checkRequest).toString))
+          .withRequestBody(equalTo(Json.toJson(CheckRequest("value")).toString))
           .willReturn(notFound())
       )
 
@@ -75,11 +73,10 @@ class UserAllowListConnectorSpec extends AnyFreeSpec
 
     "must return a failed future when the server returns an error" in {
 
-      val checkRequest = CheckRequest("value")
 
       wireMockServer.stubFor(
         post(urlMatching("/user-allow-list/digital-platform-reporting/feature-name/check"))
-          .withRequestBody(equalTo(Json.toJson(checkRequest).toString))
+          .withRequestBody(equalTo(Json.toJson(CheckRequest("value")).toString))
           .willReturn(serverError())
       )
 

@@ -26,7 +26,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class UserAllowListService @Inject()(connector: UserAllowListConnector, appConfig: FrontendAppConfig)
                                     (implicit ec: ExecutionContext) {
-
+  private val utrAllowListFeature = "UTR"
+  private val vrnAllowListFeature = "VRN"
 
   def isUserAllowed(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
     if (appConfig.userAllowListEnabled) {
@@ -40,12 +41,12 @@ class UserAllowListService @Inject()(connector: UserAllowListConnector, appConfi
   
   private def allowListedByUtr(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
     getCtUtrEnrolment(enrolments)
-      .map(utr => connector.check(appConfig.utrAllowListFeature, utr))
+      .map(utr => connector.check(utrAllowListFeature, utr))
       .getOrElse(Future.successful(false))
 
   private def allowListedByVrn(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
     getVatEnrolment(enrolments)
-      .map(vrn => connector.check(appConfig.vrnAllowListFeature, vrn))
+      .map(vrn => connector.check(vrnAllowListFeature, vrn))
       .getOrElse(Future.successful(false))
 
   private def getCtUtrEnrolment(enrolments: Enrolments): Option[String] =

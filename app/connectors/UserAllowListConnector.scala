@@ -16,9 +16,8 @@
 
 package connectors
 
-import config.{FrontendAppConfig, Service}
+import config.FrontendAppConfig
 import connectors.UserAllowListConnector.{CheckRequest, UnexpectedResponseException}
-import play.api.Configuration
 import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.libs.json.{Json, OFormat}
 import play.api.libs.ws.writeableOf_JsValue

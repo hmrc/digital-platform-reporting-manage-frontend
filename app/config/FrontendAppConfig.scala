@@ -73,6 +73,4 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
 
   val userAllowListEnabled: Boolean = configuration.get[Boolean]("features.user-allow-list")
 
-  val utrAllowListFeature = "UTR"
-  val vrnAllowListFeature = "VRN"
 }

@@ -92,7 +92,6 @@ class AuthActionSpec extends SpecBase
       "must redirect the user to log in " in {
 
         val authAction = new AuthenticatedIdentifierAction(new FakeFailingAuthConnector(new BearerTokenExpired),
-
           mockAllowListService,
           appConfig,
           bodyParsers,
