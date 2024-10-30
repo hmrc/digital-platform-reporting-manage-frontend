@@ -24,7 +24,7 @@ import models.eacd.EnrolmentDetails
 import models.requests.IdentifierRequest
 import play.api.mvc.Results.Redirect
 import play.api.mvc._
-import services.EnrolmentService
+import services.{EnrolmentService, UserAllowListService}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.retrieve.~
@@ -37,6 +37,7 @@ import scala.util.control.NonFatal
 trait IdentifierAction extends ActionBuilder[IdentifierRequest, AnyContent] with ActionFunction[Request, IdentifierRequest]
 
 class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthConnector,
+                                              userAllowListService: UserAllowListService,
                                               config: FrontendAppConfig,
                                               val parser: BodyParsers.Default,
                                               pendingEnrolmentConnector: PendingEnrolmentConnector,
@@ -49,8 +50,12 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
 
     authorised(Enrolment("HMRC-DPRS")).retrieve(Retrievals.internalId and Retrievals.authorisedEnrolments) {
       case Some(internalId) ~ enrolments =>
+
         getEnrolment(enrolments).map { dprsId =>
-          block(IdentifierRequest(request, internalId, dprsId))
+          userAllowListService.isUserAllowed(enrolments).flatMap { //TODO - This needs to be removed once we go to public beta.
+            case true => block(IdentifierRequest(request, internalId, dprsId))
+            case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
+          }
         }.getOrElse {
           Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
         }
