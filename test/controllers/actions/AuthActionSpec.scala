@@ -228,7 +228,6 @@ class AuthActionSpec extends SpecBase
             mockEnrolmentService)
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
-
           status(result) mustBe OK
           contentAsString(result) mustEqual "internalId dprsId"
         }
@@ -244,7 +243,6 @@ class AuthActionSpec extends SpecBase
             mockEnrolmentService)
           val controller = new Harness(authAction)
           val result = controller.onPageLoad()(FakeRequest())
-
           status(result) mustBe OK
           contentAsString(result) mustEqual "internalId dprsId"
         }
@@ -264,6 +262,7 @@ class AuthActionSpec extends SpecBase
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
         }
+
       }
     }
   }
