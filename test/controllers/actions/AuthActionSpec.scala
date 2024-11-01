@@ -216,7 +216,6 @@ class AuthActionSpec extends SpecBase
     }
 
     "when the user has a DPRS enrolment" - {
-
       "must succeed" - {
         "when the user has a CT UTR enrolment" in {
           when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
@@ -250,6 +249,21 @@ class AuthActionSpec extends SpecBase
           contentAsString(result) mustEqual "internalId dprsId"
         }
 
+        "when the user has a CT UTR enrolment and user not in allow list" in {
+          when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(false)
+          val enrolments = Enrolments(Set(Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None), Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "vrn")), "activated", None)))
+          val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ enrolments),
+            mockAllowListService,
+            appConfig,
+            bodyParsers,
+            mockPendingEnrolmentConnector,
+            mockEnrolmentService)
+          val controller = new Harness(authAction)
+          val result = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
+        }
       }
     }
   }
