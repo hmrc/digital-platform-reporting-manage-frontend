@@ -48,11 +48,11 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised(Enrolment("HMRC-DPRS")).retrieve(Retrievals.internalId and Retrievals.authorisedEnrolments) {
-      case Some(internalId) ~ enrolments =>
-
-        getEnrolment(enrolments).map { dprsId =>
-          userAllowListService.isUserAllowed(enrolments).flatMap { //TODO - This needs to be removed once we go to public beta.
+    authorised().retrieve(Retrievals.internalId and Retrievals.allEnrolments) {
+      case Some(internalId) ~ allEnrolments =>
+        val enrolment = allEnrolments.enrolments.filter(enrolment => enrolment.key == "HMRC-DPRS" )
+        getEnrolment(Enrolments(enrolment)).map { dprsId =>
+          userAllowListService.isUserAllowed(allEnrolments).flatMap { //TODO - This needs to be removed once we go to public beta.
             case true => block(IdentifierRequest(request, internalId, dprsId))
             case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
           }
