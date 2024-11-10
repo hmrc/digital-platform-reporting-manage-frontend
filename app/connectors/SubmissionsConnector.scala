@@ -17,7 +17,7 @@
 package connectors
 
 import config.Service
-import connectors.SubmissionsConnector.SubmissionsExistFailure
+import connectors.SubmissionsConnector.{AssumedReportsExistFailure, SubmissionsExistFailure}
 import models.submissions.ViewSubmissionsRequest
 import play.api.Configuration
 import play.api.http.Status.{NOT_FOUND, OK}
@@ -34,11 +34,11 @@ class SubmissionsConnector @Inject()(configuration: Configuration,
 
   private val digitalPlatformReporting: Service = configuration.get[Service]("microservice.services.digital-platform-reporting")
 
-  def submissionsExist(assumedReporting: Boolean)(implicit hc: HeaderCarrier): Future[Boolean] = {
+  def submissionsExist(implicit hc: HeaderCarrier): Future[Boolean] = {
 
-    val request = ViewSubmissionsRequest(assumedReporting)
+    val request = ViewSubmissionsRequest(assumedReporting = false)
 
-    httpClient.post(url"$digitalPlatformReporting/digital-platform-reporting/submission/list")
+    httpClient.post(url"$digitalPlatformReporting/digital-platform-reporting/submission/delivered/list")
       .withBody(Json.toJson(request))
       .execute[HttpResponse]
       .flatMap { response =>
@@ -49,11 +49,26 @@ class SubmissionsConnector @Inject()(configuration: Configuration,
         }
       }
   }
+  
+  def assumedReportsExist(implicit hc: HeaderCarrier): Future[Boolean] =
+    httpClient.get(url"$digitalPlatformReporting/digital-platform-reporting/submission/assumed")
+      .execute[HttpResponse]
+      .flatMap { response =>
+        response.status match {
+          case OK        => Future.successful(true)
+          case NOT_FOUND => Future.successful(false)
+          case status    => Future.failed(AssumedReportsExistFailure(status))
+        }
+      }
 }
 
 object SubmissionsConnector {
 
   final case class SubmissionsExistFailure(status: Int) extends Throwable {
     override def getMessage: String = s"Call to check if submissions exist failed with status: $status"
+  }
+  
+  final case class AssumedReportsExistFailure(status: Int) extends Throwable {
+    override def getMessage: String = s"Call to check if manual assumed reports exist failed with status: $status"
   }
 }

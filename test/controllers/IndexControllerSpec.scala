@@ -115,7 +115,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
         "must display the platform operator, reporting notification and file submission cards" in {
 
           when(mockPlatformOperatorConnector.viewPlatformOperators(any())) thenReturn Future.successful(ViewPlatformOperatorsResponse(Nil))
-          when(mockSubmissionsConnector.submissionsExist(any())(any())) thenReturn Future.successful(false)
+          when(mockSubmissionsConnector.submissionsExist(any())) thenReturn Future.successful(false)
 
           val application =
             applicationBuilder(userAnswers = None)
@@ -146,8 +146,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
 
-            verify(mockSubmissionsConnector, times(1)).submissionsExist(eqTo(false))(any())
-            verify(mockSubmissionsConnector, never()).submissionsExist(eqTo(true))(any())
+            verify(mockSubmissionsConnector, times(1)).submissionsExist(any())
+            verify(mockSubmissionsConnector, never()).assumedReportsExist(any())
           }
         }
       }
@@ -157,7 +157,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
         "must display the platform operator, reporting notification and assumed reporting cards" in {
 
           when(mockPlatformOperatorConnector.viewPlatformOperators(any())) thenReturn Future.successful(ViewPlatformOperatorsResponse(Nil))
-          when(mockSubmissionsConnector.submissionsExist(any())(any())) thenReturn Future.successful(false)
+          when(mockSubmissionsConnector.assumedReportsExist(any())) thenReturn Future.successful(false)
 
           val application =
             applicationBuilder(userAnswers = None)
@@ -188,8 +188,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
 
-            verify(mockSubmissionsConnector, times(1)).submissionsExist(eqTo(true))(any())
-            verify(mockSubmissionsConnector, never()).submissionsExist(eqTo(false))(any())
+            verify(mockSubmissionsConnector, times(1)).assumedReportsExist(any())
+            verify(mockSubmissionsConnector, never()).submissionsExist(any())
           }
         }
       }
@@ -199,7 +199,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
         "must display the platform operator, reporting notification, file submission and assumed reporting cards" in {
 
           when(mockPlatformOperatorConnector.viewPlatformOperators(any())) thenReturn Future.successful(ViewPlatformOperatorsResponse(Nil))
-          when(mockSubmissionsConnector.submissionsExist(any())(any())) thenReturn Future.successful(false)
+          when(mockSubmissionsConnector.submissionsExist(any())) thenReturn Future.successful(false)
+          when(mockSubmissionsConnector.assumedReportsExist(any())) thenReturn Future.successful(false)
 
           val application =
             applicationBuilder(userAnswers = None)
@@ -230,8 +231,8 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
 
-            verify(mockSubmissionsConnector, times(1)).submissionsExist(eqTo(true))(any())
-            verify(mockSubmissionsConnector, times(1)).submissionsExist(eqTo(false))(any())
+            verify(mockSubmissionsConnector, times(1)).submissionsExist(any())
+            verify(mockSubmissionsConnector, times(1)).assumedReportsExist(any())
           }
         }
       }

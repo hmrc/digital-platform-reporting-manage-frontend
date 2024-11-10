@@ -78,7 +78,7 @@ class IndexController @Inject()(
   private def getFileSubmissionsCard(operators: Seq[PlatformOperator], appConfig: FrontendAppConfig)
                                     (implicit request: Request[_]): Future[FileSubmissionsCardViewModel] = {
     if (appConfig.fileSubmissionsEnabled) {
-      submissionsConnector.submissionsExist(assumedReporting = false).map { response =>
+      submissionsConnector.submissionsExist.map { response =>
         FileSubmissionsCardViewModel(response, operators, appConfig)
       }
     } else {
@@ -89,7 +89,7 @@ class IndexController @Inject()(
   private def getAssumedReportingCard(operators: Seq[PlatformOperator], appConfig: FrontendAppConfig)
                                      (implicit request: Request[_]): Future[AssumedReportingCardViewModel] = {
     if (appConfig.assumedReportingEnabled) {
-      submissionsConnector.submissionsExist(assumedReporting = true).map { response =>
+      submissionsConnector.assumedReportsExist.map { response =>
         AssumedReportingCardViewModel(response, operators, appConfig)
       }
     } else {
