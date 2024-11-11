@@ -17,7 +17,7 @@
 package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import connectors.SubmissionsConnector.SubmissionsExistFailure
+import connectors.SubmissionsConnector.{AssumedReportsExistFailure, SubmissionsExistFailure}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -51,39 +51,81 @@ class SubmissionsConnectorSpec extends AnyFreeSpec
     "must return true when the server returns OK" in {
 
       wireMockServer.stubFor(
-        post(urlPathEqualTo("/digital-platform-reporting/submission/list"))
+        post(urlPathEqualTo("/digital-platform-reporting/submission/delivered/list"))
           .withHeader("Authorization", equalTo("authToken"))
           .willReturn(ok())
       )
 
-      val result = connector.submissionsExist(assumedReporting = true).futureValue
+      val result = connector.submissionsExist.futureValue
       result mustEqual true
     }
 
     "must return false when the server returns NOT_FOUND" in {
 
       wireMockServer.stubFor(
-        post(urlPathEqualTo("/digital-platform-reporting/submission/list"))
+        post(urlPathEqualTo("/digital-platform-reporting/submission/delivered/list"))
           .withHeader("Authorization", equalTo("authToken"))
           .willReturn(notFound())
       )
 
-      val result = connector.submissionsExist(assumedReporting = true).futureValue
+      val result = connector.submissionsExist.futureValue
       result mustEqual false
     }
 
     "must return a failed future when the server returns an error" in {
 
       wireMockServer.stubFor(
-        post(urlPathEqualTo("/digital-platform-reporting/submission/list"))
+        post(urlPathEqualTo("/digital-platform-reporting/submission/delivered/list"))
           .withHeader("Authorization", equalTo("authToken"))
           .willReturn(serverError())
       )
 
-      val result = connector.submissionsExist(assumedReporting = true).failed.futureValue
+      val result = connector.submissionsExist.failed.futureValue
       result mustBe a[SubmissionsExistFailure]
 
       val failure = result.asInstanceOf[SubmissionsExistFailure]
+      failure.status mustEqual INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "assumedReportsExist" - {
+
+    "must return true when the server returns OK" in {
+
+      wireMockServer.stubFor(
+        get(urlPathEqualTo("/digital-platform-reporting/submission/assumed"))
+          .withHeader("Authorization", equalTo("authToken"))
+          .willReturn(ok())
+      )
+
+      val result = connector.assumedReportsExist.futureValue
+      result mustEqual true
+    }
+
+    "must return false when the server returns NOT_FOUND" in {
+
+      wireMockServer.stubFor(
+        get(urlPathEqualTo("/digital-platform-reporting/submission/assumed"))
+          .withHeader("Authorization", equalTo("authToken"))
+          .willReturn(notFound())
+      )
+
+      val result = connector.assumedReportsExist.futureValue
+      result mustEqual false
+    }
+
+    "must return a failed future when the server returns an error" in {
+
+      wireMockServer.stubFor(
+        get(urlPathEqualTo("/digital-platform-reporting/submission/assumed"))
+          .withHeader("Authorization", equalTo("authToken"))
+          .willReturn(serverError())
+      )
+
+      val result = connector.assumedReportsExist.failed.futureValue
+      result mustBe a[AssumedReportsExistFailure]
+
+      val failure = result.asInstanceOf[AssumedReportsExistFailure]
       failure.status mustEqual INTERNAL_SERVER_ERROR
     }
   }
