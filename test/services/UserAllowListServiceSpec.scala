@@ -27,6 +27,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.auth.core.{Enrolment, EnrolmentIdentifier, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -45,9 +46,10 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
   private val ctEnrolment = Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", "utr")), "activated")
   private val mtdEnrolment = Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "vrn")), "activated")
   private val vatEnrolment = Enrolment("HMCE-VATDEC-ORG", Seq(EnrolmentIdentifier("VATRegNo", "vatref")), "activated")
-  
+  private val fatcaEnrolment = Enrolment("HMRC-FATCA-ORG", Seq(EnrolmentIdentifier("FATCAID", "fatcaId")), "activated")
+
   private implicit val hc: HeaderCarrier = HeaderCarrier()
-  
+
   "isUserAllowed" - {
 
     "when the allowlist feature is disabled" - {
@@ -96,6 +98,16 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
 
           service.isUserAllowed(enrolments).futureValue mustEqual true
         }
+
+        "when the user has an HMRC-FATCA-ORG enrolment in the list" in {
+          when(mockAppConfig.userAllowListEnabled).thenReturn(true)
+          when(mockConnector.check(eqTo("UTR"), any())(any())).thenReturn(Future.successful(false))
+          when(mockConnector.check(eqTo("FATCAID"), any())(any())).thenReturn(Future.successful(true))
+
+          val enrolments = Enrolments(Set(ctEnrolment, fatcaEnrolment))
+
+          service.isUserAllowed(enrolments).futureValue mustEqual true
+        }
       }
 
       "must return false" - {
@@ -103,12 +115,12 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
         "when the user has no CT or VAT enrolments" in {
 
           when(mockAppConfig.userAllowListEnabled) thenReturn true
-          
+
           service.isUserAllowed(emptyEnrolments).futureValue mustEqual false
         }
 
         "when the user has a CT enrolment but it isn't on the list" in {
-          
+
           when(mockAppConfig.userAllowListEnabled) thenReturn true
           when(mockConnector.check(eqTo("UTR"), any())(any())) thenReturn Future.successful(false)
 
@@ -144,6 +156,15 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
           when(mockConnector.check(eqTo("VRN"), any())(any())) thenReturn Future.successful(false)
 
           val enrolments = Enrolments(Set(ctEnrolment, mtdEnrolment))
+
+          service.isUserAllowed(enrolments).futureValue mustEqual false
+        }
+
+        "when the user has an HMRC-FATCA-ORG enrolment but it isn't on the list" in {
+          when(mockAppConfig.userAllowListEnabled).thenReturn(true)
+          when(mockConnector.check(eqTo("FATCAID"), any())(any())).thenReturn(Future.successful(false))
+
+          val enrolments = Enrolments(Set(fatcaEnrolment))
 
           service.isUserAllowed(enrolments).futureValue mustEqual false
         }

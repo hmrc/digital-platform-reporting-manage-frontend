@@ -26,19 +26,24 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class UserAllowListService @Inject()(connector: UserAllowListConnector, appConfig: FrontendAppConfig)
                                     (implicit ec: ExecutionContext) {
+
   private val utrAllowListFeature = "UTR"
   private val vrnAllowListFeature = "VRN"
+  private val fatcaAllowListFeature = "FATCAID"
 
   def isUserAllowed(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
     if (appConfig.userAllowListEnabled) {
       allowListedByUtr(enrolments).flatMap {
-        case true  => Future.successful(true)
-        case false => allowListedByVrn(enrolments)
+        case true => Future.successful(true)
+        case false => allowListedByVrn(enrolments).flatMap {
+          case true  => Future.successful(true)
+          case false => allowListedByFatcaId(enrolments)
+        }
       }
     } else {
       Future.successful(true)
     }
-  
+
   private def allowListedByUtr(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
     getCtUtrEnrolment(enrolments)
       .map(utr => connector.check(utrAllowListFeature, utr))
@@ -70,5 +75,18 @@ class UserAllowListService @Inject()(connector: UserAllowListConnector, appConfi
               .find(_.key == "VATRegNo")
               .map(_.value)
           }
+      }
+
+  private def allowListedByFatcaId(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
+    getFatcaEnrolment(enrolments)
+      .map(connector.check(fatcaAllowListFeature, _))
+      .getOrElse(Future.successful(false))
+
+  private def getFatcaEnrolment(enrolments: Enrolments): Option[String] =
+    enrolments.getEnrolment("HMRC-FATCA-ORG")
+      .flatMap { enrolment =>
+        enrolment.identifiers
+          .find(_.key == "FATCAID")
+          .map(_.value)
       }
 }
