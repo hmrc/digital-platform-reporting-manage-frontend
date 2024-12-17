@@ -30,7 +30,7 @@ error.summary.title = There is a problem
 
 index.title = Manage your digital platform reporting
 index.heading = Manage your digital platform reporting
-index.guidance = Digital platform reporting user ID: {0}
+index.guidance = Registration ID: {0}
 index.contactDetails.heading = Contact details
 index.contactDetails.p = Change the contact details you entered when registering for this service.
 index.contactDetails.actions.change = Change contact details
