@@ -16,6 +16,7 @@
 
 @import viewmodels.InputWidth._
 
+
 @this(
     layout: templates.Layout,
     formHelper: FormWithCSRF,
@@ -23,6 +24,7 @@
     govukInput: GovukInput,
     govukButton: GovukButton
 )
+
 
 @(form: Form[_], contactName: String)(implicit request: Request[_], messages: Messages)
 
@@ -44,6 +46,7 @@
                 label = LabelViewModel(messages("primaryContactEmailAddress.heading")).withCssClass("govuk-visually-hidden")
             )
             .withWidth(Full)
+            .withHint(HintViewModel(messages("primaryContactEmailAddress.hint")))
         )
 
         <div class="govuk-button-group">
