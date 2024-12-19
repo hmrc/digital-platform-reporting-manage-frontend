@@ -30,7 +30,7 @@ error.summary.title = There is a problem
 
 index.title = Manage your digital platform reporting
 index.heading = Manage your digital platform reporting
-index.guidance = Digital platform reporting user ID: {0}
+index.guidance = Registration ID: {0}
 index.contactDetails.heading = Contact details
 index.contactDetails.p = Change the contact details you entered when registering for this service.
 index.contactDetails.actions.change = Change contact details
@@ -110,6 +110,7 @@ hasSecondaryContact.change.hidden = if there is a second contact
 individualEmailAddress.title = What is your email address?
 individualEmailAddress.heading = What is your email address?
 individualEmailAddress.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
+individualEmailAddress.hint = For example, ‘name@example.com’.
 individualEmailAddress.checkYourAnswersLabel = Email address
 individualEmailAddress.error.required = Enter your email address
 individualEmailAddress.error.length = Email address must be {0} characters or less
@@ -136,6 +137,7 @@ individualPhoneNumberUpdated.heading = Telephone number has been changed success
 
 primaryContactEmailAddress.title = What is the email address for the person or team we can contact?
 primaryContactEmailAddress.heading = What is the email address for {0}?
+primaryContactEmailAddress.hint = For example, ‘name@example.com’.
 primaryContactEmailAddress.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
 primaryContactEmailAddress.checkYourAnswersLabel = Email address
 primaryContactEmailAddress.error.required = Enter the email address for {0}
@@ -143,8 +145,8 @@ primaryContactEmailAddress.error.length = Email must be {0} characters or less
 primaryContactEmailAddress.error.format = Enter an email address in the correct format, like name@example.com
 primaryContactEmailAddress.change.hidden = the email address for {0}
 
-primaryContactName.title = What is the name of the person or team we should contact?
-primaryContactName.heading = What is the name of the person or team we should contact?
+primaryContactName.title = What is the name of the first person or team we should contact?
+primaryContactName.heading = What is the name of the first person or team we should contact?
 primaryContactName.hint = For example, ‘Ashley Smith’ or ‘Tax Team’.
 primaryContactName.checkYourAnswersLabel = Contact name
 primaryContactName.error.required = Enter the name of the person or team we should contact
@@ -166,7 +168,8 @@ primaryContactUpdated.heading = First contact details have been changed successf
 
 secondaryContactEmailAddress.title = What is the email address for the second person or team we should contact?
 secondaryContactEmailAddress.heading = What is the email address for {0}?
-secondaryContactEmailAddress.p1 = We will use this email address to send confirmation of your reports or if we have any questions about them.
+secondaryContactEmailAddress.p1 = We may use this email address if we have any questions about your reports.
+secondaryContactEmailAddress.hint = For example, ‘name@example.com’.
 secondaryContactEmailAddress.checkYourAnswersLabel = Email address
 secondaryContactEmailAddress.error.required = Enter the email address for {0}
 secondaryContactEmailAddress.error.length = Email must be {0} characters or less
