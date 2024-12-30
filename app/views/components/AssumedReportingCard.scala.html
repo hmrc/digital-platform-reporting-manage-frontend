@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukTag
-@import viewmodels.{CardState, AssumedReportingCardViewModel}
+@import viewmodels.{CardLink, CardMessage, CardState, AssumedReportingCardViewModel}
 
 @this(govukTag: GovukTag)
 
@@ -31,10 +31,18 @@
         </div>
         <div class="card-action">
             @if(card.cardState == CardState.Active) {
-                @card.links.map { link =>
-                    <p class="govuk-body">
-                        <a href="@link.href" class="govuk-link">@link.text</a>
-                    </p>
+                @card.items.map { item =>
+                    @item match {
+                        case link: CardLink => {
+                            <p class="govuk-body">
+                                <a href="@link.href" class="govuk-link">@link.text</a>
+                            </p>
+                        }
+
+                        case m: CardMessage => {
+                            <p class="govuk-body">@m.text</p>
+                        }
+                    }
                 }
             } else {
                 <p class="govuk-body">@messages("index.assumedReporting.inactive")</p>

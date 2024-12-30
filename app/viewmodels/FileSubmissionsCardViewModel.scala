@@ -22,7 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 final case class FileSubmissionsCardViewModel(cardState: CardState,
-                                              links: Seq[Link],
+                                              items: Seq[CardItem],
                                               tag: Option[Tag])
 
 object FileSubmissionsCardViewModel {
@@ -31,20 +31,25 @@ object FileSubmissionsCardViewModel {
            (implicit messages: Messages): FileSubmissionsCardViewModel = {
 
     if (operators.exists(_.notifications.nonEmpty)) {
-      val addLink = Link(messages("fileSubmissionsCard.add"), appConfig.addSubmissionUrl)
-      val viewLink = Link(messages("fileSubmissionsCard.view"), appConfig.viewSubmissionsUrl)
+      val addLink = CardLink(messages("fileSubmissionsCard.add"), appConfig.addSubmissionUrl)
+      val viewLink = CardLink(messages("fileSubmissionsCard.view"), appConfig.viewSubmissionsUrl)
+      val addMessage = CardMessage(messages("fileSubmissionsCard.add"))
 
-      val links = if (submissionsExist) Seq(viewLink, addLink) else Seq(addLink)
+      val items = if (appConfig.submissionsAllowed) {
+        if (submissionsExist) Seq(viewLink, addLink) else Seq(addLink)
+      } else {
+        if (submissionsExist) Seq(viewLink, addMessage) else Seq(addMessage)
+      }
 
-      val tag = if (submissionsExist) None else Some(CardTag.notStarted)
+      val tag = if (!appConfig.submissionsAllowed) Some(CardTag.notAvailable) else if (submissionsExist) None else Some(CardTag.notStarted)
 
       FileSubmissionsCardViewModel(
         cardState = CardState.Active,
-        links = links,
+        items = items,
         tag = tag
       )
     } else {
-      FileSubmissionsCardViewModel(cardState = CardState.Inactive, links = Nil, tag = Some(CardTag.cannotStart))
+      FileSubmissionsCardViewModel(cardState = CardState.Inactive, items = Nil, tag = Some(CardTag.cannotStart))
     }
   }
 }

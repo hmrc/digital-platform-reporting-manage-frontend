@@ -22,7 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 final case class PlatformOperatorCardViewModel(cardState: CardState,
-                                               links: Seq[Link],
+                                               items: Seq[CardItem],
                                                tag: Option[Tag])
 
 object PlatformOperatorCardViewModel {
@@ -32,12 +32,12 @@ object PlatformOperatorCardViewModel {
 
     val viewLink = operators.size match {
       case 0 => None
-      case _ => Some(Link(messages("platformOperatorCard.view"), appConfig.viewPlatformOperatorsUrl))
+      case _ => Some(CardLink(messages("platformOperatorCard.view"), appConfig.viewPlatformOperatorsUrl))
     }
 
     val addLink = operators.size match {
-      case 0 => Link (messages ("platformOperatorCard.add"), appConfig.addPlatformOperatorUrl)
-      case _ => Link (messages ("platformOperatorCard.addAnother"), appConfig.addPlatformOperatorUrl)
+      case 0 => CardLink (messages ("platformOperatorCard.add"), appConfig.addPlatformOperatorUrl)
+      case _ => CardLink (messages ("platformOperatorCard.addAnother"), appConfig.addPlatformOperatorUrl)
     }
 
     val tag = operators.size match {
@@ -47,7 +47,7 @@ object PlatformOperatorCardViewModel {
 
     PlatformOperatorCardViewModel(
       cardState = CardState.Active,
-      links     = Seq(viewLink, Some(addLink)).flatten,
+      items     = Seq(viewLink, Some(addLink)).flatten,
       tag       = tag
     )
   }

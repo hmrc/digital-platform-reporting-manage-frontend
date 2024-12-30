@@ -56,6 +56,7 @@ assumedReportingCard.view = View assumed reporting history
 assumedReportingCard.add = Tell HMRC that another platform operator will report for you
 card.notStarted = Not yet started
 card.cannotStart = Cannot start yet
+card.notAvailable = Not currently available
 
 contactDetails.individual.title = Your contact details
 contactDetails.individual.heading = Your contact details

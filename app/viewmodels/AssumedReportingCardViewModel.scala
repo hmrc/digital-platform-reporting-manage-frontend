@@ -22,7 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 final case class AssumedReportingCardViewModel(cardState: CardState,
-                                               links: Seq[Link],
+                                               items: Seq[CardItem],
                                                tag: Option[Tag])
 
 object AssumedReportingCardViewModel {
@@ -31,20 +31,25 @@ object AssumedReportingCardViewModel {
            (implicit messages: Messages): AssumedReportingCardViewModel = {
 
     if (operators.exists(_.notifications.nonEmpty)) {
-      val addLink = Link(messages("assumedReportingCard.add"), appConfig.addAssumedReportUrl)
-      val viewLink = Link(messages("assumedReportingCard.view"), appConfig.viewAssumedReportsUrl)
+      val addLink = CardLink(messages("assumedReportingCard.add"), appConfig.addAssumedReportUrl)
+      val viewLink = CardLink(messages("assumedReportingCard.view"), appConfig.viewAssumedReportsUrl)
+      val addMessage = CardMessage(messages("assumedReportingCard.add"))
 
-      val links = if (assumedReportsExist) Seq(viewLink, addLink) else Seq(addLink)
+      val items = if (appConfig.submissionsAllowed) {
+        if (assumedReportsExist) Seq(viewLink, addLink) else Seq(addLink)
+      } else {
+        if (assumedReportsExist) Seq(viewLink, addMessage) else Seq(addMessage)
+      }
 
-      val tag = if (assumedReportsExist) None else Some(CardTag.notStarted)
+      val tag = if (!appConfig.submissionsAllowed) Some(CardTag.notAvailable) else if (assumedReportsExist) None else Some(CardTag.notStarted)
 
       AssumedReportingCardViewModel(
         cardState = CardState.Active,
-        links = links,
+        items = items,
         tag = tag
       )
     } else {
-      AssumedReportingCardViewModel(cardState = CardState.Inactive, links = Nil, tag = Some(CardTag.cannotStart))
+      AssumedReportingCardViewModel(cardState = CardState.Inactive, items = Nil, tag = Some(CardTag.cannotStart))
     }
   }
 }

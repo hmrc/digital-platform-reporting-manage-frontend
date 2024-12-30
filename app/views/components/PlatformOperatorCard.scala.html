@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components.GovukTag
-@import viewmodels.{CardState, PlatformOperatorCardViewModel}
+@import viewmodels.{CardLink, CardMessage, CardState, PlatformOperatorCardViewModel}
 
 @this(
         govukTag: GovukTag
@@ -32,10 +32,18 @@
             <p class="govuk-body-s">@messages("index.platformOperators.p")</p>
         </div>
         <div class="card-action">
-            @card.links.map { link =>
-                <p class="govuk-body">
-                    <a href="@link.href" class="govuk-link">@link.text</a>
-                </p>
+            @card.items.map { item =>
+                @item match {
+                    case link: CardLink => {
+                        <p class="govuk-body">
+                            <a href="@link.href" class="govuk-link">@link.text</a>
+                        </p>
+                    }
+
+                    case m: CardMessage => {
+                        <p class="govuk-body">@m.text</p>
+                    }
+                }
             }
 
             @card.tag.map { tag =>

@@ -50,7 +50,7 @@ class PlatformOperatorCardViewModelSpec extends AnyFreeSpec with Matchers with M
         val card = PlatformOperatorCardViewModel(Nil, mockAppConfig)
 
         card.cardState mustEqual CardState.Active
-        card.links must contain only Link(msgs("platformOperatorCard.add"), "add-link")
+        card.items must contain only CardLink(msgs("platformOperatorCard.add"), "add-link")
         card.tag.value.content mustEqual Text(msgs("card.notStarted"))
       }
     }
@@ -77,9 +77,9 @@ class PlatformOperatorCardViewModelSpec extends AnyFreeSpec with Matchers with M
         val card = PlatformOperatorCardViewModel(Seq(operator), mockAppConfig)
 
         card.cardState mustEqual CardState.Active
-        card.links must contain theSameElementsInOrderAs Seq(
-          Link(msgs("platformOperatorCard.view"), "view-link"),
-          Link(msgs("platformOperatorCard.addAnother"), "add-link")
+        card.items must contain theSameElementsInOrderAs Seq(
+          CardLink(msgs("platformOperatorCard.view"), "view-link"),
+          CardLink(msgs("platformOperatorCard.addAnother"), "add-link")
         )
         card.tag must not be defined
       }

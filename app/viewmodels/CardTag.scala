@@ -28,4 +28,7 @@ object CardTag {
 
   def notStarted(implicit messages: Messages): Tag =
     TagViewModel(Text(messages("card.notStarted"))).blue()
+
+  def notAvailable(implicit messages: Messages): Tag =
+    TagViewModel(Text(messages("card.notAvailable"))).grey()
 }
