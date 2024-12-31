@@ -33,15 +33,15 @@ object FileSubmissionsCardViewModel {
     if (operators.exists(_.notifications.nonEmpty)) {
       val addLink = CardLink(messages("fileSubmissionsCard.add"), appConfig.addSubmissionUrl)
       val viewLink = CardLink(messages("fileSubmissionsCard.view"), appConfig.viewSubmissionsUrl)
-      val addMessage = CardMessage(messages("fileSubmissionsCard.add"))
+      val addDisabled = CardMessage(messages("fileSubmissionsCard.add.disabled"))
 
       val items = if (appConfig.submissionsAllowed) {
         if (submissionsExist) Seq(viewLink, addLink) else Seq(addLink)
       } else {
-        if (submissionsExist) Seq(viewLink, addMessage) else Seq(addMessage)
+        if (submissionsExist) Seq(viewLink, addDisabled) else Seq(addDisabled)
       }
 
-      val tag = if (!appConfig.submissionsAllowed) Some(CardTag.notAvailable) else if (submissionsExist) None else Some(CardTag.notStarted)
+      val tag = if (appConfig.submissionsAllowed && !submissionsExist) Some(CardTag.notStarted) else None
 
       FileSubmissionsCardViewModel(
         cardState = CardState.Active,

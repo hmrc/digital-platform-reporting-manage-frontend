@@ -138,7 +138,7 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
       "when submissions are disabled" - {
 
-        "must contain an add message and a `not available` tag when there are no submissions" in {
+        "must contain an add message and no tag when there are no submissions" in {
 
           when(mockAppConfig.submissionsAllowed) thenReturn false
 
@@ -157,11 +157,11 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
           val card = AssumedReportingCardViewModel(false, Seq(operator), mockAppConfig)
 
           card.cardState mustEqual CardState.Active
-          card.items must contain only CardMessage(msgs("assumedReportingCard.add"))
-          card.tag.value.content mustEqual Text(msgs("card.notAvailable"))
+          card.items must contain only CardMessage(msgs("assumedReportingCard.add.disabled"))
+          card.tag must not be defined
         }
 
-        "must contain a view link, an add message, and a `not available` tag when there are some submissions" in {
+        "must contain a view link, an add message, and no tag when there are some submissions" in {
 
           when(mockAppConfig.viewAssumedReportsUrl) thenReturn "view-link"
 
@@ -182,9 +182,9 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
           card.cardState mustEqual CardState.Active
           card.items must contain theSameElementsInOrderAs Seq(
             CardLink(msgs("assumedReportingCard.view"), "view-link"),
-            CardMessage(msgs("assumedReportingCard.add"))
+            CardMessage(msgs("assumedReportingCard.add.disabled"))
           )
-          card.tag.value.content mustEqual Text(msgs("card.notAvailable"))
+          card.tag must not be defined
         }
       }
     }

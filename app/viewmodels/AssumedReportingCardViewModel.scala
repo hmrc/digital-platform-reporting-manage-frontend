@@ -33,15 +33,15 @@ object AssumedReportingCardViewModel {
     if (operators.exists(_.notifications.nonEmpty)) {
       val addLink = CardLink(messages("assumedReportingCard.add"), appConfig.addAssumedReportUrl)
       val viewLink = CardLink(messages("assumedReportingCard.view"), appConfig.viewAssumedReportsUrl)
-      val addMessage = CardMessage(messages("assumedReportingCard.add"))
+      val addDisabled = CardMessage(messages("assumedReportingCard.add.disabled"))
 
       val items = if (appConfig.submissionsAllowed) {
         if (assumedReportsExist) Seq(viewLink, addLink) else Seq(addLink)
       } else {
-        if (assumedReportsExist) Seq(viewLink, addMessage) else Seq(addMessage)
+        if (assumedReportsExist) Seq(viewLink, addDisabled) else Seq(addDisabled)
       }
 
-      val tag = if (!appConfig.submissionsAllowed) Some(CardTag.notAvailable) else if (assumedReportsExist) None else Some(CardTag.notStarted)
+      val tag = if (appConfig.submissionsAllowed && !assumedReportsExist) Some(CardTag.notStarted) else None
 
       AssumedReportingCardViewModel(
         cardState = CardState.Active,

@@ -138,7 +138,7 @@ class FileSubmissionsCardViewModelSpec extends AnyFreeSpec with Matchers with Mo
 
       "when submissions are disabled" - {
 
-        "must contain an add message and a `not available` tag when there are no submissions" in {
+        "must contain an add message and no tag when there are no submissions" in {
 
           when(mockAppConfig.submissionsAllowed) thenReturn false
 
@@ -157,11 +157,11 @@ class FileSubmissionsCardViewModelSpec extends AnyFreeSpec with Matchers with Mo
           val card = FileSubmissionsCardViewModel(false, Seq(operator), mockAppConfig)
 
           card.cardState mustEqual CardState.Active
-          card.items must contain only CardMessage(msgs("fileSubmissionsCard.add"))
-          card.tag.value.content mustEqual Text(msgs("card.notAvailable"))
+          card.items must contain only CardMessage(msgs("fileSubmissionsCard.add.disabled"))
+          card.tag must not be defined
         }
 
-        "must contain a view link, an add message, and a `not available` tag when there are some submissions" in {
+        "must contain a view link, an add message, and no tag when there are some submissions" in {
 
           when(mockAppConfig.viewSubmissionsUrl) thenReturn "view-link"
           when(mockAppConfig.submissionsAllowed) thenReturn false
@@ -183,9 +183,9 @@ class FileSubmissionsCardViewModelSpec extends AnyFreeSpec with Matchers with Mo
           card.cardState mustEqual CardState.Active
           card.items must contain theSameElementsInOrderAs Seq(
             CardLink(msgs("fileSubmissionsCard.view"), "view-link"),
-            CardMessage(msgs("fileSubmissionsCard.add"))
+            CardMessage(msgs("fileSubmissionsCard.add.disabled"))
           )
-          card.tag.value.content mustEqual Text(msgs("card.notAvailable"))
+          card.tag must not be defined
         }
       }
     }
