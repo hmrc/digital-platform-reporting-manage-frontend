@@ -20,4 +20,5 @@ case class IndexViewModel(operatorId: String,
                           platformOperatorCard: PlatformOperatorCardViewModel,
                           reportingNotificationCard: ReportingNotificationCardViewModel,
                           fileSubmissionsCard: FileSubmissionsCardViewModel,
-                          assumedReportingCard: AssumedReportingCardViewModel)
+                          assumedReportingCard: AssumedReportingCardViewModel,
+                          submissionsAllowed: Boolean)
