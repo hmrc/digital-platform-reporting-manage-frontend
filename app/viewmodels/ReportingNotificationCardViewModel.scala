@@ -22,7 +22,7 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.govukfrontend.views.viewmodels.tag.Tag
 
 case class ReportingNotificationCardViewModel(cardState: CardState,
-                                              links: Seq[Link],
+                                              items: Seq[CardItem],
                                               tag: Option[Tag])
 
 object ReportingNotificationCardViewModel {
@@ -32,14 +32,14 @@ object ReportingNotificationCardViewModel {
 
     val viewLink = operators.find(_.notifications.nonEmpty).map { _ =>
       operators.size match {
-        case 1 => Link(messages("reportingNotificationCard.view"), appConfig.viewNotificationsSingleUrl(operators.head.operatorId))
-        case _ => Link(messages("reportingNotificationCard.view"), appConfig.viewNotificationsUrl)
+        case 1 => CardLink(messages("reportingNotificationCard.view"), appConfig.viewNotificationsSingleUrl(operators.head.operatorId))
+        case _ => CardLink(messages("reportingNotificationCard.view"), appConfig.viewNotificationsUrl)
       }
     }
 
     val addLink = operators.size match {
       case 0 => None
-      case _ => Some(Link(messages("reportingNotificationCard.add"), appConfig.addNotificationUrl))
+      case _ => Some(CardLink(messages("reportingNotificationCard.add"), appConfig.addNotificationUrl))
     }
 
     val tag = operators.size match {
@@ -51,7 +51,7 @@ object ReportingNotificationCardViewModel {
 
     ReportingNotificationCardViewModel(
       cardState = if (links.isEmpty) CardState.Inactive else CardState.Active,
-      links     = links,
+      items     = links,
       tag       = tag
     )
   }

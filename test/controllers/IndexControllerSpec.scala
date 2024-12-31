@@ -51,7 +51,10 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
         val application =
           applicationBuilder(userAnswers = None)
-            .configure("features.platform-operators" -> false)
+            .configure(
+              "features.platform-operators" -> false,
+              "features.submissions-enabled" -> true
+            )
             .build()
 
         running(application) {
@@ -67,7 +70,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
           val notificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil, None)
           val fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None)
           val assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil, None)
-          val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+          val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard, true)
           contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
         }
       }
@@ -87,6 +90,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
               .configure("features.platform-operators" -> true)
               .configure("features.file-submissions" -> false)
               .configure("features.assumed-reporting" -> false)
+              .configure("features.submissions-enabled" -> true)
               .build()
 
           running(application) {
@@ -103,7 +107,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
             val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
             val fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None)
             val assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil, None)
-            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard, true)
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
           }
@@ -126,6 +130,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
               .configure("features.platform-operators" -> true)
               .configure("features.file-submissions" -> true)
               .configure("features.assumed-reporting" -> false)
+              .configure("features.submissions-enabled" -> true)
               .build()
 
           running(application) {
@@ -142,7 +147,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
             val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
             val fileSubmissionsCard = FileSubmissionsCardViewModel(false, Nil, appConfig)(messages(application))
             val assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil, None)
-            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard, true)
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
 
@@ -168,6 +173,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
               .configure("features.platform-operators" -> true)
               .configure("features.file-submissions" -> false)
               .configure("features.assumed-reporting" -> true)
+              .configure("features.submissions-enabled" -> true)
               .build()
 
           running(application) {
@@ -184,7 +190,7 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
             val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
             val fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None)
             val assumedReportingCard = AssumedReportingCardViewModel(false, Nil, appConfig)(messages(application))
-            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard, true)
 
             contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
 
@@ -196,43 +202,91 @@ class IndexControllerSpec extends SpecBase with MockitoSugar with BeforeAndAfter
 
       "and file submissions and assumed reporting are enabled" - {
 
-        "must display the platform operator, reporting notification, file submission and assumed reporting cards" in {
+        "and submissions are enabled" - {
 
-          when(mockPlatformOperatorConnector.viewPlatformOperators(any())) thenReturn Future.successful(ViewPlatformOperatorsResponse(Nil))
-          when(mockSubmissionsConnector.submissionsExist(any())) thenReturn Future.successful(false)
-          when(mockSubmissionsConnector.assumedReportsExist(any())) thenReturn Future.successful(false)
+          "must display the platform operator, reporting notification, file submission and assumed reporting cards" in {
 
-          val application =
-            applicationBuilder(userAnswers = None)
-              .overrides(
-                bind[PlatformOperatorConnector].toInstance(mockPlatformOperatorConnector),
-                bind[SubmissionsConnector].toInstance(mockSubmissionsConnector)
-              )
-              .configure("features.platform-operators" -> true)
-              .configure("features.file-submissions" -> true)
-              .configure("features.assumed-reporting" -> true)
-              .build()
+            when(mockPlatformOperatorConnector.viewPlatformOperators(any())) thenReturn Future.successful(ViewPlatformOperatorsResponse(Nil))
+            when(mockSubmissionsConnector.submissionsExist(any())) thenReturn Future.successful(false)
+            when(mockSubmissionsConnector.assumedReportsExist(any())) thenReturn Future.successful(false)
 
-          running(application) {
-            val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+            val application =
+              applicationBuilder(userAnswers = None)
+                .overrides(
+                  bind[PlatformOperatorConnector].toInstance(mockPlatformOperatorConnector),
+                  bind[SubmissionsConnector].toInstance(mockSubmissionsConnector)
+                )
+                .configure("features.platform-operators" -> true)
+                .configure("features.file-submissions" -> true)
+                .configure("features.assumed-reporting" -> true)
+                .configure("features.submissions-enabled" -> true)
+                .build()
 
-            val result = route(application, request).value
+            running(application) {
+              val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
 
-            val view = application.injector.instanceOf[IndexView]
-            val appConfig = application.injector.instanceOf[FrontendAppConfig]
+              val result = route(application, request).value
 
-            status(result) mustEqual OK
+              val view = application.injector.instanceOf[IndexView]
+              val appConfig = application.injector.instanceOf[FrontendAppConfig]
 
-            val operatorCard = PlatformOperatorCardViewModel(Nil, appConfig)(messages(application))
-            val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
-            val fileSubmissionsCard = FileSubmissionsCardViewModel(false, Nil, appConfig)(messages(application))
-            val assumedReportingCard = AssumedReportingCardViewModel(false, Nil, appConfig)(messages(application))
-            val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard)
+              status(result) mustEqual OK
 
-            contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
+              val operatorCard = PlatformOperatorCardViewModel(Nil, appConfig)(messages(application))
+              val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
+              val fileSubmissionsCard = FileSubmissionsCardViewModel(false, Nil, appConfig)(messages(application))
+              val assumedReportingCard = AssumedReportingCardViewModel(false, Nil, appConfig)(messages(application))
+              val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard, true)
 
-            verify(mockSubmissionsConnector, times(1)).submissionsExist(any())
-            verify(mockSubmissionsConnector, times(1)).assumedReportsExist(any())
+              contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
+
+              verify(mockSubmissionsConnector, times(1)).submissionsExist(any())
+              verify(mockSubmissionsConnector, times(1)).assumedReportsExist(any())
+            }
+          }
+        }
+
+        "and submissions are disabled" - {
+
+          "must display the platform operator, reporting notification, file submission and assumed reporting cards" in {
+
+            when(mockPlatformOperatorConnector.viewPlatformOperators(any())) thenReturn Future.successful(ViewPlatformOperatorsResponse(Nil))
+            when(mockSubmissionsConnector.submissionsExist(any())) thenReturn Future.successful(false)
+            when(mockSubmissionsConnector.assumedReportsExist(any())) thenReturn Future.successful(false)
+
+            val application =
+              applicationBuilder(userAnswers = None)
+                .overrides(
+                  bind[PlatformOperatorConnector].toInstance(mockPlatformOperatorConnector),
+                  bind[SubmissionsConnector].toInstance(mockSubmissionsConnector)
+                )
+                .configure("features.platform-operators" -> true)
+                .configure("features.file-submissions" -> true)
+                .configure("features.assumed-reporting" -> true)
+                .configure("features.submissions-enabled" -> false)
+                .build()
+
+            running(application) {
+              val request = FakeRequest(GET, routes.IndexController.onPageLoad().url)
+
+              val result = route(application, request).value
+
+              val view = application.injector.instanceOf[IndexView]
+              val appConfig = application.injector.instanceOf[FrontendAppConfig]
+
+              status(result) mustEqual OK
+
+              val operatorCard = PlatformOperatorCardViewModel(Nil, appConfig)(messages(application))
+              val notificationCard = ReportingNotificationCardViewModel(Nil, appConfig)(messages(application))
+              val fileSubmissionsCard = FileSubmissionsCardViewModel(false, Nil, appConfig)(messages(application))
+              val assumedReportingCard = AssumedReportingCardViewModel(false, Nil, appConfig)(messages(application))
+              val viewModel = IndexViewModel("dprsId", operatorCard, notificationCard, fileSubmissionsCard, assumedReportingCard, false)
+
+              contentAsString(result) mustEqual view(viewModel)(request, messages(application)).toString
+
+              verify(mockSubmissionsConnector, times(1)).submissionsExist(any())
+              verify(mockSubmissionsConnector, times(1)).assumedReportsExist(any())
+            }
           }
         }
       }

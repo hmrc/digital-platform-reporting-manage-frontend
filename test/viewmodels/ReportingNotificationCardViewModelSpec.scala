@@ -49,7 +49,7 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
       val card = ReportingNotificationCardViewModel(Nil, mockAppConfig)
 
       card.cardState mustEqual CardState.Inactive
-      card.links mustBe empty
+      card.items mustBe empty
       card.tag.value.content mustEqual Text(msgs("card.cannotStart"))
     }
 
@@ -73,7 +73,7 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
       val card = ReportingNotificationCardViewModel(Seq(operator), mockAppConfig)
 
       card.cardState mustEqual CardState.Active
-      card.links must contain only Link(msgs("reportingNotificationCard.add"), "add-link")
+      card.items must contain only CardLink(msgs("reportingNotificationCard.add"), "add-link")
       card.tag.value.content mustEqual Text(msgs("card.notStarted"))
     }
 
@@ -97,9 +97,9 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
       val card = ReportingNotificationCardViewModel(Seq(operator), mockAppConfig)
 
       card.cardState mustEqual CardState.Active
-      card.links must contain theSameElementsInOrderAs Seq(
-        Link(msgs("reportingNotificationCard.view"), "view-link"),
-        Link(msgs("reportingNotificationCard.add"), "add-link")
+      card.items must contain theSameElementsInOrderAs Seq(
+        CardLink(msgs("reportingNotificationCard.view"), "view-link"),
+        CardLink(msgs("reportingNotificationCard.add"), "add-link")
       )
       card.tag must not be defined
     }
@@ -124,7 +124,7 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
       val card = ReportingNotificationCardViewModel(Seq(operator, operator), mockAppConfig)
 
       card.cardState mustEqual CardState.Active
-      card.links must contain only Link(msgs("reportingNotificationCard.add"), "add-link")
+      card.items must contain only CardLink(msgs("reportingNotificationCard.add"), "add-link")
       card.tag.value.content mustEqual Text(msgs("card.notStarted"))
     }
 
@@ -148,9 +148,9 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
       val card = ReportingNotificationCardViewModel(Seq(operator, operator), mockAppConfig)
 
       card.cardState mustEqual CardState.Active
-      card.links must contain theSameElementsInOrderAs Seq(
-        Link(msgs("reportingNotificationCard.view"), "view-link"),
-        Link(msgs("reportingNotificationCard.add"), "add-link")
+      card.items must contain theSameElementsInOrderAs Seq(
+        CardLink(msgs("reportingNotificationCard.view"), "view-link"),
+        CardLink(msgs("reportingNotificationCard.add"), "add-link")
       )
       card.tag must not be defined
     }

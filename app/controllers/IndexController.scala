@@ -56,7 +56,8 @@ class IndexController @Inject()(
             platformOperatorCard      = PlatformOperatorCardViewModel(operators, appConfig),
             reportingNotificationCard = ReportingNotificationCardViewModel(operators, appConfig),
             fileSubmissionsCard       = fileSubmissionsCard,
-            assumedReportingCard      = assumedReportingCard
+            assumedReportingCard      = assumedReportingCard,
+            submissionsAllowed        = appConfig.submissionsAllowed
           )
 
           Ok(view(viewModel))
@@ -68,7 +69,8 @@ class IndexController @Inject()(
         platformOperatorCard      = PlatformOperatorCardViewModel(CardState.Hidden, Nil, None),
         reportingNotificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil, None),
         fileSubmissionsCard       = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None),
-        assumedReportingCard      = AssumedReportingCardViewModel(CardState.Hidden, Nil, None)
+        assumedReportingCard      = AssumedReportingCardViewModel(CardState.Hidden, Nil, None),
+        submissionsAllowed        = appConfig.submissionsAllowed
       )
 
       Future.successful(Ok(view(viewModel)))

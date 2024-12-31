@@ -16,4 +16,7 @@
 
 package viewmodels
 
-final case class Link(text: String, href: String)
+sealed trait CardItem
+
+final case class CardLink(text: String, href: String) extends CardItem
+final case class CardMessage(text: String) extends CardItem

@@ -57,11 +57,11 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   val viewNotificationsUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator-to-view"
   def viewNotificationsSingleUrl(operatorId: String) = s"$platformOperatorFrontendBaseUrl/reporting-notification/$operatorId/view"
 
-  private val submissionsFrontendBaeUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-submission-frontend.baseUrl")
-  val addSubmissionUrl = s"$submissionsFrontendBaeUrl/submission/which-platform-operator"
-  val viewSubmissionsUrl = s"$submissionsFrontendBaeUrl/submission/view"
-  val addAssumedReportUrl = s"$submissionsFrontendBaeUrl/assumed-reporting/which-platform-operator"
-  val viewAssumedReportsUrl = s"$submissionsFrontendBaeUrl/assumed-reporting/view"
+  private val submissionsFrontendBaseUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-submission-frontend.baseUrl")
+  val addSubmissionUrl = s"$submissionsFrontendBaseUrl/submission/which-platform-operator"
+  val viewSubmissionsUrl = s"$submissionsFrontendBaseUrl/submission/view"
+  val addAssumedReportUrl = s"$submissionsFrontendBaseUrl/assumed-reporting/which-platform-operator"
+  val viewAssumedReportsUrl = s"$submissionsFrontendBaseUrl/assumed-reporting/view"
 
   val auditSource: String = configuration.get[String]("auditing.auditSource")
 
@@ -72,5 +72,5 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   val internalAuthToken: String = configuration.get[String]("internal-auth.token")
 
   val userAllowListEnabled: Boolean = configuration.get[Boolean]("features.user-allow-list")
-
+  val submissionsAllowed: Boolean = configuration.get[Boolean]("features.submissions-enabled")
 }

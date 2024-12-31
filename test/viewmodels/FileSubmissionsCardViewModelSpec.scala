@@ -50,7 +50,7 @@ class FileSubmissionsCardViewModelSpec extends AnyFreeSpec with Matchers with Mo
         val card = FileSubmissionsCardViewModel(false, Nil, mockAppConfig)
 
         card.cardState mustEqual CardState.Inactive
-        card.links mustBe empty
+        card.items mustBe empty
         card.tag.value.content mustEqual Text(msgs("card.cannotStart"))
       }
     }
@@ -74,61 +74,119 @@ class FileSubmissionsCardViewModelSpec extends AnyFreeSpec with Matchers with Mo
         val card = FileSubmissionsCardViewModel(false, Seq(operator), mockAppConfig)
 
         card.cardState mustEqual CardState.Inactive
-        card.links mustBe empty
+        card.items mustBe empty
         card.tag.value.content mustEqual Text(msgs("card.cannotStart"))
       }
     }
 
     "when at least one platform operator exists with a reporting notification" - {
 
-      "must contain an add link and a `not started` tag when there are no submissions" in {
+      "when submissions are enabled" - {
 
-        when(mockAppConfig.addSubmissionUrl) thenReturn "add-link"
+        "must contain an add link and a `not started` tag when there are no submissions" in {
 
-        val operator = PlatformOperator(
-          operatorId = "operatorId",
-          operatorName = "operatorName",
-          tinDetails = Nil,
-          businessName = None,
-          tradingName = None,
-          primaryContactDetails = ContactDetails(None, "name", "email"),
-          secondaryContactDetails = None,
-          addressDetails = AddressDetails("line 1", None, None, None, None, None),
-          notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
-        )
+          when(mockAppConfig.addSubmissionUrl) thenReturn "add-link"
+          when(mockAppConfig.submissionsAllowed) thenReturn true
 
-        val card = FileSubmissionsCardViewModel(false, Seq(operator), mockAppConfig)
+          val operator = PlatformOperator(
+            operatorId = "operatorId",
+            operatorName = "operatorName",
+            tinDetails = Nil,
+            businessName = None,
+            tradingName = None,
+            primaryContactDetails = ContactDetails(None, "name", "email"),
+            secondaryContactDetails = None,
+            addressDetails = AddressDetails("line 1", None, None, None, None, None),
+            notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
+          )
 
-        card.cardState mustEqual CardState.Active
-        card.links must contain only Link(msgs("fileSubmissionsCard.add"), "add-link")
-        card.tag.value.content mustEqual Text(msgs("card.notStarted"))
+          val card = FileSubmissionsCardViewModel(false, Seq(operator), mockAppConfig)
+
+          card.cardState mustEqual CardState.Active
+          card.items must contain only CardLink(msgs("fileSubmissionsCard.add"), "add-link")
+          card.tag.value.content mustEqual Text(msgs("card.notStarted"))
+        }
+
+        "must contain view and add links, and no tag, when there are some submissions" in {
+
+          when(mockAppConfig.addSubmissionUrl) thenReturn "add-link"
+          when(mockAppConfig.viewSubmissionsUrl) thenReturn "view-link"
+          when(mockAppConfig.submissionsAllowed) thenReturn true
+
+          val operator = PlatformOperator(
+            operatorId = "operatorId",
+            operatorName = "operatorName",
+            tinDetails = Nil,
+            businessName = None,
+            tradingName = None,
+            primaryContactDetails = ContactDetails(None, "name", "email"),
+            secondaryContactDetails = None,
+            addressDetails = AddressDetails("line 1", None, None, None, None, None),
+            notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
+          )
+
+          val card = FileSubmissionsCardViewModel(true, Seq(operator), mockAppConfig)
+
+          card.cardState mustEqual CardState.Active
+          card.items must contain theSameElementsInOrderAs Seq(
+            CardLink(msgs("fileSubmissionsCard.view"), "view-link"),
+            CardLink(msgs("fileSubmissionsCard.add"), "add-link")
+          )
+          card.tag must not be defined
+        }
       }
 
-      "must contain view and add links, and no tag, when there are some submissions" in {
+      "when submissions are disabled" - {
 
-        when(mockAppConfig.addSubmissionUrl) thenReturn "add-link"
-        when(mockAppConfig.viewSubmissionsUrl) thenReturn "view-link"
+        "must contain an add message and no tag when there are no submissions" in {
 
-        val operator = PlatformOperator(
-          operatorId = "operatorId",
-          operatorName = "operatorName",
-          tinDetails = Nil,
-          businessName = None,
-          tradingName = None,
-          primaryContactDetails = ContactDetails(None, "name", "email"),
-          secondaryContactDetails = None,
-          addressDetails = AddressDetails("line 1", None, None, None, None, None),
-          notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
-        )
+          when(mockAppConfig.submissionsAllowed) thenReturn false
 
-        val card = FileSubmissionsCardViewModel(true, Seq(operator), mockAppConfig)
+          val operator = PlatformOperator(
+            operatorId = "operatorId",
+            operatorName = "operatorName",
+            tinDetails = Nil,
+            businessName = None,
+            tradingName = None,
+            primaryContactDetails = ContactDetails(None, "name", "email"),
+            secondaryContactDetails = None,
+            addressDetails = AddressDetails("line 1", None, None, None, None, None),
+            notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
+          )
 
-        card.cardState mustEqual CardState.Active
-        card.links must contain theSameElementsInOrderAs Seq(
-          Link(msgs("fileSubmissionsCard.view"), "view-link"),
-          Link(msgs("fileSubmissionsCard.add"), "add-link")
-        )
-        card.tag must not be defined
+          val card = FileSubmissionsCardViewModel(false, Seq(operator), mockAppConfig)
+
+          card.cardState mustEqual CardState.Active
+          card.items must contain only CardMessage(msgs("fileSubmissionsCard.add.disabled"))
+          card.tag must not be defined
+        }
+
+        "must contain a view link, an add message, and no tag when there are some submissions" in {
+
+          when(mockAppConfig.viewSubmissionsUrl) thenReturn "view-link"
+          when(mockAppConfig.submissionsAllowed) thenReturn false
+
+          val operator = PlatformOperator(
+            operatorId = "operatorId",
+            operatorName = "operatorName",
+            tinDetails = Nil,
+            businessName = None,
+            tradingName = None,
+            primaryContactDetails = ContactDetails(None, "name", "email"),
+            secondaryContactDetails = None,
+            addressDetails = AddressDetails("line 1", None, None, None, None, None),
+            notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
+          )
+
+          val card = FileSubmissionsCardViewModel(true, Seq(operator), mockAppConfig)
+
+          card.cardState mustEqual CardState.Active
+          card.items must contain theSameElementsInOrderAs Seq(
+            CardLink(msgs("fileSubmissionsCard.view"), "view-link"),
+            CardMessage(msgs("fileSubmissionsCard.add.disabled"))
+          )
+          card.tag must not be defined
+        }
       }
     }
   }
