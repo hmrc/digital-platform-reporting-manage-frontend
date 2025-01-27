@@ -48,6 +48,12 @@ index.assumedReporting.inactive = Tell HMRC that another platform operator will 
 index.submissionsDisabled.title = Important
 index.submissionsDisabled.heading = The submission service is currently unavailable
 index.submissionsDisabled.content = It is not possible to submit a report or add assumed reporting details right now. You can still view the status of your previous XML submissions and your assumed reporting history.
+
+index.userResearchBanner.h2 = Help make this service better
+index.userResearchBanner.link.text = Sign up to take part in research (opens in new tab)
+index.userResearchBanner.button.text = Hide message
+index.userResearchBanner.button.accessibility.text = Hide message. I do not want to take part in research
+
 platformOperatorCard.view = View platform operators
 platformOperatorCard.add = Add a platform operator
 platformOperatorCard.addAnother = Add another platform operator

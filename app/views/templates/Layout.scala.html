@@ -33,7 +33,14 @@
     defaultLayout: TwoThirdsMainContent
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, mainContentLayout: Option[Html => Html] = Some(defaultLayout(_)))(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+@(
+    pageTitle: String,
+    showBackLink: Boolean = true,
+    timeout: Boolean = true,
+    showSignOut: Boolean = true,
+    mainContentLayout: Option[Html => Html] = Some(defaultLayout(_)),
+    userResearchBanner: Option[Html] = None
+)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
 
@@ -81,7 +88,8 @@
     headerBlock = Some(hmrcStandardHeader(
         serviceUrl  = Some(routes.IndexController.onPageLoad().url),
         signOutUrl  = if(showSignOut) Some(controllers.auth.routes.AuthController.signOut().url) else None,
-        phaseBanner = Some(betaBanner(appConfig.feedbackUrl))
+        phaseBanner = Some(betaBanner(appConfig.feedbackUrl)),
+        additionalBannersBlock = userResearchBanner
     )),
     beforeContentBlock = Some(beforeContent),
     footerBlock        = Some(hmrcStandardFooter()),

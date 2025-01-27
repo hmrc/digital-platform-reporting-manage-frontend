@@ -39,6 +39,9 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.host")
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting"
 
+  val userResearchBannerEnabled: Boolean = configuration.get[Boolean]("features.user-research-banner")
+  val userResearchBannerLink: String = configuration.get[String]("urls.user-research-banner")
+
   val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
 

@@ -27,6 +27,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import viewmodels._
 import views.html.IndexView
+import views.html.components.UserResearchBanner
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -36,10 +37,13 @@ class IndexController @Inject()(
                                  view: IndexView,
                                  platformOperatorConnector: PlatformOperatorConnector,
                                  submissionsConnector: SubmissionsConnector,
-                                 appConfig: FrontendAppConfig
+                                 appConfig: FrontendAppConfig,
+                                 userResearchBanner: UserResearchBanner
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
+
+    val maybeUserResearchBanner = if (appConfig.userResearchBannerEnabled) {Some(userResearchBanner())} else None
 
     if (appConfig.platformOperatorsEnabled)  {
       platformOperatorConnector.viewPlatformOperators.flatMap { platformOperatorResponse =>
@@ -60,7 +64,7 @@ class IndexController @Inject()(
             submissionsAllowed        = appConfig.submissionsAllowed
           )
 
-          Ok(view(viewModel))
+          Ok(view(viewModel, maybeUserResearchBanner))
         }
       }
     } else {
@@ -73,7 +77,7 @@ class IndexController @Inject()(
         submissionsAllowed        = appConfig.submissionsAllowed
       )
 
-      Future.successful(Ok(view(viewModel)))
+      Future.successful(Ok(view(viewModel, maybeUserResearchBanner)))
     }
   }
 
