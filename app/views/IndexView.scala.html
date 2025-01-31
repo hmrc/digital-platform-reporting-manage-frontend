@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.FrontendAppConfig
 @import viewmodels.IndexViewModel
 @import views.html.components.UserResearchBanner
 
@@ -23,7 +24,8 @@
         platformOperatorCard: components.PlatformOperatorCard,
         reportingNotificationCard: components.ReportingNotificationCard,
         fileSubmissionsCard: components.FileSubmissionsCard,
-        assumedReportingCard: components.AssumedReportingCard
+        assumedReportingCard: components.AssumedReportingCard,
+        frontendAppConfig: FrontendAppConfig
 )
 
 @(viewModel: IndexViewModel, userResearchBanner: Option[Html])(implicit request: Request[_], messages: Messages)
@@ -47,6 +49,19 @@
                     @messages("index.submissionsDisabled.heading")
                 </h3>
                 <p class="govuk-body">@messages("index.submissionsDisabled.content")</p>
+            </div>
+        </div>
+    }
+
+    @if(frontendAppConfig.showDeadlineBanner) {
+        <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                @messages("index.deadlineBanner.title")
+                </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">@messages("index.deadlineBanner.content")</p>
             </div>
         </div>
     }

@@ -76,4 +76,6 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
 
   val userAllowListEnabled: Boolean = configuration.get[Boolean]("features.user-allow-list")
   val submissionsAllowed: Boolean = configuration.get[Boolean]("features.submissions-enabled")
+
+  val showDeadlineBanner: Boolean = configuration.get[Boolean]("features.show-deadline-banner")
 }
