@@ -54,6 +54,9 @@ index.userResearchBanner.link.text = Sign up to take part in research (opens in 
 index.userResearchBanner.button.text = Hide message
 index.userResearchBanner.button.accessibility.text = Hide message. I do not want to take part in research
 
+index.deadlineBanner.title = Important
+index.deadlineBanner.content = HMRC understands digital platform reporting is new and some platform operators may face difficulties in meeting the reporting deadline. If a platform operator fails to meet the deadline, we will consider the facts and circumstances of each case. A penalty will not be charged if the platform operator can demonstrate they took all reasonable steps to comply.
+
 platformOperatorCard.view = View platform operators
 platformOperatorCard.add = Add a platform operator
 platformOperatorCard.addAnother = Add another platform operator
