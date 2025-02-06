@@ -25,11 +25,11 @@
 @()(implicit request: Request[_], messages: Messages)
 
 @layout(
-    pageTitle    = titleNoForm(messages("noAccess.title")),
+    pageTitle    = titleNoForm(messages("unauthorised.noAccess.title")),
     timeout      = false,
     showBackLink = false
 ) {
 
-    <h1 class="govuk-heading-xl">@messages("noAccess.heading")</h1>
-    <p class="govuk-body"> @messages("noAccess.p1") <a class="govuk-link" href="@appConfig.registerUrl">@messages("noAccess.p1.link")</a> </p>
+    <h1 class="govuk-heading-xl">@messages("unauthorised.noAccess.heading")</h1>
+    <p class="govuk-body"> @messages("unauthorised.noAccess.p1") <a class="govuk-link" href="@appConfig.registerUrl">@messages("unauthorised.noAccess.p1.link")</a> </p>
 }
