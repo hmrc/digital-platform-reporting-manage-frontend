@@ -94,6 +94,11 @@ signedOut.guidance = We did not save your answers.
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
 
+noAccess.title = You do not have access to this page
+noAccess.heading = You do not have access to this page
+noAccess.p1 = To access this page, you must
+noAccess.p1.link = register to carry out digital platform reporting.
+
 canPhoneIndividual.title = Can we contact you by telephone?
 canPhoneIndividual.heading = Can we contact you by telephone?
 canPhoneIndividual.p1 = We may call if we have any questions about your reports.

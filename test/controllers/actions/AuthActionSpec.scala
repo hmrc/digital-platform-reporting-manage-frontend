@@ -187,7 +187,7 @@ class AuthActionSpec extends SpecBase
 
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
+          redirectLocation(result).value mustEqual routes.UnauthorisedController.noAccessPageLoad().url
 
           verify(mockEnrolmentService, never()).enrol(any())(any())
           verify(mockPendingEnrolmentConnector, never()).remove()(any())
@@ -209,7 +209,7 @@ class AuthActionSpec extends SpecBase
 
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
+        redirectLocation(result).value mustEqual routes.UnauthorisedController.noAccessPageLoad().url
 
         verify(mockPendingEnrolmentConnector, never()).remove()(any())
       }
