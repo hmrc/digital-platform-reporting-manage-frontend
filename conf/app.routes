@@ -15,6 +15,7 @@ GET         /manage-reporting/account/sign-out                                  
 GET         /manage-reporting/account/signed-out                                controllers.auth.SignedOutController.onPageLoad()
 
 GET         /manage-reporting/unauthorised                                      controllers.UnauthorisedController.onPageLoad()
+GET         /manage-reporting/unauthorised/no-access                            controllers.UnauthorisedController.noAccessPageLoad()
 
 GET         /contact-details/view-contact-details                               controllers.ContactDetailsController.onPageLoad()
 

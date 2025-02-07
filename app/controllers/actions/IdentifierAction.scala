@@ -57,7 +57,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
             case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
           }
         }.getOrElse {
-          Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
+          Future.successful(Redirect(routes.UnauthorisedController.noAccessPageLoad()))
         }
 
       case _ => reEnrol(request, block)(hc).recover {

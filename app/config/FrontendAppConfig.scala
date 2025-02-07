@@ -52,9 +52,11 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   val assumedReportingEnabled: Boolean = configuration.get[Boolean]("features.assumed-reporting")
 
   private val platformOperatorFrontendBaseUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-operator-frontend.baseUrl")
-
   val addPlatformOperatorUrl = s"$platformOperatorFrontendBaseUrl/platform-operator/add-platform-operator/start"
   val viewPlatformOperatorsUrl= s"$platformOperatorFrontendBaseUrl/platform-operator/view"
+
+  private val registerFrontendBaseUrl: String = configuration.get[String]("microservice.services.digital-platform-reporting-register-frontend.baseUrl")
+  val registerUrl = s"$registerFrontendBaseUrl/register"
 
   val addNotificationUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator"
   val viewNotificationsUrl = s"$platformOperatorFrontendBaseUrl/reporting-notification/which-platform-operator-to-view"
