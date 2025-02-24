@@ -25,8 +25,7 @@ import connectors.PendingEnrolmentConnector
 import controllers.routes
 import models.eacd.EnrolmentDetails
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.MockitoSugar.{never, reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
@@ -46,8 +45,6 @@ class AuthActionSpec extends SpecBase
   with MockitoSugar
   with BeforeAndAfterEach {
 
-  implicit private val hc: HeaderCarrier = HeaderCarrier()
-
   private val application = applicationBuilder(userAnswers = None).build()
   private val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
   private val appConfig = application.injector.instanceOf[FrontendAppConfig]
@@ -64,7 +61,7 @@ class AuthActionSpec extends SpecBase
   }
 
   override def beforeEach(): Unit = {
-    Mockito.reset(mockPendingEnrolmentConnector, mockEnrolmentService)
+    reset(mockPendingEnrolmentConnector, mockEnrolmentService)
     super.beforeEach()
   }
 
@@ -123,8 +120,8 @@ class AuthActionSpec extends SpecBase
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
 
-          verify(mockEnrolmentService, never()).enrol(any())(any())
-          verify(mockPendingEnrolmentConnector, never()).remove()(any())
+          verify(mockEnrolmentService, never).enrol(any())(any())
+          verify(mockPendingEnrolmentConnector, never).remove()(any())
         }
 
         "if enrolment fails" in {
@@ -145,7 +142,7 @@ class AuthActionSpec extends SpecBase
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
 
-          verify(mockPendingEnrolmentConnector, never()).remove()(any())
+          verify(mockPendingEnrolmentConnector, never).remove()(any())
         }
       }
     }
@@ -165,9 +162,9 @@ class AuthActionSpec extends SpecBase
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
 
-        verify(mockPendingEnrolmentConnector, never()).getPendingEnrolment()(any())
-        verify(mockEnrolmentService, never()).enrol(any())(any())
-        verify(mockPendingEnrolmentConnector, never()).remove()(any())
+        verify(mockPendingEnrolmentConnector, never).getPendingEnrolment()(any())
+        verify(mockEnrolmentService, never).enrol(any())(any())
+        verify(mockPendingEnrolmentConnector, never).remove()(any())
       }
     }
 
@@ -189,8 +186,8 @@ class AuthActionSpec extends SpecBase
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustEqual routes.UnauthorisedController.noAccessPageLoad().url
 
-          verify(mockEnrolmentService, never()).enrol(any())(any())
-          verify(mockPendingEnrolmentConnector, never()).remove()(any())
+          verify(mockEnrolmentService, never).enrol(any())(any())
+          verify(mockPendingEnrolmentConnector, never).remove()(any())
         }
       }
 
@@ -211,7 +208,7 @@ class AuthActionSpec extends SpecBase
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustEqual routes.UnauthorisedController.noAccessPageLoad().url
 
-        verify(mockPendingEnrolmentConnector, never()).remove()(any())
+        verify(mockPendingEnrolmentConnector, never).remove()(any())
       }
     }
 
@@ -219,7 +216,10 @@ class AuthActionSpec extends SpecBase
       "must succeed" - {
         "when the user has a CT UTR enrolment" in {
           when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
-          val enrolments = Enrolments(Set(Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None), Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)))
+          val enrolments = Enrolments(Set(
+            Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None),
+            Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)
+          ))
           val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ enrolments),
             mockAllowListService,
             appConfig,
@@ -234,7 +234,10 @@ class AuthActionSpec extends SpecBase
 
         "when the user has a HMRC-MTD-VAT enrolment" in {
           when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
-          val enrolments = Enrolments(Set(Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None), Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "vrn")), "activated", None)))
+          val enrolments = Enrolments(Set(
+            Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None),
+            Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "vrn")), "activated", None)
+          ))
           val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ enrolments),
             mockAllowListService,
             appConfig,
@@ -249,7 +252,10 @@ class AuthActionSpec extends SpecBase
 
         "when the user has a CT UTR enrolment and user not in allow list" in {
           when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(false)
-          val enrolments = Enrolments(Set(Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None), Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "vrn")), "activated", None)))
+          val enrolments = Enrolments(Set(
+            Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None),
+            Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "vrn")), "activated", None)
+          ))
           val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ enrolments),
             mockAllowListService,
             appConfig,

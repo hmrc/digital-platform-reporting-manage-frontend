@@ -16,20 +16,22 @@
 
 package forms
 
-import javax.inject.Inject
 import forms.mappings.Mappings
 import play.api.data.Form
-import play.api.i18n.Messages
+
+import javax.inject.Inject
 
 class SecondaryContactPhoneNumberFormProvider @Inject() extends Mappings {
+  private val maxLength = 24
 
-  def apply(contactName: String): Form[String] =
+  def apply(contactName: String): Form[String] = {
     Form(
       "value" -> text("secondaryContactPhoneNumber.error.required", args = Seq(contactName))
         .verifying(firstError(
-          maxLength(24, "secondaryContactPhoneNumber.error.length"),
+          maxLength(maxLength, "secondaryContactPhoneNumber.error.length"),
           regexp(Validation.phoneNumberPattern.toString, "secondaryContactPhoneNumber.error.format"),
           validPhoneNumber("secondaryContactPhoneNumber.error.format")
         ))
     )
+  }
 }

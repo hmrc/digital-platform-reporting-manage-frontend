@@ -17,14 +17,13 @@
 package viewmodels
 
 import config.FrontendAppConfig
-import models.operator.{AddressDetails, ContactDetails, NotificationType, TinType}
 import models.operator.responses.{NotificationDetails, PlatformOperator}
+import models.operator.{AddressDetails, ContactDetails, NotificationType}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
-import org.mockito.Mockito.when
-import org.scalatest.{BeforeAndAfterEach, OptionValues}
+import org.mockito.MockitoSugar.{reset, when}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
+import org.scalatest.{BeforeAndAfterEach, OptionValues}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers.stubMessages
@@ -36,9 +35,10 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
 
   private val mockAppConfig = mock[FrontendAppConfig]
   private implicit val msgs: Messages = stubMessages()
+  private val year2024 = 2024
 
   override def beforeEach(): Unit = {
-    Mockito.reset(mockAppConfig)
+    reset(mockAppConfig)
     super.beforeEach()
   }
 
@@ -91,7 +91,7 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
         primaryContactDetails = ContactDetails(None, "name", "email"),
         secondaryContactDetails = None,
         addressDetails = AddressDetails("line 1", None, None, None, None, None),
-        notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
+        notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, year2024, Instant.now))
       )
 
       val card = ReportingNotificationCardViewModel(Seq(operator), mockAppConfig)
@@ -142,7 +142,7 @@ class ReportingNotificationCardViewModelSpec extends AnyFreeSpec with Matchers w
         primaryContactDetails = ContactDetails(None, "name", "email"),
         secondaryContactDetails = None,
         addressDetails = AddressDetails("line 1", None, None, None, None, None),
-        notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, 2024, Instant.now))
+        notifications = Seq(NotificationDetails(NotificationType.Epo, None, None, year2024, Instant.now))
       )
 
       val card = ReportingNotificationCardViewModel(Seq(operator, operator), mockAppConfig)

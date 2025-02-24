@@ -18,9 +18,6 @@ package builders
 
 import models.enrolment.response.PendingEnrolment
 
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-
 object PendingEnrolmentBuilder {
 
   val aPendingEnrolment: PendingEnrolment = PendingEnrolment(
