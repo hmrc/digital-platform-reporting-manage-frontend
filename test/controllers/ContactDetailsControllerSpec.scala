@@ -20,9 +20,9 @@ import base.SpecBase
 import connectors.SubscriptionConnector
 import models.UserAnswers
 import models.subscription._
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentCaptor, Mockito}
-import org.mockito.Mockito.{times, verify, when}
+import org.mockito.MockitoSugar.{reset, times, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.i18n.Messages
@@ -48,7 +48,7 @@ class ContactDetailsControllerSpec
   private val mockRepository = mock[SessionRepository]
 
   override def beforeEach(): Unit = {
-    Mockito.reset(mockConnector, mockRepository)
+    reset(mockConnector, mockRepository)
     super.beforeEach()
   }
 

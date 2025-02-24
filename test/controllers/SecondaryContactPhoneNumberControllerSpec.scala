@@ -20,8 +20,8 @@ import audit.{AuditService, ChangeDetailsAuditEvent}
 import base.SpecBase
 import connectors.SubscriptionConnector
 import forms.SecondaryContactPhoneNumberFormProvider
-import models.subscription._
 import models.UserAnswers
+import models.subscription._
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
 import org.mockito.ArgumentCaptor
@@ -29,7 +29,6 @@ import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
 import pages._
-import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -42,7 +41,6 @@ import scala.concurrent.Future
 
 class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
-  private implicit val msgs: Messages = stubMessages()
   private val onwardRoute = Call("GET", "/foo")
   private val contactName = "name"
   private val formProvider = new SecondaryContactPhoneNumberFormProvider()
@@ -98,7 +96,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
       val originalPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
       val originalSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 123456"))
-      val originalInfo = SubscriptionInfo("dprsId", true, None, originalPrimaryContact, Some(originalSecondaryContact))
+      val originalInfo = SubscriptionInfo("dprsId", gbUser = true, None, originalPrimaryContact, Some(originalSecondaryContact))
 
       val answers =
         emptyUserAnswers
@@ -131,7 +129,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
         val expectedPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
         val expectedSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 654321"))
-        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryContact))
+        val expectedRequest = SubscriptionInfo("dprsId", gbUser = true, None, expectedPrimaryContact, Some(expectedSecondaryContact))
         val expectedAuditService = ChangeDetailsAuditEvent(originalInfo, expectedRequest)
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -158,7 +156,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
       val originalPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
       val originalSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 123456"))
-      val originalInfo = SubscriptionInfo("dprsId", true, None, originalPrimaryContact, Some(originalSecondaryContact))
+      val originalInfo = SubscriptionInfo("dprsId", gbUser = true, None, originalPrimaryContact, Some(originalSecondaryContact))
 
       val answers =
         emptyUserAnswers
@@ -191,7 +189,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
         val expectedPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
         val expectedSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 654321"))
-        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedPrimaryContact, Some(expectedSecondaryContact))
+        val expectedRequest = SubscriptionInfo("dprsId", gbUser = true, None, expectedPrimaryContact, Some(expectedSecondaryContact))
 
         route(application, request).value.failed.futureValue
 

@@ -20,8 +20,7 @@ import base.SpecBase
 import config.FrontendAppConfig
 import connectors.UserAllowListConnector
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito
-import org.mockito.Mockito.{never, verify, when}
+import org.mockito.MockitoSugar.{never, reset, verify, when}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
@@ -37,7 +36,7 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
   private val mockAppConfig = mock[FrontendAppConfig]
 
   override def beforeEach(): Unit = {
-    Mockito.reset(mockConnector, mockAppConfig)
+    reset(mockConnector, mockAppConfig)
     super.beforeEach()
   }
 
@@ -59,7 +58,7 @@ class UserAllowListServiceSpec extends SpecBase with MockitoSugar with BeforeAnd
         when(mockAppConfig.userAllowListEnabled) thenReturn false
 
         service.isUserAllowed(emptyEnrolments).futureValue mustEqual true
-        verify(mockConnector, never()).check(any(), any())(any())
+        verify(mockConnector, never).check(any(), any())(any())
       }
     }
 

@@ -19,17 +19,13 @@ package forms
 import forms.behaviours.StringFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
-import play.api.i18n.Messages
-import play.api.test.Helpers.stubMessages
 
 class IndividualPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
-  private implicit val msgs: Messages = stubMessages()
-  val requiredKey = "individualPhoneNumber.error.required"
-  val lengthKey = "individualPhoneNumber.error.length"
-  val formatKey = "individualPhoneNumber.error.format"
-
-  val form = new IndividualPhoneNumberFormProvider()()
+  private val requiredKey = "individualPhoneNumber.error.required"
+  private val lengthKey = "individualPhoneNumber.error.length"
+  private val formatKey = "individualPhoneNumber.error.format"
+  private val form = new IndividualPhoneNumberFormProvider()()
 
   ".value" - {
 

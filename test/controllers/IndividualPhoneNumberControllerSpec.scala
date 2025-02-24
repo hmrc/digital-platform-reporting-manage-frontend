@@ -20,16 +20,14 @@ import audit.{AuditService, ChangeDetailsAuditEvent}
 import base.SpecBase
 import connectors.SubscriptionConnector
 import forms.IndividualPhoneNumberFormProvider
-import models.subscription._
 import models.UserAnswers
+import models.subscription._
 import navigation.{FakeNavigator, Navigator}
 import org.apache.pekko.Done
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatestplus.mockito.MockitoSugar
-import pages.IndividualPhoneNumberPage
-import play.api.i18n.Messages
 import pages.{CanPhoneIndividualPage, IndividualEmailAddressPage, IndividualPhoneNumberPage}
 import play.api.inject.bind
 import play.api.mvc.Call
@@ -45,7 +43,6 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
 
   private val onwardRoute = Call("GET", "/foo")
 
-  private implicit val msgs: Messages = stubMessages()
   private val formProvider = new IndividualPhoneNumberFormProvider()
   private val form = formProvider()
 
@@ -97,7 +94,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
 
       val originalContact = IndividualContact(Individual("first", "last"), "foo@example.com", Some("07777 777777"))
-      val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
+      val originalInfo = SubscriptionInfo("dprsId", gbUser = true, None, originalContact, None)
 
       val answers =
         emptyUserAnswers
@@ -124,7 +121,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "07777 888888"))
 
         val expectedContact = IndividualContact(Individual("first", "last"), "foo@example.com", Some("07777 888888"))
-        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
+        val expectedRequest = SubscriptionInfo("dprsId", gbUser = true, None, expectedContact, None)
         val expectedAuditEvent = ChangeDetailsAuditEvent(originalInfo, expectedRequest)
         val answersCaptor: ArgumentCaptor[UserAnswers] = ArgumentCaptor.forClass(classOf[UserAnswers])
 
@@ -150,7 +147,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
       when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
 
       val originalContact = IndividualContact(Individual("first", "last"), "foo@example.com", Some("07777 777777"))
-      val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
+      val originalInfo = SubscriptionInfo("dprsId", gbUser = true, None, originalContact, None)
 
       val answers =
         emptyUserAnswers
@@ -177,7 +174,7 @@ class IndividualPhoneNumberControllerSpec extends SpecBase with MockitoSugar {
             .withFormUrlEncodedBody(("value", "07777 888888"))
 
         val expectedContact = IndividualContact(Individual("first", "last"), "foo@example.com", Some("07777 888888"))
-        val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
+        val expectedRequest = SubscriptionInfo("dprsId", gbUser = true, None, expectedContact, None)
         route(application, request).value.failed.futureValue
 
         verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())

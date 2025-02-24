@@ -19,12 +19,9 @@ package forms
 import forms.behaviours.StringFieldBehaviours
 import org.scalacheck.Gen
 import play.api.data.FormError
-import play.api.i18n.Messages
-import play.api.test.Helpers.stubMessages
 
 class SecondaryContactPhoneNumberFormProviderSpec extends StringFieldBehaviours {
 
-  private implicit val msgs: Messages = stubMessages()
   private val requiredKey = "secondaryContactPhoneNumber.error.required"
   private val lengthKey = "secondaryContactPhoneNumber.error.length"
   private val formatKey = "secondaryContactPhoneNumber.error.format"
