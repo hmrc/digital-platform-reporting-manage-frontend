@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.UnauthorisedView
+import views.html.{NoEnrolementView, UnauthorisedView}
 
 class UnauthorisedControllerSpec extends SpecBase {
 
@@ -35,6 +35,22 @@ class UnauthorisedControllerSpec extends SpecBase {
         val result = route(application, request).value
 
         val view = application.injector.instanceOf[UnauthorisedView]
+
+        status(result) mustEqual OK
+        contentAsString(result) mustEqual view()(request, messages(application)).toString
+      }
+    }
+
+    "must return OK and the noEnrolment view for a GET" in {
+
+      val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+
+      running(application) {
+        val request = FakeRequest(GET, routes.UnauthorisedController.noAccessPageLoad().url)
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[NoEnrolementView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
