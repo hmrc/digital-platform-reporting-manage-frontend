@@ -142,7 +142,7 @@ class SessionRepositorySpec
 
       insert(userAnswers).futureValue
 
-      val result = repository.clear(userAnswers.id).futureValue
+      repository.clear(userAnswers.id).futureValue
 
       repository.get(userAnswers.id).futureValue must not be defined
     }
@@ -164,7 +164,7 @@ class SessionRepositorySpec
 
         insert(userAnswers).futureValue
 
-        val result = repository.keepAlive(userAnswers.id).futureValue
+        repository.keepAlive(userAnswers.id).futureValue
 
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
 
