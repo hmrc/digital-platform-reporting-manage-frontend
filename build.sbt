@@ -10,7 +10,7 @@ ThisBuild / scalaVersion := "2.13.16"
 
 lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
-  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
+  .disablePlugins(JUnitXmlReportPlugin)
   .settings(inConfig(Test)(testSettings) *)
   .settings(ThisBuild / useSuperShell := false)
   .settings(CodeCoverageSettings.settings *)
@@ -35,7 +35,7 @@ lazy val microservice = (project in file("."))
     scalacOptions ++= Seq(
       "-feature",
       "-Wconf:cat=deprecation:ws,cat=feature:ws,cat=optimizer:ws,src=target/.*:s",
-      "-Wconf:src=routes/.*:s", // Silence all warnings in generated routes
+      "-Wconf:src=routes/.*:s",
       "-Wconf:src=html/.*:s",
       "-Wconf:msg=Flag.*repeatedly:s",
       "-Ypatmat-exhaust-depth", "40"
@@ -43,7 +43,6 @@ lazy val microservice = (project in file("."))
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
     resolvers ++= Seq(Resolver.jcenterRepo),
-    // concatenate js
     Concat.groups := Seq(
       "javascripts/application.js" ->
         group(Seq(
