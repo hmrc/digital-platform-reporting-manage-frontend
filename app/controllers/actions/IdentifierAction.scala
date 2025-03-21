@@ -52,7 +52,7 @@ class AuthenticatedIdentifierAction @Inject()(override val authConnector: AuthCo
       case Some(internalId) ~ allEnrolments =>
         val enrolment = allEnrolments.enrolments.filter(enrolment => enrolment.key == "HMRC-DPRS" )
         getEnrolment(Enrolments(enrolment)).map { dprsId =>
-          userAllowListService.isUserAllowed(allEnrolments).flatMap { //TODO - This needs to be removed once we go to public beta.
+          userAllowListService.isUserAllowed(allEnrolments).flatMap { 
             case true => block(IdentifierRequest(request, internalId, dprsId))
             case false => Future.successful(Redirect(routes.UnauthorisedController.onPageLoad()))
           }
