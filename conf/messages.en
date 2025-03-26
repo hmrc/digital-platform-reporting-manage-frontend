@@ -138,6 +138,7 @@ individualEmailAddress.change.hidden = your email address
 
 individualEmailAddressUpdated.title = Email address has been changed successfully
 individualEmailAddressUpdated.heading = Email address has been changed successfully
+individualEmailAddressUpdated.button = Return to view contact details
 
 individualPhoneNumber.title = What is your telephone number?
 individualPhoneNumber.heading = What is your telephone number?
@@ -150,9 +151,11 @@ individualPhoneNumber.change.hidden = your telephone number
 
 individualPhoneNumberRemoved.title = Telephone number has been removed successfully
 individualPhoneNumberRemoved.heading = Telephone number has been removed successfully
+individualPhoneNumberRemoved.button = Return to view contact details
 
 individualPhoneNumberUpdated.title = Telephone number has been changed successfully
 individualPhoneNumberUpdated.heading = Telephone number has been changed successfully
+individualPhoneNumberUpdated.button = Return to view contact details
 
 primaryContactEmailAddress.title = What is the email address for the person or team we can contact?
 primaryContactEmailAddress.heading = What is the email address for {0}?
@@ -184,6 +187,7 @@ primaryContactPhoneNumber.change.hidden = the telephone number for {0}
 
 primaryContactUpdated.title = First contact details have been changed successfully
 primaryContactUpdated.heading = First contact details have been changed successfully
+primaryContactUpdated.button = Return to view contact details
 
 secondaryContactEmailAddress.title = What is the email address for the second person or team we should contact?
 secondaryContactEmailAddress.heading = What is the email address for {0}?
@@ -215,3 +219,4 @@ secondaryContactPhoneNumber.change.hidden = the telephone number for {0}
 
 secondaryContactUpdated.title = Second contact details have been changed successfully
 secondaryContactUpdated.heading = Second contact details have been changed successfully
+secondaryContactUpdated.button = Return to view contact details
