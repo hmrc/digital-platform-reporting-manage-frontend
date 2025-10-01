@@ -20,14 +20,12 @@ import config.FrontendAppConfig
 import models.UserAnswers
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model._
-import org.mongodb.scala.SingleObservableFuture
+import uk.gov.hmrc.mdc.Mdc
 import play.api.libs.json.Format
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import uk.gov.hmrc.play.http.logging.Mdc
-
 import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}

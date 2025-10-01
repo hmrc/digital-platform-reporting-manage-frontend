@@ -42,7 +42,6 @@ lazy val microservice = (project in file("."))
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
-    resolvers ++= Seq(Resolver.jcenterRepo),
     Concat.groups := Seq(
       "javascripts/application.js" ->
         group(Seq(
