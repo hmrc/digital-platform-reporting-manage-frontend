@@ -26,7 +26,7 @@ import play.api.libs.ws.writeableOf_JsValue
 import services.UuidService
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, RequestId, StringContextOps}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,7 +39,7 @@ class TaxEnrolmentConnector @Inject()(appConfig: FrontendAppConfig,
 
   def upsert(upsertKnownFacts: UpsertKnownFacts)
             (implicit hc: HeaderCarrier): Future[Done] = {
-    val correlationId = hc.requestId.getOrElse(RequestId(uuidService.generate())).value
+    val correlationId = uuidService.generate()
     httpClient.put(url"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/enrolments/${upsertKnownFacts.enrolmentKey}")
       .setHeader("X-Correlation-ID" -> correlationId)
       .setHeader("X-Conversation-ID" -> uuidService.generate())
@@ -49,14 +49,14 @@ class TaxEnrolmentConnector @Inject()(appConfig: FrontendAppConfig,
       .flatMap { response =>
         response.status match {
           case NO_CONTENT => Future.successful(Done)
-          case code => Future.failed(UpsertTaxEnrolmentFailure(code))
+          case code => Future.failed(UpsertTaxEnrolmentFailure(code, correlationId))
         }
       }
   }
 
   def allocateEnrolmentToGroup(groupEnrolment: GroupEnrolment)
                               (implicit hc: HeaderCarrier): Future[Done] = {
-    val correlationId = hc.requestId.getOrElse(RequestId(uuidService.generate())).value
+    val correlationId = uuidService.generate()
     httpClient.post(url"${appConfig.taxEnrolmentsBaseUrl}/tax-enrolments/groups/${groupEnrolment.groupId}/enrolments/${groupEnrolment.enrolmentKey}")
       .setHeader("X-Correlation-ID" -> correlationId)
       .setHeader("X-Conversation-ID" -> uuidService.generate())
@@ -66,7 +66,7 @@ class TaxEnrolmentConnector @Inject()(appConfig: FrontendAppConfig,
       .flatMap { response =>
         response.status match {
           case CREATED | CONFLICT => Future.successful(Done)
-          case code => Future.failed(AllocateEnrolmentToGroupTaxEnrolmentFailure(code))
+          case code => Future.failed(AllocateEnrolmentToGroupTaxEnrolmentFailure(code, correlationId))
         }
       }
   }
@@ -74,11 +74,11 @@ class TaxEnrolmentConnector @Inject()(appConfig: FrontendAppConfig,
 
 object TaxEnrolmentConnector {
 
-  final case class UpsertTaxEnrolmentFailure(status: Int) extends Throwable {
-    override def getMessage: String = s"Upsert tax enrolment failed with status: $status"
+  final case class UpsertTaxEnrolmentFailure(status: Int, correlationId : String) extends Throwable {
+    override def getMessage: String = s"Upsert tax enrolment failed with status: $status and correlationId : $correlationId"
   }
 
-  final case class AllocateEnrolmentToGroupTaxEnrolmentFailure(status: Int) extends Throwable {
-    override def getMessage: String = s"Allocate enrolment to group tax enrolment failed with status: $status"
+  final case class AllocateEnrolmentToGroupTaxEnrolmentFailure(status: Int, correlationId : String) extends Throwable {
+    override def getMessage: String = s"Allocate enrolment to group tax enrolment failed with status: $status and correlationId : $correlationId"
   }
 }
