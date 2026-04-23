@@ -44,7 +44,7 @@ trait TagFluency {
       withCssClass("govuk-tag--green")
 
     def turquoise(): Tag =
-      withCssClass("govuk-tag--turquoise")
+      withCssClass("govuk-tag--teal")
 
     def blue(): Tag =
       withCssClass("govuk-tag--blue")
@@ -53,7 +53,7 @@ trait TagFluency {
       withCssClass("govuk-tag--purple")
 
     def pink(): Tag =
-      withCssClass("govuk-tag--pink")
+      withCssClass("govuk-tag--magenta")
 
     def red(): Tag =
       withCssClass("govuk-tag--red")
