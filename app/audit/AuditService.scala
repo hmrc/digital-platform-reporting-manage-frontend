@@ -33,7 +33,7 @@ class AuditService @Inject()(auditConnector: AuditConnector,
                             (implicit ec: ExecutionContext) extends Logging {
 
   def sendAudit(event: ChangeDetailsAuditEvent)
-               (implicit hc: HeaderCarrier): Unit = {
+             (implicit hc: HeaderCarrier): Unit = {
     val dataEvent = ExtendedDataEvent(
       auditSource = appConfig.auditSource,
       auditType = event.auditType,

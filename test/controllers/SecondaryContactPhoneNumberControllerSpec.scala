@@ -63,7 +63,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
         val view = application.injector.instanceOf[SecondaryContactPhoneNumberView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, contactName)(using request, messages(application)).toString
       }
     }
 
@@ -81,7 +81,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("07777 777777"), contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("07777 777777"), contactName)(using request, messages(application)).toString
       }
     }
 
@@ -91,8 +91,8 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
       val mockConnector = mock[SubscriptionConnector]
       val mockAuditService = mock[AuditService]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
+      when(mockSessionRepository.set(any())) `thenReturn` Future.successful(true)
+      when(mockConnector.updateSubscription(any())(using any())) `thenReturn` Future.successful(Done)
 
       val originalPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
       val originalSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 123456"))
@@ -137,9 +137,9 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(using any())
         verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
-        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditService))(any())
+        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditService))(using any())
 
         val savedAnswers = answersCaptor.getValue
         savedAnswers.get(SecondaryContactPhoneNumberPage).value mustEqual "07777 654321"
@@ -152,7 +152,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
       val mockConnector = mock[SubscriptionConnector]
       val mockAuditService = mock[AuditService]
 
-      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
+      when(mockConnector.updateSubscription(any())(using any())) `thenReturn` Future.failed(new Exception("foo"))
 
       val originalPrimaryContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
       val originalSecondaryContact = OrganisationContact(Organisation("second name"), "bar@example.com", Some("07777 123456"))
@@ -193,9 +193,9 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
 
         route(application, request).value.failed.futureValue
 
-        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(using any())
         verify(mockSessionRepository, never()).set(any())
-        verify(mockAuditService, never()).sendAudit(any())(any())
+        verify(mockAuditService, never()).sendAudit(any())(using any())
       }
     }
 
@@ -215,7 +215,7 @@ class SecondaryContactPhoneNumberControllerSpec extends SpecBase with MockitoSug
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, contactName)(using request, messages(application)).toString
       }
     }
 

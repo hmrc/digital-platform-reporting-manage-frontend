@@ -28,28 +28,26 @@ final case class AssumedReportingCardViewModel(cardState: CardState,
 object AssumedReportingCardViewModel {
 
   def apply(assumedReportsExist: Boolean, operators: Seq[PlatformOperator], appConfig: FrontendAppConfig)
-           (implicit messages: Messages): AssumedReportingCardViewModel = {
+           (implicit messages: Messages): AssumedReportingCardViewModel =
 
-    if (operators.exists(_.notifications.nonEmpty)) {
+    if operators.exists(_.notifications.nonEmpty) then {
       val addLink = CardLink(messages("assumedReportingCard.add"), appConfig.addAssumedReportUrl)
       val viewLink = CardLink(messages("assumedReportingCard.view"), appConfig.viewAssumedReportsUrl)
       val addDisabled = CardMessage(messages("assumedReportingCard.add.disabled"))
 
-      val items = if (appConfig.submissionsAllowed) {
-        if (assumedReportsExist) Seq(viewLink, addLink) else Seq(addLink)
-      } else {
-        if (assumedReportsExist) Seq(viewLink, addDisabled) else Seq(addDisabled)
-      }
+      val items = if appConfig.submissionsAllowed then
+        if assumedReportsExist then Seq(viewLink, addLink) else Seq(addLink)
+      else
+        if assumedReportsExist then Seq(viewLink, addDisabled) else Seq(addDisabled)
 
-      val tag = if (appConfig.submissionsAllowed && !assumedReportsExist) Some(CardTag.notStarted) else None
+      val tag = if appConfig.submissionsAllowed && !assumedReportsExist then Some(CardTag.notStarted) else None
 
       AssumedReportingCardViewModel(
         cardState = CardState.Active,
         items = items,
         tag = tag
       )
-    } else {
-      AssumedReportingCardViewModel(cardState = CardState.Inactive, items = Nil, tag = Some(CardTag.cannotStart))
     }
-  }
+    else
+      AssumedReportingCardViewModel(cardState = CardState.Inactive, items = Nil, tag = Some(CardTag.cannotStart))
 }

@@ -62,7 +62,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[IndividualEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form)(using request, messages(application)).toString
       }
     }
 
@@ -80,7 +80,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("foo@example.com"))(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("foo@example.com"))(using request, messages(application)).toString
       }
     }
 
@@ -90,8 +90,8 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       val mockConnector = mock[SubscriptionConnector]
       val mockAuditService = mock[AuditService]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
+      when(mockSessionRepository.set(any())) `thenReturn` Future.successful(true)
+      when(mockConnector.updateSubscription(any())(using any())) `thenReturn` Future.successful(Done)
 
       val originalContact = IndividualContact(Individual("first", "last"), "foo@example.com", None)
       val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
@@ -127,9 +127,9 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(using any())
         verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
-        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditEvent))(any())
+        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditEvent))(using any())
 
         val savedAnswers = answersCaptor.getValue
         savedAnswers.get(IndividualEmailAddressPage).value mustEqual "bar@example.com"
@@ -142,7 +142,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
       val mockConnector = mock[SubscriptionConnector]
       val mockAuditService = mock[AuditService]
 
-      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
+      when(mockConnector.updateSubscription(any())(using any())) `thenReturn` Future.failed(new Exception("foo"))
 
       val originalContact = IndividualContact(Individual("first", "last"), "foo@example.com", None)
       val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
@@ -174,9 +174,9 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val expectedRequest = SubscriptionInfo("dprsId", true, None, expectedContact, None)
         route(application, request).value.failed.futureValue
 
-        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(using any())
         verify(mockSessionRepository, never()).set(any())
-        verify(mockAuditService, never()).sendAudit(any())(any())
+        verify(mockAuditService, never()).sendAudit(any())(using any())
       }
     }
 
@@ -196,7 +196,7 @@ class IndividualEmailAddressControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm)(using request, messages(application)).toString
       }
     }
 

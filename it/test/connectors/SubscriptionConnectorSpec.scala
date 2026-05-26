@@ -63,7 +63,7 @@ class SubscriptionConnectorSpec extends AnyFreeSpec
             )
         )
 
-        connector.updateSubscription(request)(hc).futureValue
+        connector.updateSubscription(request)(using hc).futureValue
       }
 
       "and return a failed future when the server returns an error" in {
@@ -78,7 +78,7 @@ class SubscriptionConnectorSpec extends AnyFreeSpec
             .willReturn(serverError())
         )
 
-        val result = connector.updateSubscription(request)(hc).failed.futureValue
+        val result = connector.updateSubscription(request)(using hc).failed.futureValue
         result mustBe a[UpdateSubscriptionFailure]
 
         val updateSubscriptionFailure = result.asInstanceOf[UpdateSubscriptionFailure]
@@ -111,7 +111,7 @@ class SubscriptionConnectorSpec extends AnyFreeSpec
           .willReturn(ok(responsePayload.toString))
       )
 
-      val result = connector.getSubscription(hc).futureValue
+      val result = connector.getSubscription(using hc).futureValue
 
       result mustEqual expectedResponse
     }
@@ -126,7 +126,7 @@ class SubscriptionConnectorSpec extends AnyFreeSpec
           .willReturn(serverError())
       )
 
-      val result = connector.getSubscription(hc).failed.futureValue
+      val result = connector.getSubscription(using hc).failed.futureValue
       result mustBe a[GetSubscriptionFailure]
 
       val getSubscriptionFailure = result.asInstanceOf[GetSubscriptionFailure]

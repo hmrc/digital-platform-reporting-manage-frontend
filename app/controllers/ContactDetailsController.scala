@@ -50,7 +50,8 @@ class ContactDetailsController @Inject()(
         userAnswers      <- Future.fromTry(userAnswersService.fromSubscription(request.userId, subscriptionInfo))
         updatedAnswers   <- Future.fromTry(userAnswers.set(OriginalSubscriptionInfoQuery, subscriptionInfo))
         _                <- sessionRepository.set(updatedAnswers)
-      } yield {
+      }
+      yield
 
         subscriptionInfo.primaryContact match {
           case _: IndividualContact =>
@@ -59,6 +60,5 @@ class ContactDetailsController @Inject()(
           case _: OrganisationContact =>
             Ok(organisationView(ContactDetailsOrganisationViewModel(updatedAnswers)))
         }
-      }
   }
 }

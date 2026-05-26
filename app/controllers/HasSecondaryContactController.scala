@@ -78,9 +78,10 @@ class HasSecondaryContactController @Inject()(
           hasSecondContact =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(HasSecondaryContactPage, hasSecondContact))
-              _              <- if (hasSecondContact) Future.successful(Done) else updateSubscription(updatedAnswers)
+              _              <- if hasSecondContact then Future.successful(Done) else updateSubscription(updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(HasSecondaryContactPage, updatedAnswers))
+            }
+            yield Redirect(navigator.nextPage(HasSecondaryContactPage, updatedAnswers))
         )
       }
   }

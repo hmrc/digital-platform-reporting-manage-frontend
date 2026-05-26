@@ -37,7 +37,7 @@ trait SubscriptionUpdater extends Logging { self: FrontendBaseController =>
   val auditService: AuditService
   implicit val ec: ExecutionContext
 
-  protected def updateSubscription(answers: UserAnswers)(implicit request: DataRequest[_]): Future[Done] =
+  protected def updateSubscription(answers: UserAnswers)(implicit request: DataRequest[?]): Future[Done] =
     userAnswersService.toSubscriptionInfo(answers, request.dprsId)
       .fold(
         errors => Future.failed(BuildSubscriptionRequestFailure(errors)),

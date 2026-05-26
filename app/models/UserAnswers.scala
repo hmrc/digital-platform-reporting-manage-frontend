@@ -35,7 +35,7 @@ final case class UserAnswers(
                             ) {
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
-    Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
+    Reads.optionNoError(using Reads.at(page.path)).reads(data).getOrElse(None)
 
   def getEither[A](page: Gettable[A])(implicit rds: Reads[A]): EitherNec[Query, A] =
     get(page).toRight(NonEmptyChain.one(page))
@@ -75,7 +75,7 @@ final case class UserAnswers(
 
 object UserAnswers {
 
-  def encryptedFormat(implicit crypto: Encrypter with Decrypter): OFormat[UserAnswers] = {
+  def encryptedFormat(implicit crypto: Encrypter & Decrypter): OFormat[UserAnswers] = {
     
     implicit val sensitiveFormat: Format[SensitiveString] =
       JsonEncryption.sensitiveEncrypterDecrypter(SensitiveString.apply)
@@ -84,14 +84,14 @@ object UserAnswers {
       (
         (__ \ "_id").read[String] and
         (__ \ "data").read[SensitiveString] and
-        (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
+        (__ \ "lastUpdated").read(using MongoJavatimeFormats.instantFormat)
       )((id, data, lastUpdated) => UserAnswers(id, Json.parse(data.decryptedValue).as[JsObject], lastUpdated))
         
     val encryptedWrites: OWrites[UserAnswers] =
       (
         (__ \ "_id").write[String] and
         (__ \ "data").write[SensitiveString] and
-        (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
+        (__ \ "lastUpdated").write(using MongoJavatimeFormats.instantFormat)
       )(ua => (ua.id, SensitiveString(Json.stringify(ua.data)), ua.lastUpdated))
 
     OFormat(encryptedReads, encryptedWrites)

@@ -40,11 +40,10 @@ trait Constraints {
 
         import ev._
 
-        if (input >= minimum) {
+        if input >= minimum then
           Valid
-        } else {
+        else
           Invalid(errorKey, minimum)
-        }
     }
 
   protected def maximumValue[A](maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
@@ -53,11 +52,10 @@ trait Constraints {
 
         import ev._
 
-        if (input <= maximum) {
+        if input <= maximum then
           Valid
-        } else {
+        else
           Invalid(errorKey, maximum)
-        }
     }
 
   protected def inRange[A](minimum: A, maximum: A, errorKey: String)(implicit ev: Ordering[A]): Constraint[A] =
@@ -66,11 +64,10 @@ trait Constraints {
 
         import ev._
 
-        if (input >= minimum && input <= maximum) {
+        if input >= minimum && input <= maximum then
           Valid
-        } else {
+        else
           Invalid(errorKey, minimum, maximum)
-        }
     }
 
   protected def regexp(regex: String, errorKey: String): Constraint[String] =
@@ -86,13 +83,13 @@ trait Constraints {
       case str if str.length <= maximum =>
         Valid
       case _ =>
-        Invalid(errorKey,  maximum +: args: _*)
+        Invalid(errorKey,  maximum +: args*)
     }
 
   protected def maxDate(maximum: LocalDate, errorKey: String, args: Any*): Constraint[LocalDate] =
     Constraint {
       case date if date.isAfter(maximum) =>
-        Invalid(errorKey, args: _*)
+        Invalid(errorKey, args*)
       case _ =>
         Valid
     }
@@ -100,12 +97,12 @@ trait Constraints {
   protected def minDate(minimum: LocalDate, errorKey: String, args: Any*): Constraint[LocalDate] =
     Constraint {
       case date if date.isBefore(minimum) =>
-        Invalid(errorKey, args: _*)
+        Invalid(errorKey, args*)
       case _ =>
         Valid
     }
 
-  protected def nonEmptySet(errorKey: String): Constraint[Set[_]] =
+  protected def nonEmptySet(errorKey: String): Constraint[Set[?]] =
     Constraint {
       case set if set.nonEmpty =>
         Valid

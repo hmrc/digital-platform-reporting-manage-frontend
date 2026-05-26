@@ -73,7 +73,8 @@ class IndividualEmailAddressController @Inject()(
             updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualEmailAddressPage, value))
             _              <- updateSubscription(updatedAnswers)
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(IndividualEmailAddressPage, updatedAnswers))
+          }
+          yield Redirect(navigator.nextPage(IndividualEmailAddressPage, updatedAnswers))
       )
   }
 }

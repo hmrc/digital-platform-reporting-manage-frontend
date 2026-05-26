@@ -79,7 +79,8 @@ class PrimaryContactPhoneNumberController @Inject()(
               updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactPhoneNumberPage, value))
               _              <- updateSubscription(updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PrimaryContactPhoneNumberPage, updatedAnswers))
+            }
+            yield Redirect(navigator.nextPage(PrimaryContactPhoneNumberPage, updatedAnswers))
         )
       }
   }

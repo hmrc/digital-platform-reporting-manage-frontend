@@ -57,7 +57,7 @@ class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[SecondaryContactNameView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, primaryContactName)(request, messages(application)).toString
+        contentAsString(result).mustEqual(view(form)(using request, messages(application)).toString)
       }
     }
 
@@ -74,8 +74,8 @@ class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("answer"), primaryContactName)(request, messages(application)).toString
+        status(result).mustEqual(OK)
+        contentAsString(result).mustEqual(view(form.fill("answer"))(using request, messages(application)).toString)
       }
     }
 
@@ -83,7 +83,7 @@ class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
 
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) `thenReturn` Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
@@ -121,7 +121,7 @@ class SecondaryContactNameControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, primaryContactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm)(using request, messages(application)).toString
       }
     }
 

@@ -44,13 +44,13 @@ object ReportingNotificationCardViewModel {
 
     val tag = operators.size match {
       case 0 => Some(CardTag.cannotStart)
-      case _ => if (operators.exists(_.notifications.nonEmpty)) None else Some(CardTag.notStarted)
+      case _ => if operators.exists(_.notifications.nonEmpty) then None else Some(CardTag.notStarted)
     }
 
     val links = Seq(viewLink, addLink).flatten
 
     ReportingNotificationCardViewModel(
-      cardState = if (links.isEmpty) CardState.Inactive else CardState.Active,
+      cardState = if links.isEmpty then CardState.Inactive else CardState.Active,
       items     = links,
       tag       = tag
     )

@@ -57,7 +57,7 @@ class SessionRepositorySpec
   private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
 
   private val mockAppConfig = mock[FrontendAppConfig]
-  when(mockAppConfig.cacheTtl) thenReturn 1L
+  when(mockAppConfig.cacheTtl).thenReturn(1L)
 
   private val aesKey = {
     val aesKey = new Array[Byte](32)
@@ -67,25 +67,25 @@ class SessionRepositorySpec
 
   private val configuration = Configuration("crypto.key" -> aesKey)
 
-  private implicit val crypto: Encrypter with Decrypter =
+  private implicit val crypto: Encrypter & Decrypter =
     SymmetricCryptoFactory.aesGcmCryptoFromConfig("crypto", configuration.underlying)
 
   protected override val repository: SessionRepository = new SessionRepository(
     mongoComponent = mongoComponent,
     appConfig      = mockAppConfig,
     clock          = stubClock
-  )(scala.concurrent.ExecutionContext.Implicits.global, implicitly)
+  )(using scala.concurrent.ExecutionContext.Implicits.global,  implicitly)
 
   ".set" - {
 
     "must set the last updated time on the supplied user answers to `now`, and save them" in {
 
-      val expectedResult = userAnswers copy (lastUpdated = instant)
+      val expectedResult = userAnswers.copy(lastUpdated = instant)
 
       repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
-      updatedRecord mustEqual expectedResult
+      updatedRecord.mustEqual(expectedResult)
     }
 
     "must store the data section as encrypted bytes" in {
@@ -118,10 +118,10 @@ class SessionRepositorySpec
 
         insert(userAnswers).futureValue
 
-        val result         = repository.get(userAnswers.id).futureValue
-        val expectedResult = userAnswers copy (lastUpdated = instant)
+        val result         = repository.get(userAnswers.id).futureValue.get
+        val expectedResult = userAnswers.copy(lastUpdated = instant)
 
-        result.value mustEqual expectedResult
+        result.mustEqual(expectedResult)
       }
     }
 
@@ -166,10 +166,10 @@ class SessionRepositorySpec
 
         repository.keepAlive(userAnswers.id).futureValue
 
-        val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
+        val expectedUpdatedAnswers = userAnswers.copy(lastUpdated = instant)
 
         val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
-        updatedAnswers mustEqual expectedUpdatedAnswers
+        updatedAnswers.mustEqual(expectedUpdatedAnswers)
       }
     }
 

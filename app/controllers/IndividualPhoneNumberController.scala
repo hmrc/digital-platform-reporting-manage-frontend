@@ -74,7 +74,8 @@ class IndividualPhoneNumberController @Inject()(
             updatedAnswers <- Future.fromTry(request.userAnswers.set(IndividualPhoneNumberPage, value))
             _              <- updateSubscription(updatedAnswers)
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(IndividualPhoneNumberPage, updatedAnswers))
+          }
+          yield Redirect(navigator.nextPage(IndividualPhoneNumberPage, updatedAnswers))
       )
   }
 }

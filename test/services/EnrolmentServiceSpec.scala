@@ -63,7 +63,7 @@ class EnrolmentServiceSpec extends AnyFreeSpec
 
       underTest.enrol(anEnrolmentDetails).failed
 
-      verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(any())
+      verify(mockTaxEnrolmentConnector, never()).allocateEnrolmentToGroup(any())(using any())
     }
 
     "must error when allocation fails" in {

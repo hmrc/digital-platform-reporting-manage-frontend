@@ -32,7 +32,7 @@ class UserAllowListService @Inject()(connector: UserAllowListConnector, appConfi
   private val fatcaAllowListFeature = "FATCAID"
 
   def isUserAllowed(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
-    if (appConfig.userAllowListEnabled) {
+    if appConfig.userAllowListEnabled then
       allowListedByUtr(enrolments).flatMap {
         case true => Future.successful(true)
         case false => allowListedByVrn(enrolments).flatMap {
@@ -40,9 +40,8 @@ class UserAllowListService @Inject()(connector: UserAllowListConnector, appConfi
           case false => allowListedByFatcaId(enrolments)
         }
       }
-    } else {
+    else
       Future.successful(true)
-    }
 
   private def allowListedByUtr(enrolments: Enrolments)(implicit hc: HeaderCarrier): Future[Boolean] =
     getCtUtrEnrolment(enrolments)

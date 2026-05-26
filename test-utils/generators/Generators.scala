@@ -36,14 +36,14 @@ trait Generators extends ModelGenerators {
     for {
       seq1 <- gen
       seq2 <- Gen.listOfN(seq1.length, genValue)
-    } yield {
+    }
+    yield
       seq1.toSeq.zip(seq2).foldLeft("") {
         case (acc, (n, Some(v))) =>
           acc + n + v
         case (acc, (n, _)) =>
           acc + n
       }
-    }
   }
 
   def intsInRangeWithCommas(min: Int, max: Int): Gen[String] = {
@@ -88,21 +88,23 @@ trait Generators extends ModelGenerators {
     for {
       length <- choose(1, maxLength)
       chars <- listOfN(length, arbitrary[Char])
-    } yield chars.mkString
+    }
+    yield chars.mkString
 
   def stringsLongerThan(minLength: Int): Gen[String] = for {
     maxLength <- (minLength * 2).max(100)
     length    <- Gen.chooseNum(minLength + 1, maxLength)
     chars     <- listOfN(length, arbitrary[Char])
-  } yield chars.mkString
+  }
+  yield chars.mkString
 
   def stringsExceptSpecificValues(excluded: Seq[String]): Gen[String] =
     nonEmptyString suchThat (!excluded.contains(_))
 
   def oneOf[T](xs: Seq[Gen[T]]): Gen[T] =
-    if (xs.isEmpty) {
+    if xs.isEmpty then
       throw new IllegalArgumentException("oneOf called on empty collection")
-    } else {
+    else {
       val vector = xs.toVector
       choose(0, vector.size - 1).flatMap(vector(_))
     }
@@ -158,12 +160,14 @@ trait Generators extends ModelGenerators {
     (for {
       length <- Gen.choose(1, length)
       chars <- Gen.listOfN(length, safeTextInputs)
-    } yield chars.mkString).suchThat(_.trim.nonEmpty)
+    }
+    yield chars.mkString).suchThat(_.trim.nonEmpty)
 
   def unsafeTextInputsWithMaxLength(maxLength: Int): Gen[String] = (for {
     length <- choose(2, maxLength)
     invalidChar <- unsafeTextInputs
     validChars <- listOfN(length - 1, unsafeTextInputs)
-  } yield (validChars :+ invalidChar).mkString).suchThat(_.trim.nonEmpty)
-
+  }
+  yield (validChars :+ invalidChar).mkString).suchThat(_.trim.nonEmpty)
 }
+

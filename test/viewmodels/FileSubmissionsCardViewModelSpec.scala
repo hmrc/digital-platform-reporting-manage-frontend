@@ -85,8 +85,8 @@ class FileSubmissionsCardViewModelSpec extends AnyFreeSpec with Matchers with Mo
 
         "must contain an add link and a `not started` tag when there are no submissions" in {
 
-          when(mockAppConfig.addSubmissionUrl) thenReturn "add-link"
-          when(mockAppConfig.submissionsAllowed) thenReturn true
+          when(mockAppConfig.addSubmissionUrl) `thenReturn` "add-link"
+          when(mockAppConfig.submissionsAllowed) `thenReturn` true
 
           val operator = PlatformOperator(
             operatorId = "operatorId",
@@ -109,9 +109,9 @@ class FileSubmissionsCardViewModelSpec extends AnyFreeSpec with Matchers with Mo
 
         "must contain view and add links, and no tag, when there are some submissions" in {
 
-          when(mockAppConfig.addSubmissionUrl) thenReturn "add-link"
-          when(mockAppConfig.viewSubmissionsUrl) thenReturn "view-link"
-          when(mockAppConfig.submissionsAllowed) thenReturn true
+          when(mockAppConfig.addSubmissionUrl) `thenReturn` "add-link"
+          when(mockAppConfig.viewSubmissionsUrl) `thenReturn` "view-link"
+          when(mockAppConfig.submissionsAllowed) `thenReturn` true
 
           val operator = PlatformOperator(
             operatorId = "operatorId",
@@ -140,7 +140,7 @@ class FileSubmissionsCardViewModelSpec extends AnyFreeSpec with Matchers with Mo
 
         "must contain an add message and no tag when there are no submissions" in {
 
-          when(mockAppConfig.submissionsAllowed) thenReturn false
+          when(mockAppConfig.submissionsAllowed) `thenReturn` false
 
           val operator = PlatformOperator(
             operatorId = "operatorId",
@@ -163,8 +163,8 @@ class FileSubmissionsCardViewModelSpec extends AnyFreeSpec with Matchers with Mo
 
         "must contain a view link, an add message, and no tag when there are some submissions" in {
 
-          when(mockAppConfig.viewSubmissionsUrl) thenReturn "view-link"
-          when(mockAppConfig.submissionsAllowed) thenReturn false
+          when(mockAppConfig.viewSubmissionsUrl) `thenReturn` "view-link"
+          when(mockAppConfig.submissionsAllowed) `thenReturn` false
 
           val operator = PlatformOperator(
             operatorId = "operatorId",

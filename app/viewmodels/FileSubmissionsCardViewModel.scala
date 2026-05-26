@@ -28,28 +28,26 @@ final case class FileSubmissionsCardViewModel(cardState: CardState,
 object FileSubmissionsCardViewModel {
 
   def apply(submissionsExist: Boolean, operators: Seq[PlatformOperator], appConfig: FrontendAppConfig)
-           (implicit messages: Messages): FileSubmissionsCardViewModel = {
+           (implicit messages: Messages): FileSubmissionsCardViewModel =
 
-    if (operators.exists(_.notifications.nonEmpty)) {
+    if operators.exists(_.notifications.nonEmpty) then {
       val addLink = CardLink(messages("fileSubmissionsCard.add"), appConfig.addSubmissionUrl)
       val viewLink = CardLink(messages("fileSubmissionsCard.view"), appConfig.viewSubmissionsUrl)
       val addDisabled = CardMessage(messages("fileSubmissionsCard.add.disabled"))
 
-      val items = if (appConfig.submissionsAllowed) {
-        if (submissionsExist) Seq(viewLink, addLink) else Seq(addLink)
-      } else {
-        if (submissionsExist) Seq(viewLink, addDisabled) else Seq(addDisabled)
-      }
+      val items = if appConfig.submissionsAllowed then
+        if submissionsExist then Seq(viewLink, addLink) else Seq(addLink)
+      else
+        if submissionsExist then Seq(viewLink, addDisabled) else Seq(addDisabled)
 
-      val tag = if (appConfig.submissionsAllowed && !submissionsExist) Some(CardTag.notStarted) else None
+      val tag = if appConfig.submissionsAllowed && !submissionsExist then Some(CardTag.notStarted) else None
 
       FileSubmissionsCardViewModel(
         cardState = CardState.Active,
         items = items,
         tag = tag
       )
-    } else {
-      FileSubmissionsCardViewModel(cardState = CardState.Inactive, items = Nil, tag = Some(CardTag.cannotStart))
     }
-  }
+    else
+      FileSubmissionsCardViewModel(cardState = CardState.Inactive, items = Nil, tag = Some(CardTag.cannotStart))
 }

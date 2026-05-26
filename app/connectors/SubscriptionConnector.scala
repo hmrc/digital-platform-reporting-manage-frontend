@@ -29,6 +29,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue
 
 @Singleton
 class SubscriptionConnector @Inject() (

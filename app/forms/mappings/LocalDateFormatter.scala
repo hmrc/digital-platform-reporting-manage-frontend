@@ -57,7 +57,8 @@ private[mappings] class LocalDateFormatter(
       month <- month.bind(s"$key.month", data)
       year  <- int.bind(s"$key.year", data)
       date  <- toDate(key, day, month, year)
-    } yield date
+    }
+    yield date
   }
 
   override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], LocalDate] = {

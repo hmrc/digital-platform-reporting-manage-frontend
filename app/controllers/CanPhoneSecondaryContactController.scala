@@ -77,9 +77,10 @@ class CanPhoneSecondaryContactController @Inject()(
           canPhone =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(CanPhoneSecondaryContactPage, canPhone))
-              _              <- if (canPhone) Future.successful(Done) else updateSubscription(updatedAnswers)
+              _              <- if canPhone then Future.successful(Done) else updateSubscription(updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(CanPhoneSecondaryContactPage, updatedAnswers))
+            }
+            yield Redirect(navigator.nextPage(CanPhoneSecondaryContactPage, updatedAnswers))
         )
       }
   }
