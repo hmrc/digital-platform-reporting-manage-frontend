@@ -30,7 +30,7 @@ class FrontendAppConfig @Inject()(configuration: Configuration) {
   val signOutUrl: String       = configuration.get[String]("urls.signOut")
 
   private val exitSurveyBaseUrl: String = configuration.get[String]("feedback-frontend.host")
-  val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting"
+  val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/digital-platform-reporting?useServiceNavigation"
 
   val userResearchBannerEnabled: Boolean = configuration.get[Boolean]("features.user-research-banner")
   val userResearchBannerLink: String = configuration.get[String]("urls.user-research-banner")
