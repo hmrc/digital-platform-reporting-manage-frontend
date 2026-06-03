@@ -28,8 +28,8 @@ object Contact {
     
   implicit lazy val writes: OWrites[Contact] = new OWrites[Contact] {
     override def writes(o: Contact): JsObject = o match {
-      case ic: IndividualContact => Json.toJsObject(ic)(IndividualContact.format)
-      case oc: OrganisationContact => Json.toJsObject(oc)(OrganisationContact.format)
+      case ic: IndividualContact => Json.toJsObject(ic)(using IndividualContact.format)
+      case oc: OrganisationContact => Json.toJsObject(oc)( using OrganisationContact.format)
     }
   }
 }

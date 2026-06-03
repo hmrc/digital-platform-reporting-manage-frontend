@@ -20,10 +20,10 @@ import play.api.data.{Form, FormError}
 
 trait StringFieldBehaviours extends FieldBehaviours {
 
-    def fieldWithMaxLength(form: Form[_],
+    def fieldWithMaxLength(form: Form[?],
                            fieldName: String,
                            maxLength: Int,
-                           lengthError: FormError): Unit = {
+                           lengthError: FormError): Unit =
 
     s"not bind strings longer than $maxLength characters" in {
 
@@ -33,5 +33,4 @@ trait StringFieldBehaviours extends FieldBehaviours {
           result.errors must contain only lengthError
       }
     }
-  }
 }

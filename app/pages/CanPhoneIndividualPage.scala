@@ -28,5 +28,5 @@ case object CanPhoneIndividualPage extends QuestionPage[Boolean] {
   override def toString: String = "canPhoneIndividual"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if (value.contains(false)) userAnswers.remove(IndividualPhoneNumberPage) else super.cleanup(value, userAnswers)
+    if value.contains(false) then userAnswers.remove(IndividualPhoneNumberPage) else super.cleanup(value, userAnswers)
 }

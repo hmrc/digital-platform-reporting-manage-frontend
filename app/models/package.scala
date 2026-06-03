@@ -45,7 +45,7 @@ package object models {
           setKeyNode(n, jsValue, value)
 
         case (first :: second :: rest, oldValue) =>
-          Reads.optionNoError(Reads.at[JsValue](JsPath(first :: Nil)))
+          Reads.optionNoError(using Reads.at[JsValue](JsPath(first :: Nil)))
             .reads(oldValue).flatMap {
               opt =>
 
@@ -73,11 +73,10 @@ package object models {
 
       oldValue match {
         case oldValue: JsArray if index >= 0 && index <= oldValue.value.length =>
-          if (index == oldValue.value.length) {
+          if index == oldValue.value.length then
             JsSuccess(oldValue.append(newValue))
-          } else {
+          else
             JsSuccess(JsArray(oldValue.value.updated(index, newValue)))
-          }
         case oldValue: JsArray =>
           JsError(s"array index out of bounds: $index, $oldValue")
         case _ =>
@@ -108,7 +107,7 @@ package object models {
       }
     }
 
-    def remove(path: JsPath): JsResult[JsValue] = {
+    def remove(path: JsPath): JsResult[JsValue] =
 
       (path.path, jsValue) match {
         case (Nil, _) => JsError("path cannot be empty")
@@ -116,7 +115,7 @@ package object models {
         case ((n: KeyPathNode) :: Nil, value: JsObject) if !value.keys.contains(n.key) => JsError("cannot find value at path")
         case ((n: IdxPathNode) :: Nil, value: JsArray) => removeIndexNode(n, value)
         case ((_: KeyPathNode) :: Nil, _) => JsError(s"cannot remove a key on $jsValue")
-        case (first :: second :: rest, oldValue) => Reads.optionNoError(Reads.at[JsValue](JsPath(first :: Nil)))
+        case (first :: second :: rest, oldValue) => Reads.optionNoError(using Reads.at[JsValue](JsPath(first :: Nil)))
           .reads(oldValue).flatMap {
             (opt: Option[JsValue]) =>
 
@@ -138,6 +137,5 @@ package object models {
           }
         case (pathNodes, value) => JsError(s"Unsupported path $pathNodes for value $value")
       }
-    }
   }
 }

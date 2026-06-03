@@ -63,7 +63,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
         val view = application.injector.instanceOf[CanPhonePrimaryContactView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, contactName)(using request, messages(application)).toString
       }
     }
 
@@ -81,7 +81,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill(true), contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill(true), contactName)(using request, messages(application)).toString
       }
     }
 
@@ -91,8 +91,8 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
       val mockConnector = mock[SubscriptionConnector]
       val mockAuditService = mock[AuditService]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
-      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.successful(Done)
+      when(mockSessionRepository.set(any())) `thenReturn` Future.successful(true)
+      when(mockConnector.updateSubscription(any())(using any())) `thenReturn` Future.successful(Done)
 
       val originalContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
       val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
@@ -131,9 +131,9 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(using any())
         verify(mockSessionRepository, times(1)).set(answersCaptor.capture())
-        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditEvent))(any())
+        verify(mockAuditService, times(1)).sendAudit(eqTo(expectedAuditEvent))(using any())
 
         val savedAnswers = answersCaptor.getValue
         savedAnswers.get(PrimaryContactPhoneNumberPage) must not be defined
@@ -146,7 +146,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
       val mockConnector = mock[SubscriptionConnector]
       val mockAuditService = mock[AuditService]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) `thenReturn` Future.successful(true)
 
       val answers =
         emptyUserAnswers
@@ -176,9 +176,9 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual onwardRoute.url
-        verify(mockConnector, never()).updateSubscription(any())(any())
+        verify(mockConnector, never()).updateSubscription(any())(using any())
         verify(mockSessionRepository, times(1)).set(any())
-        verify(mockAuditService, never()).sendAudit(any())(any())
+        verify(mockAuditService, never()).sendAudit(any())(using any())
       }
     }
 
@@ -188,7 +188,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
       val mockConnector = mock[SubscriptionConnector]
       val mockAuditService = mock[AuditService]
 
-      when(mockConnector.updateSubscription(any())(any())) thenReturn Future.failed(new Exception("foo"))
+      when(mockConnector.updateSubscription(any())(using any())) `thenReturn` Future.failed(new Exception("foo"))
 
       val originalContact = OrganisationContact(Organisation("name"), "foo@example.com", Some("07777 777777"))
       val originalInfo = SubscriptionInfo("dprsId", true, None, originalContact, None)
@@ -223,9 +223,9 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
 
         route(application, request).value.failed.futureValue
 
-        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(any())
+        verify(mockConnector, times(1)).updateSubscription(eqTo(expectedRequest))(using any())
         verify(mockSessionRepository, never()).set(any())
-        verify(mockAuditService, never()).sendAudit(any())(any())
+        verify(mockAuditService, never()).sendAudit(any())(using any())
       }
     }
 
@@ -245,7 +245,7 @@ class CanPhonePrimaryContactControllerSpec extends SpecBase with MockitoSugar {
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, contactName)(using request, messages(application)).toString
       }
     }
 

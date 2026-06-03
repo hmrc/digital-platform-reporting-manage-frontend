@@ -105,7 +105,7 @@ class AuthActionSpec extends SpecBase
     "when InsufficientEnrolments" - {
       "must redirect the user to unauthorised page" - {
         "if no pending enrolment is found" in {
-          when(mockPendingEnrolmentConnector.getPendingEnrolment()(any())).thenReturn(Future.failed(new RuntimeException()))
+          when(mockPendingEnrolmentConnector.getPendingEnrolment()(using any())).thenReturn(Future.failed(new RuntimeException()))
 
           val authAction = new AuthenticatedIdentifierAction(
             new FakeFailingAuthConnector(InsufficientEnrolments("error")),
@@ -120,13 +120,13 @@ class AuthActionSpec extends SpecBase
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
 
-          verify(mockEnrolmentService, never).enrol(any())(any())
-          verify(mockPendingEnrolmentConnector, never).remove()(any())
+          verify(mockEnrolmentService, never).enrol(any())(using any())
+          verify(mockPendingEnrolmentConnector, never).remove()(using any())
         }
 
         "if enrolment fails" in {
-          when(mockPendingEnrolmentConnector.getPendingEnrolment()(any())).thenReturn(Future.successful(aPendingEnrolment))
-          when(mockEnrolmentService.enrol(eqTo(EnrolmentDetails(aPendingEnrolment)))(any())).thenReturn(Future.failed(new RuntimeException()))
+          when(mockPendingEnrolmentConnector.getPendingEnrolment()(using any())).thenReturn(Future.successful(aPendingEnrolment))
+          when(mockEnrolmentService.enrol(eqTo(EnrolmentDetails(aPendingEnrolment)))(using any())).thenReturn(Future.failed(new RuntimeException()))
 
           val authAction = new AuthenticatedIdentifierAction(
             new FakeFailingAuthConnector(InsufficientEnrolments("error")),
@@ -142,7 +142,7 @@ class AuthActionSpec extends SpecBase
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
 
-          verify(mockPendingEnrolmentConnector, never).remove()(any())
+          verify(mockPendingEnrolmentConnector, never).remove()(using any())
         }
       }
     }
@@ -162,16 +162,16 @@ class AuthActionSpec extends SpecBase
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustEqual routes.UnauthorisedController.onPageLoad().url
 
-        verify(mockPendingEnrolmentConnector, never).getPendingEnrolment()(any())
-        verify(mockEnrolmentService, never).enrol(any())(any())
-        verify(mockPendingEnrolmentConnector, never).remove()(any())
+        verify(mockPendingEnrolmentConnector, never).getPendingEnrolment()(using any())
+        verify(mockEnrolmentService, never).enrol(any())(using any())
+        verify(mockPendingEnrolmentConnector, never).remove()(using any())
       }
     }
 
     "when the user doesn't have a DPRS enrolments" - {
       "must redirect the user to the unauthorised page" - {
         "if no pending enrolment is found" in {
-          when(mockPendingEnrolmentConnector.getPendingEnrolment()(any())).thenReturn(Future.failed(new RuntimeException()))
+          when(mockPendingEnrolmentConnector.getPendingEnrolment()(using any())).thenReturn(Future.failed(new RuntimeException()))
 
           val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ emptyEnrolments),
             mockAllowListService,
@@ -186,14 +186,14 @@ class AuthActionSpec extends SpecBase
           status(result) mustBe SEE_OTHER
           redirectLocation(result).value mustEqual routes.UnauthorisedController.noAccessPageLoad().url
 
-          verify(mockEnrolmentService, never).enrol(any())(any())
-          verify(mockPendingEnrolmentConnector, never).remove()(any())
+          verify(mockEnrolmentService, never).enrol(any())(using any())
+          verify(mockPendingEnrolmentConnector, never).remove()(using any())
         }
       }
 
       "if enrolment fails" in {
-        when(mockPendingEnrolmentConnector.getPendingEnrolment()(any())).thenReturn(Future.successful(aPendingEnrolment))
-        when(mockEnrolmentService.enrol(eqTo(EnrolmentDetails(aPendingEnrolment)))(any())).thenReturn(Future.failed(new RuntimeException()))
+        when(mockPendingEnrolmentConnector.getPendingEnrolment()(using any())).thenReturn(Future.successful(aPendingEnrolment))
+        when(mockEnrolmentService.enrol(eqTo(EnrolmentDetails(aPendingEnrolment)))(using any())).thenReturn(Future.failed(new RuntimeException()))
 
         val authAction = new AuthenticatedIdentifierAction(new FakeAuthConnector(Some("internalId") ~ emptyEnrolments),
           mockAllowListService,
@@ -208,14 +208,14 @@ class AuthActionSpec extends SpecBase
         status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustEqual routes.UnauthorisedController.noAccessPageLoad().url
 
-        verify(mockPendingEnrolmentConnector, never).remove()(any())
+        verify(mockPendingEnrolmentConnector, never).remove()(using any())
       }
     }
 
     "when the user has a DPRS enrolment" - {
       "must succeed" - {
         "when the user has a CT UTR enrolment" in {
-          when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
+          when(mockAllowListService.isUserAllowed(any())(using any())) thenReturn Future.successful(true)
           val enrolments = Enrolments(Set(
             Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None),
             Enrolment("IR-CT", Seq(EnrolmentIdentifier("UTR", " utr")), "activated", None)
@@ -233,7 +233,7 @@ class AuthActionSpec extends SpecBase
         }
 
         "when the user has a HMRC-MTD-VAT enrolment" in {
-          when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(true)
+          when(mockAllowListService.isUserAllowed(any())(using any())) thenReturn Future.successful(true)
           val enrolments = Enrolments(Set(
             Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None),
             Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "vrn")), "activated", None)
@@ -251,7 +251,7 @@ class AuthActionSpec extends SpecBase
         }
 
         "when the user has a CT UTR enrolment and user not in allow list" in {
-          when(mockAllowListService.isUserAllowed(any())(any())) thenReturn Future.successful(false)
+          when(mockAllowListService.isUserAllowed(any())(using any())) thenReturn Future.successful(false)
           val enrolments = Enrolments(Set(
             Enrolment("HMRC-DPRS", Seq(EnrolmentIdentifier("DPRSID", "dprsId")), "activated", None),
             Enrolment("HMRC-MTD-VAT", Seq(EnrolmentIdentifier("VRN", "vrn")), "activated", None)

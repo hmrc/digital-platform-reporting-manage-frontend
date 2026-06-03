@@ -61,7 +61,7 @@ class ContactDetailsControllerSpec
         val contact = IndividualContact(Individual("first", "last"), "email", Some("phone"))
         val subscriptionInfo = SubscriptionInfo("id", gbUser = true, None, contact, None)
 
-        when(mockConnector.getSubscription(any())) thenReturn Future.successful(subscriptionInfo)
+        when(mockConnector.getSubscription(using any())) thenReturn Future.successful(subscriptionInfo)
         when(mockRepository.set(any())) thenReturn Future.successful(true)
 
         val application =
@@ -70,7 +70,7 @@ class ContactDetailsControllerSpec
               bind[SubscriptionConnector].toInstance(mockConnector),
               bind[SessionRepository].toInstance(mockRepository)
             )
-            .build
+            .build()
 
         running(application) {
           val request = FakeRequest(GET, routes.ContactDetailsController.onPageLoad().url)
@@ -86,9 +86,9 @@ class ContactDetailsControllerSpec
           val viewModel = ContactDetailsIndividualViewModel(userAnswers)
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(viewModel)(request, implicitly).toString
+          contentAsString(result) mustEqual view(viewModel)(using request, implicitly).toString
 
-          verify(mockConnector, times(1)).getSubscription(any())
+          verify(mockConnector, times(1)).getSubscription(using any())
           verify(mockRepository, times(1)).set(answersCaptor.capture())
 
           val answers = answersCaptor.getValue
@@ -102,7 +102,7 @@ class ContactDetailsControllerSpec
         val secondaryContact = OrganisationContact(Organisation("second name"), "second email", Some("second phone"))
         val subscriptionInfo = SubscriptionInfo("id", gbUser = true, None, primaryContact, Some(secondaryContact))
 
-        when(mockConnector.getSubscription(any())) thenReturn Future.successful(subscriptionInfo)
+        when(mockConnector.getSubscription(using any())) thenReturn Future.successful(subscriptionInfo)
         when(mockRepository.set(any())) thenReturn Future.successful(true)
 
         val application =
@@ -111,7 +111,7 @@ class ContactDetailsControllerSpec
               bind[SubscriptionConnector].toInstance(mockConnector),
               bind[SessionRepository].toInstance(mockRepository)
             )
-            .build
+            .build()
 
         running(application) {
           val request = FakeRequest(GET, routes.ContactDetailsController.onPageLoad().url)
@@ -126,9 +126,9 @@ class ContactDetailsControllerSpec
           val viewModel = ContactDetailsOrganisationViewModel(userAnswers)
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(viewModel)(request, implicitly).toString
+          contentAsString(result) mustEqual view(viewModel)(using request, implicitly).toString
 
-          verify(mockConnector, times(1)).getSubscription(any())
+          verify(mockConnector, times(1)).getSubscription(using any())
           verify(mockRepository, times(1)).set(any())
         }
       }
@@ -136,7 +136,7 @@ class ContactDetailsControllerSpec
 
     "must return a failed future when subscription information cannot be retrieved" in {
 
-      when(mockConnector.getSubscription(any())) thenReturn Future.failed(new Exception("foo"))
+      when(mockConnector.getSubscription(using any())) thenReturn Future.failed(new Exception("foo"))
 
       val application =
         applicationBuilder(userAnswers = None)
@@ -144,7 +144,7 @@ class ContactDetailsControllerSpec
             bind[SubscriptionConnector].toInstance(mockConnector),
             bind[SessionRepository].toInstance(mockRepository)
           )
-          .build
+          .build()
 
       running(application) {
         val request = FakeRequest(GET, routes.ContactDetailsController.onPageLoad().url)

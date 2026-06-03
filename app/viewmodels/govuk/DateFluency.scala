@@ -52,9 +52,9 @@ trait DateFluency {
       val anySpecificError = dayError || monthError || yearError
       val allFieldsError   = field.error.isDefined && !anySpecificError
 
-      val dayErrorClass   = if (dayError || allFieldsError) errorClass else ""
-      val monthErrorClass = if (monthError || allFieldsError) errorClass else ""
-      val yearErrorClass  = if (yearError || allFieldsError) errorClass else ""
+      val dayErrorClass   = if dayError || allFieldsError then errorClass else ""
+      val monthErrorClass = if monthError || allFieldsError then errorClass else ""
+      val yearErrorClass  = if yearError || allFieldsError then errorClass else ""
 
       val items = Seq(
         InputItem(

@@ -65,7 +65,8 @@ class PrimaryContactNameController @Inject()(
           for {
             updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactNamePage, value))
             _              <- sessionRepository.set(updatedAnswers)
-          } yield Redirect(navigator.nextPage(PrimaryContactNamePage, updatedAnswers))
+          }
+          yield Redirect(navigator.nextPage(PrimaryContactNamePage, updatedAnswers))
       )
   }
 }

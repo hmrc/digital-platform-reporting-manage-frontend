@@ -20,7 +20,7 @@ import play.api.data.{Form, FormError}
 
 trait IntFieldBehaviours extends FieldBehaviours {
 
-  def intField(form: Form[_],
+  def intField(form: Form[?],
                fieldName: String,
                nonNumericError: FormError,
                wholeNumberError: FormError): Unit = {
@@ -62,10 +62,10 @@ trait IntFieldBehaviours extends FieldBehaviours {
     }
   }
 
-  def intFieldWithMinimum(form: Form[_],
+  def intFieldWithMinimum(form: Form[?],
                           fieldName: String,
                           minimum: Int,
-                          expectedError: FormError): Unit = {
+                          expectedError: FormError): Unit =
 
     s"not bind integers below $minimum" in {
 
@@ -75,12 +75,11 @@ trait IntFieldBehaviours extends FieldBehaviours {
           result.errors must contain only expectedError
       }
     }
-  }
 
-  def intFieldWithMaximum(form: Form[_],
+  def intFieldWithMaximum(form: Form[?],
                           fieldName: String,
                           maximum: Int,
-                          expectedError: FormError): Unit = {
+                          expectedError: FormError): Unit =
 
     s"not bind integers above $maximum" in {
 
@@ -90,13 +89,12 @@ trait IntFieldBehaviours extends FieldBehaviours {
           result.errors must contain only expectedError
       }
     }
-  }
 
-  def intFieldWithRange(form: Form[_],
+  def intFieldWithRange(form: Form[?],
                         fieldName: String,
                         minimum: Int,
                         maximum: Int,
-                        expectedError: FormError): Unit = {
+                        expectedError: FormError): Unit =
 
     s"not bind integers outside the range $minimum to $maximum" in {
 
@@ -106,5 +104,4 @@ trait IntFieldBehaviours extends FieldBehaviours {
           result.errors must contain only expectedError
       }
     }
-  }
 }

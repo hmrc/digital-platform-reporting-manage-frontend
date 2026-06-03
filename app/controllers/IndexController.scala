@@ -43,9 +43,9 @@ class IndexController @Inject()(
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
 
-    val maybeUserResearchBanner = if (appConfig.userResearchBannerEnabled) {Some(userResearchBanner())} else None
+    val maybeUserResearchBanner = if appConfig.userResearchBannerEnabled then {Some(userResearchBanner())} else None
 
-    if (appConfig.platformOperatorsEnabled)  {
+    if appConfig.platformOperatorsEnabled then 
       platformOperatorConnector.viewPlatformOperators.flatMap { platformOperatorResponse =>
 
         val operators = platformOperatorResponse.platformOperators
@@ -53,7 +53,8 @@ class IndexController @Inject()(
         for {
           fileSubmissionsCard  <- getFileSubmissionsCard(operators, appConfig)
           assumedReportingCard <- getAssumedReportingCard(operators, appConfig)
-        } yield {
+        }
+        yield {
 
           val viewModel = IndexViewModel(
             operatorId                = request.dprsId,
@@ -67,7 +68,7 @@ class IndexController @Inject()(
           Ok(view(viewModel, maybeUserResearchBanner))
         }
       }
-    } else {
+    else {
       val viewModel = IndexViewModel(
         operatorId                = request.dprsId,
         platformOperatorCard      = PlatformOperatorCardViewModel(CardState.Hidden, Nil, None),
@@ -82,24 +83,20 @@ class IndexController @Inject()(
   }
 
   private def getFileSubmissionsCard(operators: Seq[PlatformOperator], appConfig: FrontendAppConfig)
-                                    (implicit request: Request[_]): Future[FileSubmissionsCardViewModel] = {
-    if (appConfig.fileSubmissionsEnabled) {
+                                    (implicit request: Request[?]): Future[FileSubmissionsCardViewModel] =
+    if appConfig.fileSubmissionsEnabled then
       submissionsConnector.submissionsExist.map { response =>
         FileSubmissionsCardViewModel(response, operators, appConfig)
       }
-    } else {
+    else
       Future.successful(FileSubmissionsCardViewModel(CardState.Hidden, Nil, None))
-    }
-  }
 
   private def getAssumedReportingCard(operators: Seq[PlatformOperator], appConfig: FrontendAppConfig)
-                                     (implicit request: Request[_]): Future[AssumedReportingCardViewModel] = {
-    if (appConfig.assumedReportingEnabled) {
+                                     (implicit request: Request[?]): Future[AssumedReportingCardViewModel] =
+    if appConfig.assumedReportingEnabled then
       submissionsConnector.assumedReportsExist.map { response =>
         AssumedReportingCardViewModel(response, operators, appConfig)
       }
-    } else {
+    else
       Future.successful(AssumedReportingCardViewModel(CardState.Hidden, Nil, None))
-    }
-  }
 }

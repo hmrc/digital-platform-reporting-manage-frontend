@@ -57,7 +57,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
         val view = application.injector.instanceOf[SecondaryContactEmailAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form, contactName)(using request, messages(application)).toString
       }
     }
 
@@ -75,7 +75,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(form.fill("foo@example.com"), contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(form.fill("foo@example.com"), contactName)(using request, messages(application)).toString
       }
     }
 
@@ -83,7 +83,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
 
       val mockSessionRepository = mock[SessionRepository]
 
-      when(mockSessionRepository.set(any())) thenReturn Future.successful(true)
+      when(mockSessionRepository.set(any())) `thenReturn` Future.successful(true)
 
       val application =
         applicationBuilder(userAnswers = Some(baseAnswers))
@@ -121,7 +121,7 @@ class SecondaryContactEmailAddressControllerSpec extends SpecBase with MockitoSu
         val result = route(application, request).value
 
         status(result) mustEqual BAD_REQUEST
-        contentAsString(result) mustEqual view(boundForm, contactName)(request, messages(application)).toString
+        contentAsString(result) mustEqual view(boundForm, contactName)(using request, messages(application)).toString
       }
     }
 

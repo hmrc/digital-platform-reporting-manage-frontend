@@ -36,7 +36,7 @@ class SessionRepository @Inject()(
                                    mongoComponent: MongoComponent,
                                    appConfig: FrontendAppConfig,
                                    clock: Clock
-                                 )(implicit ec: ExecutionContext, crypto: Encrypter with Decrypter)
+                                 )(implicit ec: ExecutionContext, crypto: Encrypter & Decrypter)
   extends PlayMongoRepository[UserAnswers](
     collectionName = "user-answers",
     mongoComponent = mongoComponent,
@@ -76,7 +76,7 @@ class SessionRepository @Inject()(
 
   def set(answers: UserAnswers): Future[Boolean] = Mdc.preservingMdc {
 
-    val updatedAnswers = answers copy (lastUpdated = Instant.now(clock))
+    val updatedAnswers = answers.copy (lastUpdated = Instant.now(clock))
 
     collection
       .replaceOne(

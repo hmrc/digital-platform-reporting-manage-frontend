@@ -67,7 +67,7 @@ class AuditServiceSpec extends AnyFreeSpec with Matchers with MockitoSugar {
       service.sendAudit(eventModel)
       val eventCaptor: ArgumentCaptor[ExtendedDataEvent] = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      verify(mockAuditConnector, times(1)).sendExtendedEvent(eventCaptor.capture())(any(), any())
+      verify(mockAuditConnector, times(1)).sendExtendedEvent(eventCaptor.capture())(using any(), any())
 
       val event = eventCaptor.getValue
       event.auditSource mustEqual auditSource

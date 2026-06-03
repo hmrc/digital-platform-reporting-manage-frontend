@@ -34,5 +34,6 @@ class EnrolmentService @Inject()(taxEnrollmentConnector: TaxEnrolmentConnector)
            (implicit hc: HeaderCarrier): Future[Done] = for {
     _ <- taxEnrollmentConnector.upsert(UpsertKnownFacts(enrolmentDetails))
     result <- taxEnrollmentConnector.allocateEnrolmentToGroup(GroupEnrolment(enrolmentDetails))
-  } yield result
+  }
+  yield result
 }

@@ -72,7 +72,8 @@ class PrimaryContactEmailAddressController @Inject()(
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(PrimaryContactEmailAddressPage, value))
               _ <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(PrimaryContactEmailAddressPage, updatedAnswers))
+            }
+            yield Redirect(navigator.nextPage(PrimaryContactEmailAddressPage, updatedAnswers))
         )
       }
   }

@@ -45,7 +45,7 @@ class PlatformOperatorCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
       "must contain an add link and a `not started` tag" in {
 
-        when(mockAppConfig.addPlatformOperatorUrl) thenReturn "add-link"
+        when(mockAppConfig.addPlatformOperatorUrl) `thenReturn` "add-link"
 
         val card = PlatformOperatorCardViewModel(Nil, mockAppConfig)
 
@@ -59,8 +59,8 @@ class PlatformOperatorCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
       "must contain an `add another` link and a view link, and have no tag" in {
 
-        when(mockAppConfig.addPlatformOperatorUrl) thenReturn "add-link"
-        when(mockAppConfig.viewPlatformOperatorsUrl) thenReturn "view-link"
+        when(mockAppConfig.addPlatformOperatorUrl) `thenReturn` "add-link"
+        when(mockAppConfig.viewPlatformOperatorsUrl) `thenReturn` "view-link"
 
         val operator = PlatformOperator(
           operatorId = "operatorId",

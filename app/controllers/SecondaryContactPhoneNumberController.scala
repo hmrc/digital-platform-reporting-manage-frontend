@@ -47,7 +47,7 @@ class SecondaryContactPhoneNumberController @Inject()(
                                                        val userAnswersService: UserAnswersService,
                                                        val auditService: AuditService
                                                      )(implicit val ec: ExecutionContext)
-  extends FrontendBaseController with I18nSupport with AnswerExtractor with SubscriptionUpdater{
+  extends FrontendBaseController with I18nSupport with AnswerExtractor with SubscriptionUpdater {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) {
     implicit request =>
@@ -79,7 +79,8 @@ class SecondaryContactPhoneNumberController @Inject()(
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactPhoneNumberPage, value))
               _              <- updateSubscription(updatedAnswers)
               _              <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SecondaryContactPhoneNumberPage, updatedAnswers))
+            }
+            yield Redirect(navigator.nextPage(SecondaryContactPhoneNumberPage, updatedAnswers))
         )
       }
   }

@@ -36,7 +36,8 @@ class UserAnswersService @Inject() {
       _ <- setOptional(TradingNameQuery, subscription.tradingName)
       _ <- set(GbUserQuery, subscription.gbUser)
       _ <- setContacts(subscription.primaryContact, subscription.secondaryContact)
-    } yield ()
+    }
+    yield ()
 
     transformation.runS(UserAnswers(userId))
   }
@@ -48,7 +49,8 @@ class UserAnswersService @Inject() {
           _ <- setPrimaryContact(contact)
           _ <- set(HasSecondaryContactPage, secondary.isDefined)
           _ <- setSecondaryContact(secondary)
-        } yield ()
+        }
+        yield ()
       case contact: IndividualContact =>
         setIndividualContact(contact)
     }
@@ -59,18 +61,19 @@ class UserAnswersService @Inject() {
       _ <- set(PrimaryContactEmailAddressPage, contact.email)
       _ <- set(CanPhonePrimaryContactPage, contact.phone.isDefined)
       _ <- setOptional(PrimaryContactPhoneNumberPage, contact.phone)
-    } yield ()
+    }
+    yield ()
 
-  private def setSecondaryContact(optionalContact: Option[OrganisationContact]): StateT[Try, UserAnswers, Unit] = {
+  private def setSecondaryContact(optionalContact: Option[OrganisationContact]): StateT[Try, UserAnswers, Unit] =
     optionalContact.map { contact =>
       for {
         _ <- set(SecondaryContactNamePage, contact.organisation.name)
         _ <- set(SecondaryContactEmailAddressPage, contact.email)
         _ <- set(CanPhoneSecondaryContactPage, contact.phone.isDefined)
         _ <- setOptional(SecondaryContactPhoneNumberPage, contact.phone)
-      } yield ()
+      }
+      yield ()
     }.getOrElse(StateT.pure(()))
-  }
 
   private def setIndividualContact(contact: IndividualContact): StateT[Try, UserAnswers, Unit] =
     for {
@@ -79,7 +82,8 @@ class UserAnswersService @Inject() {
       _ <- set(CanPhoneIndividualPage, contact.phone.isDefined)
       _ <- setOptional(IndividualPhoneNumberPage, contact.phone)
       _ <- set(HasSecondaryContactPage, false)
-    } yield ()
+    }
+    yield ()
 
   private def set[A](settable: Settable[A], value: A)(implicit writes: Writes[A]): StateT[Try, UserAnswers, Unit] =
     StateT.modifyF[Try, UserAnswers](_.set(settable, value))

@@ -54,7 +54,7 @@ class SecondaryContactNameController @Inject()(
           case Some(value) => form.fill(value)
         }
 
-        Ok(view(preparedForm, primaryContactName))
+        Ok(view(preparedForm))
       }
   }
 
@@ -66,13 +66,14 @@ class SecondaryContactNameController @Inject()(
 
         form.bindFromRequest().fold(
           formWithErrors =>
-            Future.successful(BadRequest(view(formWithErrors, primaryContactName))),
+            Future.successful(BadRequest(view(formWithErrors))),
 
           value =>
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(SecondaryContactNamePage, value))
               _ <- sessionRepository.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(SecondaryContactNamePage, updatedAnswers))
+            }
+            yield Redirect(navigator.nextPage(SecondaryContactNamePage, updatedAnswers))
         )
       }
   }

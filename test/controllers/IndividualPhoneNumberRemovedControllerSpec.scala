@@ -37,7 +37,7 @@ class IndividualPhoneNumberRemovedControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[IndividualPhoneNumberRemovedView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view()(using request, messages(application)).toString
       }
     }
   }

@@ -24,7 +24,7 @@ import javax.inject.Inject
 class SecondaryContactPhoneNumberFormProvider @Inject() extends Mappings {
   private val maxLength = 24
 
-  def apply(contactName: String): Form[String] = {
+  def apply(contactName: String): Form[String] =
     Form(
       "value" -> text("secondaryContactPhoneNumber.error.required", args = Seq(contactName))
         .verifying(firstError(
@@ -33,5 +33,4 @@ class SecondaryContactPhoneNumberFormProvider @Inject() extends Mappings {
           validPhoneNumber("secondaryContactPhoneNumber.error.format")
         ))
     )
-  }
 }

@@ -28,13 +28,12 @@ case object HasSecondaryContactPage extends QuestionPage[Boolean] {
   override def toString: String = "hasSecondaryContact"
 
   override def cleanup(value: Option[Boolean], userAnswers: UserAnswers): Try[UserAnswers] =
-    if (value.contains(false)) {
+    if value.contains(false) then
       userAnswers
         .remove(SecondaryContactNamePage)
         .flatMap(_.remove(SecondaryContactEmailAddressPage))
         .flatMap(_.remove(CanPhoneSecondaryContactPage))
         .flatMap(_.remove(SecondaryContactPhoneNumberPage))
-    } else {
+    else
       super.cleanup(value, userAnswers)
-    }
 }

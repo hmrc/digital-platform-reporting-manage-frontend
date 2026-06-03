@@ -21,13 +21,14 @@ import play.api.data.{Form, FormError}
 
 trait CheckboxFieldBehaviours extends FormSpec {
 
-  def checkboxField[T](form: Form[_],
+  def checkboxField[T](form: Form[?],
                        fieldName: String,
                        validValues: Seq[T],
                        invalidError: FormError): Unit = {
     for {
       (value, i) <- validValues.zipWithIndex
-    } yield s"binds `$value` successfully" in {
+    }
+    yield s"binds `$value` successfully" in {
       val data = Map(
         s"$fieldName[$i]" -> value.toString
       )
@@ -44,7 +45,7 @@ trait CheckboxFieldBehaviours extends FormSpec {
     }
   }
 
-  def mandatoryCheckboxField(form: Form[_],
+  def mandatoryCheckboxField(form: Form[?],
                              fieldName: String,
                              requiredKey: String): Unit = {
 

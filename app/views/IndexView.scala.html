@@ -24,11 +24,10 @@
         platformOperatorCard: components.PlatformOperatorCard,
         reportingNotificationCard: components.ReportingNotificationCard,
         fileSubmissionsCard: components.FileSubmissionsCard,
-        assumedReportingCard: components.AssumedReportingCard,
-        frontendAppConfig: FrontendAppConfig
+        assumedReportingCard: components.AssumedReportingCard
 )
 
-@(viewModel: IndexViewModel, userResearchBanner: Option[Html])(implicit request: Request[_], messages: Messages)
+@(viewModel: IndexViewModel, userResearchBanner: Option[Html])(implicit request: Request[?], messages: Messages)
 
 @layout(
     pageTitle    = titleNoForm(messages("index.title")),

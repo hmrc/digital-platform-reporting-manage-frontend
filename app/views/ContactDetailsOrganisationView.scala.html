@@ -21,7 +21,7 @@
         govukSummaryList: GovukSummaryList
 )
 
-@(viewModel: ContactDetailsOrganisationViewModel)(implicit request: Request[_], messages: Messages)
+@(viewModel: ContactDetailsOrganisationViewModel)(implicit request: Request[?], messages: Messages)
 
 @layout(
     pageTitle = titleNoForm(messages("contactDetails.organisation.title")),

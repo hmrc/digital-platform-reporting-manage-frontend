@@ -85,8 +85,8 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
         "must contain an add link and a `not started` tag when there are no submissions" in {
 
-          when(mockAppConfig.addAssumedReportUrl) thenReturn "add-link"
-          when(mockAppConfig.submissionsAllowed) thenReturn true
+          when(mockAppConfig.addAssumedReportUrl) `thenReturn` "add-link"
+          when(mockAppConfig.submissionsAllowed) `thenReturn` true
 
           val operator = PlatformOperator(
             operatorId = "operatorId",
@@ -109,9 +109,9 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
         "must contain view and add links, and no tag, when there are some submissions" in {
 
-          when(mockAppConfig.addAssumedReportUrl) thenReturn "add-link"
-          when(mockAppConfig.viewAssumedReportsUrl) thenReturn "view-link"
-          when(mockAppConfig.submissionsAllowed) thenReturn true
+          when(mockAppConfig.addAssumedReportUrl) `thenReturn` "add-link"
+          when(mockAppConfig.viewAssumedReportsUrl) `thenReturn` "view-link"
+          when(mockAppConfig.submissionsAllowed) `thenReturn` true
 
           val operator = PlatformOperator(
             operatorId = "operatorId",
@@ -140,7 +140,7 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
         "must contain an add message and no tag when there are no submissions" in {
 
-          when(mockAppConfig.submissionsAllowed) thenReturn false
+          when(mockAppConfig.submissionsAllowed) `thenReturn` false
 
           val operator = PlatformOperator(
             operatorId = "operatorId",
@@ -163,7 +163,7 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
 
         "must contain a view link, an add message, and no tag when there are some submissions" in {
 
-          when(mockAppConfig.viewAssumedReportsUrl) thenReturn "view-link"
+          when(mockAppConfig.viewAssumedReportsUrl) `thenReturn` "view-link"
 
           val operator = PlatformOperator(
             operatorId = "operatorId",
@@ -184,7 +184,7 @@ class AssumedReportingCardViewModelSpec extends AnyFreeSpec with Matchers with M
             CardLink(msgs("assumedReportingCard.view"), "view-link"),
             CardMessage(msgs("assumedReportingCard.add.disabled"))
           )
-          card.tag must not be defined
+          card.tag must not `be` defined
         }
       }
     }

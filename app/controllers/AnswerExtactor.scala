@@ -41,5 +41,5 @@ trait AnswerExtractor {
       .get(query)
       .map(block(_))
       .getOrElse(Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad())))
-
 }
+
