@@ -26,7 +26,7 @@
 
 @(form: Form[?], contactName: String)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("secondaryContactEmailAddress.title"))) {
+@layout(pageTitle = title(form, messages("secondaryContactEmailAddress.heading", contactName))) {
 
     @formHelper(action = routes.SecondaryContactEmailAddressController.onSubmit) {
 

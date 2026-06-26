@@ -24,7 +24,7 @@
 
 @(form: Form[?], contactName: String)(implicit request: Request[?], messages: Messages)
 
-@layout(pageTitle = title(form, messages("canPhonePrimaryContact.title"))) {
+@layout(pageTitle = title(form, messages("canPhonePrimaryContact.heading", contactName))) {
 
     @formHelper(action = routes.CanPhonePrimaryContactController.onSubmit, Symbol("autoComplete") -> "off") {
 
