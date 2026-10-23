@@ -17,7 +17,7 @@
 package controllers
 
 import config.FrontendAppConfig
-import connectors.{PlatformOperatorConnector, SubmissionsConnector}
+import connectors.{PlatformOperatorConnector, SubmissionsConnector, SubscriptionConnector}
 import controllers.actions.IdentifierAction
 import models.operator.responses.PlatformOperator
 
@@ -25,7 +25,7 @@ import javax.inject.Inject
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Request}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels._
+import viewmodels.*
 import views.html.IndexView
 import views.html.components.UserResearchBanner
 
@@ -37,48 +37,56 @@ class IndexController @Inject()(
                                  view: IndexView,
                                  platformOperatorConnector: PlatformOperatorConnector,
                                  submissionsConnector: SubmissionsConnector,
+                                 connector: SubscriptionConnector,
                                  appConfig: FrontendAppConfig,
                                  userResearchBanner: UserResearchBanner
                                )(implicit ec: ExecutionContext) extends FrontendBaseController with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
 
-    val maybeUserResearchBanner = if appConfig.userResearchBannerEnabled then {Some(userResearchBanner())} else None
+    val maybeUserResearchBanner =
+      if appConfig.userResearchBannerEnabled then Some(userResearchBanner())
+      else None
 
-    if appConfig.platformOperatorsEnabled then 
-      platformOperatorConnector.viewPlatformOperators.flatMap { platformOperatorResponse =>
+    connector.getSubscription.flatMap { subscriptionInfo =>
 
-        val operators = platformOperatorResponse.platformOperators
+      if appConfig.platformOperatorsEnabled then {
+        platformOperatorConnector.viewPlatformOperators.flatMap { platformOperatorResponse =>
 
-        for {
-          fileSubmissionsCard  <- getFileSubmissionsCard(operators, appConfig)
-          assumedReportingCard <- getAssumedReportingCard(operators, appConfig)
+          val operators = platformOperatorResponse.platformOperators
+
+          for {
+            fileSubmissionsCard <- getFileSubmissionsCard(operators, appConfig)
+            assumedReportingCard <- getAssumedReportingCard(operators, appConfig)
+          } yield {
+
+            val viewModel = IndexViewModel(
+              operatorId = request.dprsId,
+              subscriptionInfo = subscriptionInfo,
+              platformOperatorCard = PlatformOperatorCardViewModel(operators, appConfig),
+              reportingNotificationCard = ReportingNotificationCardViewModel(operators, appConfig),
+              fileSubmissionsCard = fileSubmissionsCard,
+              assumedReportingCard = assumedReportingCard,
+              submissionsAllowed = appConfig.submissionsAllowed
+            )
+
+            Ok(view(viewModel, maybeUserResearchBanner))
+          }
         }
-        yield {
+      } else {
 
-          val viewModel = IndexViewModel(
-            operatorId                = request.dprsId,
-            platformOperatorCard      = PlatformOperatorCardViewModel(operators, appConfig),
-            reportingNotificationCard = ReportingNotificationCardViewModel(operators, appConfig),
-            fileSubmissionsCard       = fileSubmissionsCard,
-            assumedReportingCard      = assumedReportingCard,
-            submissionsAllowed        = appConfig.submissionsAllowed
-          )
+        val viewModel = IndexViewModel(
+          operatorId = request.dprsId,
+          subscriptionInfo = subscriptionInfo,
+          platformOperatorCard = PlatformOperatorCardViewModel(CardState.Hidden, Nil, None),
+          reportingNotificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil, None),
+          fileSubmissionsCard = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None),
+          assumedReportingCard = AssumedReportingCardViewModel(CardState.Hidden, Nil, None),
+          submissionsAllowed = appConfig.submissionsAllowed
+        )
 
-          Ok(view(viewModel, maybeUserResearchBanner))
-        }
+        Future.successful(Ok(view(viewModel, maybeUserResearchBanner)))
       }
-    else {
-      val viewModel = IndexViewModel(
-        operatorId                = request.dprsId,
-        platformOperatorCard      = PlatformOperatorCardViewModel(CardState.Hidden, Nil, None),
-        reportingNotificationCard = ReportingNotificationCardViewModel(CardState.Hidden, Nil, None),
-        fileSubmissionsCard       = FileSubmissionsCardViewModel(CardState.Hidden, Nil, None),
-        assumedReportingCard      = AssumedReportingCardViewModel(CardState.Hidden, Nil, None),
-        submissionsAllowed        = appConfig.submissionsAllowed
-      )
-
-      Future.successful(Ok(view(viewModel, maybeUserResearchBanner)))
     }
   }
 

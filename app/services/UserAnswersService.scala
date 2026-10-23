@@ -22,7 +22,7 @@ import models.UserAnswers
 import models.subscription._
 import pages._
 import play.api.libs.json.Writes
-import queries.{GbUserQuery, IndividualQuery, Query, Settable, TradingNameQuery}
+import queries.{GbUserQuery, IndividualQuery, Query, Settable, TradingNameQuery, BusinessNameQuery}
 
 import javax.inject.{Inject, Singleton}
 import scala.util.Try
@@ -99,7 +99,7 @@ class UserAnswersService @Inject() {
       getPrimaryContact(answers),
       getSecondaryContact(answers)
     ).parMapN { (gbUser, primaryContact, secondaryContact) =>
-      SubscriptionInfo(dprsId, gbUser, answers.get(TradingNameQuery), primaryContact, secondaryContact)
+      SubscriptionInfo(dprsId, gbUser, answers.get(TradingNameQuery), answers.get(BusinessNameQuery), primaryContact, secondaryContact)
     }
 
   private def getPrimaryContact(answers: UserAnswers): EitherNec[Query, Contact] =

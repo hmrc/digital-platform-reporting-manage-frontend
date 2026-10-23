@@ -16,7 +16,10 @@
 
 package viewmodels
 
+import models.subscription.SubscriptionInfo
+
 case class IndexViewModel(operatorId: String,
+                          subscriptionInfo : SubscriptionInfo,
                           platformOperatorCard: PlatformOperatorCardViewModel,
                           reportingNotificationCard: ReportingNotificationCardViewModel,
                           fileSubmissionsCard: FileSubmissionsCardViewModel,
