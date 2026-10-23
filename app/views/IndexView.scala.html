@@ -57,6 +57,10 @@
   <p class="govuk-body">
     @messages("index.guidance", viewModel.operatorId)
   </p>
+  <p class="govuk-body">
+      <span>Business Name: </span>@viewModel.subscriptionInfo.businessName.getOrElse("")
+  </p>
+
 
   <div class="flex-container grid-row">
 

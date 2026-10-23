@@ -21,6 +21,7 @@ import play.api.libs.json._
 final case class SubscriptionInfo(
                                    id: String,
                                    gbUser: Boolean,
+                                   businessName: Option[String],
                                    tradingName: Option[String],
                                    primaryContact: Contact,
                                    secondaryContact: Option[OrganisationContact]
