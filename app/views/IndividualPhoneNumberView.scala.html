@@ -41,6 +41,9 @@
             )
             .withWidth(Full)
             .withHint(HintViewModel(messages("individualPhoneNumber.hint")))
+            .withAttribute("inputmode", "tel")
+            .withInputType("tel")
+            .withAttribute("data-hmrc-label", messages("individualPhoneNumber.heading"))
         )
 
         <div class="govuk-button-group">
